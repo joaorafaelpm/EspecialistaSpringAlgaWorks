@@ -1,12 +1,13 @@
-package com.algaworks.algafood_api.jpa.Restaurante;
+package com.algaworks.algafood_api.jpa.Permissao;
 
 import com.algaworks.algafood_api.AlgafoodApiApplication;
-import com.algaworks.algafood_api.domain.repository.RestauranteRepository;
+import com.algaworks.algafood_api.domain.repository.FormaPagamentoRepository;
+import com.algaworks.algafood_api.domain.repository.PermissaoRepository;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
-public class RemoverRestaurante {
+public class RemoverPermissao {
 
     public static void main(String[] args) {
 
@@ -14,8 +15,9 @@ public class RemoverRestaurante {
                 .web(WebApplicationType.NONE)
                 .run(args);
 
-        RestauranteRepository restaurante = applicationContext.getBean(RestauranteRepository.class);
-        restaurante.remove(1L);
+        PermissaoRepository permissaoRepository = applicationContext.getBean(PermissaoRepository.class);
+
+        permissaoRepository.remove(1L);
 
     }
 

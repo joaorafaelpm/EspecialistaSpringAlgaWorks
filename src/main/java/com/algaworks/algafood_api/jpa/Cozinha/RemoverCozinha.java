@@ -22,7 +22,7 @@ public class RemoverCozinha {
         Cozinha cozinha = new Cozinha();
          cozinha.setId(1L);
 
-         controllerCozinha.remover(cozinha);
+         controllerCozinha.remover(1L);
 
 
 

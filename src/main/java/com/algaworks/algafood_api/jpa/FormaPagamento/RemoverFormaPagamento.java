@@ -1,12 +1,12 @@
-package com.algaworks.algafood_api.jpa.Restaurante;
+package com.algaworks.algafood_api.jpa.FormaPagamento;
 
 import com.algaworks.algafood_api.AlgafoodApiApplication;
-import com.algaworks.algafood_api.domain.repository.RestauranteRepository;
+import com.algaworks.algafood_api.domain.repository.FormaPagamentoRepository;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
-public class RemoverRestaurante {
+public class RemoverFormaPagamento {
 
     public static void main(String[] args) {
 
@@ -14,8 +14,9 @@ public class RemoverRestaurante {
                 .web(WebApplicationType.NONE)
                 .run(args);
 
-        RestauranteRepository restaurante = applicationContext.getBean(RestauranteRepository.class);
-        restaurante.remove(1L);
+        FormaPagamentoRepository formaPagamentoRepository = applicationContext.getBean(FormaPagamentoRepository.class);
+
+        formaPagamentoRepository.remove(1L);
 
     }
 

@@ -1,12 +1,14 @@
-package com.algaworks.algafood_api.jpa.Restaurante;
+package com.algaworks.algafood_api.jpa.Cidade;
 
 import com.algaworks.algafood_api.AlgafoodApiApplication;
-import com.algaworks.algafood_api.domain.repository.RestauranteRepository;
+import com.algaworks.algafood_api.domain.model.Cidade;
+import com.algaworks.algafood_api.domain.repository.CidadeRepository;
+import com.algaworks.algafood_api.domain.repository.EstadoRepository;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
-public class RemoverRestaurante {
+public class AtualizarCidade {
 
     public static void main(String[] args) {
 
@@ -14,9 +16,12 @@ public class RemoverRestaurante {
                 .web(WebApplicationType.NONE)
                 .run(args);
 
-        RestauranteRepository restaurante = applicationContext.getBean(RestauranteRepository.class);
-        restaurante.remove(1L);
+        CidadeRepository cidadeRepository = applicationContext.getBean(CidadeRepository.class);
 
+
+        Cidade cidade = new Cidade();
+        cidade.setId(1L);
+        cidadeRepository.save(cidade);
     }
 
 }

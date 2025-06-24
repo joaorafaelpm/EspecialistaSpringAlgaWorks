@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class CozinhaRepositoryImpl implements CozinhaRepository {
+public class CozinhaImpl implements CozinhaRepository {
 
     @PersistenceContext
     private EntityManager manager;
@@ -38,8 +38,8 @@ public class CozinhaRepositoryImpl implements CozinhaRepository {
 
     @Override
     @Transactional
-    public void remover (Cozinha cozinha) {
-        cozinha = buscar(cozinha.getId()) ;
+    public void remover (Long id) {
+        Cozinha cozinha = buscar(id) ;
         manager.remove(cozinha);
     }
 

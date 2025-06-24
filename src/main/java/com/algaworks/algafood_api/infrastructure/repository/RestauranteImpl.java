@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class RestauranteRepositoryImpl implements RestauranteRepository {
+public class RestauranteImpl implements RestauranteRepository {
 
     @PersistenceContext
     EntityManager manager ;
@@ -33,7 +33,8 @@ public class RestauranteRepositoryImpl implements RestauranteRepository {
 
     @Transactional
     @Override
-    public void remove (Restaurante restaurante) {
+    public void remove (Long id) {
+        Restaurante restaurante = getById(id);
         manager.remove(restaurante);
     }
 

@@ -7,8 +7,6 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.math.BigDecimal;
-
 public class AtualizarRestaurante {
 
     public static void main(String[] args) {
