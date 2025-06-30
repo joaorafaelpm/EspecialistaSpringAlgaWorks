@@ -22,13 +22,13 @@ public class ProcurarCozinha {
         CozinhaRepository controllerCozinha = applicationContext.getBean(CozinhaRepository.class) ;
 
 
-        List<Cozinha> cozinhas = controllerCozinha.listar();
+        List<Cozinha> cozinhas = controllerCozinha.all();
 
         for (Cozinha i : cozinhas) {
             System.out.println(i.getNome());
         }
 
-        Cozinha cozinha = controllerCozinha.buscar(2L);
+        Cozinha cozinha = controllerCozinha.getById(2L);
         System.out.println(cozinha.toString());
 
     }

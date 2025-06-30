@@ -21,7 +21,7 @@ public class AtualizacaoCozinha {
 
          Cozinha cozinha = new Cozinha(1L , "Brasileira");
 
-         controllerCozinha.salvar(cozinha);
+         controllerCozinha.save(cozinha);
 
 
     }

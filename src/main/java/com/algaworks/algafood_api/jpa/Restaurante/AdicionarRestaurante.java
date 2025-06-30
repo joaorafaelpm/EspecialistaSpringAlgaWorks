@@ -20,7 +20,7 @@ public class AdicionarRestaurante {
         RestauranteRepository restaurante = applicationContext.getBean(RestauranteRepository.class);
 
         Restaurante restaurante1 = new Restaurante("Ronaldo 2" , new BigDecimal(10.00));
-        restaurante.add(restaurante1);
+        restaurante.save(restaurante1);
     }
 
 }

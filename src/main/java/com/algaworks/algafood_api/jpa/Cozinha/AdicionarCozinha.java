@@ -20,8 +20,8 @@ public class AdicionarCozinha {
         Cozinha cozinha1 = new Cozinha(3L , "Japonesa");
         Cozinha cozinha2 = new Cozinha(4L , "Italiana");
 
-        controllerCozinha.salvar(cozinha1);
-        controllerCozinha.salvar(cozinha2);
+        controllerCozinha.save(cozinha1);
+        controllerCozinha.save(cozinha2);
     }
 
 

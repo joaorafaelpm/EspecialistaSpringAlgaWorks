@@ -19,7 +19,7 @@ public class AtualizarRestaurante {
 
         Restaurante restaurante1 = new Restaurante();
         restaurante1.setId(1L);
-        restaurante.add(restaurante1);
+        restaurante.save(restaurante1);
     }
 
 }
