@@ -6,7 +6,6 @@ import com.algaworks.algafood_api.domain.model.Estado;
 import com.algaworks.algafood_api.domain.repository.EstadoRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,13 +20,11 @@ public class CadastroEstadoService {
 
     public void remove (Long id) {
         try {
-            Estado estado = estadoRepository.getById(id);
-            if (estado == null) {
-                throw new EntidadeNaoEncontradaException(
+            estadoRepository.findById(id).orElseThrow(() ->
+                    new EntidadeNaoEncontradaException(
                         String.format("Estado de código %d não foi encontrado!" , id)
-                );
-            }
-            estadoRepository.remove(id);
+                ));
+            estadoRepository.deleteById(id);
         }
         catch (DataIntegrityViolationException e) {
             throw new EntidadeEmUsoException(

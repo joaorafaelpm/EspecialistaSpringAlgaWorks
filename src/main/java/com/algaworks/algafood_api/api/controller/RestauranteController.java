@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -27,17 +28,18 @@ public class RestauranteController {
 
     @GetMapping
     public List<Restaurante> all () {
-        return restauranteRepository.all();
+        return restauranteRepository.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Restaurante> getById (@PathVariable Long id) {
-        Restaurante restaurante = restauranteRepository.getById(id);
-        if (restaurante != null) {
-            return ResponseEntity.ok(restaurante);
+        Optional<Restaurante> restaurante = restauranteRepository.findById(id);
+        if (restaurante.isPresent()) {
+            return ResponseEntity.ok(restaurante.get());
         }
         return ResponseEntity.notFound().build();
     }
+
 
     @PostMapping
     public ResponseEntity<?> add (@RequestBody Restaurante restaurante) {
@@ -54,9 +56,10 @@ public class RestauranteController {
     @PutMapping("/{id}")
     public ResponseEntity<?> save (@PathVariable Long id , @RequestBody Restaurante restaurante) {
         try {
-            Restaurante restauranteAntigo = restauranteRepository.getById(id);
-            if (restauranteAntigo != null) {
+            Optional<Restaurante> restauranteAntigo = restauranteRepository.findById(id);
+            if (restauranteAntigo.isPresent()) {
                 BeanUtils.copyProperties(restaurante, restauranteAntigo , "id" );
+                restaurante.setId(id);
                 restauranteService.save(restaurante);
                 return ResponseEntity.ok(restaurante);
             }
@@ -68,16 +71,20 @@ public class RestauranteController {
         }
     }
 
+
+
     @PatchMapping("/{id}")
     public ResponseEntity<?> savePatch (@PathVariable Long id , @RequestBody Map<String , Object> campos) {
-        Restaurante restauranteAntigo = restauranteRepository.getById(id);
-        if (restauranteAntigo == null) {
+        Optional<Restaurante> restauranteAntigo = restauranteRepository.findById(id);
+        if (restauranteAntigo.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        merge(campos , restauranteAntigo);
+        Restaurante restaurante = restauranteAntigo.get();
 
-        return save(id , restauranteAntigo);
+        merge(campos , restaurante);
+
+        return save(id , restaurante);
     }
 
     public void merge (Map<String , Object> dadosOrigem , Restaurante restauranteDestino) {

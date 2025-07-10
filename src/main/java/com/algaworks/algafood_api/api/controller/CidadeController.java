@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -24,14 +25,14 @@ public class CidadeController {
 
     @GetMapping
     public List<Cidade> all () {
-        return cidadeRepository.all();
+        return cidadeRepository.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Cidade> getById (@PathVariable Long id) {
-        Cidade cidade = cidadeRepository.getById(id);
-        if (cidade != null) {
-            return ResponseEntity.ok(cidade);
+        Optional<Cidade> cidade = cidadeRepository.findById(id);
+        if (cidade.isPresent()) {
+            return ResponseEntity.ok(cidade.get());
         }
         return ResponseEntity.notFound().build() ;
     }
@@ -49,13 +50,13 @@ public class CidadeController {
     @PutMapping("/{id}")
     public ResponseEntity<?> save (@PathVariable Long id , @RequestBody  Cidade cidade) {
         try {
-            Cidade cidadeAntiga = cidadeRepository.getById(id);
-            if (cidadeAntiga == null) {
+            Optional<Cidade> cidadeAntiga = cidadeRepository.findById(id);
+            if (cidadeAntiga.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
-            BeanUtils.copyProperties(cidade , cidadeAntiga , "id");
-            cidadeAntiga = cidadeService.save(cidadeAntiga);
-            return ResponseEntity.ok(cidadeAntiga);
+            BeanUtils.copyProperties(cidade , cidadeAntiga.get() , "id");
+            Cidade cidadeSalva = cidadeService.save(cidadeAntiga.get());
+            return ResponseEntity.ok(cidadeSalva);
 
         }
         catch (EntidadeNaoEncontradaException e) {
