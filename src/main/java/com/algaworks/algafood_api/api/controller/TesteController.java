@@ -4,6 +4,7 @@ import com.algaworks.algafood_api.domain.model.Cozinha;
 import com.algaworks.algafood_api.domain.model.Restaurante;
 import com.algaworks.algafood_api.domain.repository.CozinhaRepository;
 import com.algaworks.algafood_api.domain.repository.RestauranteRepository;
+import com.algaworks.algafood_api.infrastructure.repository.spec.RestauranteSpecs;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+
+import static com.algaworks.algafood_api.infrastructure.repository.spec.RestauranteSpecs.comFreteGratis;
+import static com.algaworks.algafood_api.infrastructure.repository.spec.RestauranteSpecs.comNomeSemelhante;
 
 @RestController
 @AllArgsConstructor
@@ -62,12 +66,20 @@ public class TesteController {
         return restauranteRepository.find(nome , taxaInicial , taxaFinal) ;
     }
 
-
     @GetMapping("/restaurantes/conte-numero-cozinha")
     public int contarCozinhaPorId (Long cozinhaId) {
         return restauranteRepository.countByCozinhaId(cozinhaId) ;
     }
 
+    @GetMapping("/restaurantes/frete-gratis-e-nome")
+    public List<Restaurante> restauranteFreteGratisENome (String nome ) {
+        return restauranteRepository.findFreteGratisPorNome(nome);
+    }
+
+    @GetMapping("/restaurantes/primeiro")
+    public Optional<Restaurante> pegarPrimeiroRestaurante () {
+        return restauranteRepository.findFirst();
+    }
 
 
 
