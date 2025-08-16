@@ -6,6 +6,7 @@ import com.algaworks.algafood_api.domain.repository.RestauranteRepository;
 import com.algaworks.algafood_api.domain.service.CadastroRestauranteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.util.Optional;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/restaurantes")
+@Slf4j
 public class RestauranteController {
 
     RestauranteRepository restauranteRepository;
@@ -28,6 +30,10 @@ public class RestauranteController {
 
     @GetMapping
     public List<Restaurante> all () {
+
+
+
+
         return restauranteRepository.findAll();
     }
 
@@ -56,12 +62,15 @@ public class RestauranteController {
     @PutMapping("/{id}")
     public ResponseEntity<?> save (@PathVariable Long id , @RequestBody Restaurante restaurante) {
         try {
-            Optional<Restaurante> restauranteAntigo = restauranteRepository.findById(id);
-            if (restauranteAntigo.isPresent()) {
-                BeanUtils.copyProperties(restaurante, restauranteAntigo , "id" );
+            Restaurante restauranteAtualizado = restauranteRepository.findById(id)
+                    .orElse(null);
+            if  (restauranteAtualizado != null) {
+                BeanUtils.copyProperties(restaurante, restauranteAtualizado ,
+                        "id" , "endereco" , "dataCadastro", "data_cadastro" , "formasPagamento");
                 restaurante.setId(id);
-                restauranteService.save(restaurante);
-                return ResponseEntity.ok(restaurante);
+                log.info(restaurante.toString());
+                restauranteService.save(restauranteAtualizado);
+                return ResponseEntity.ok(restauranteAtualizado);
             }
 
             return ResponseEntity.notFound().build();
