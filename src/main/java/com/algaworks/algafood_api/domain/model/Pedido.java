@@ -1,8 +1,6 @@
 package com.algaworks.algafood_api.domain.model;
 
 import com.algaworks.algafood_api.domain.model.enuns.StatusPedido;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -30,28 +28,31 @@ public class Pedido {
 
     @CreationTimestamp
     private LocalDateTime dataCriacao;
-
     private LocalDateTime dataConfirmacao ;
     private LocalDateTime dataCancelamento;
     private LocalDateTime dataEntrega;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status_pedido")
     private StatusPedido statusPedido = StatusPedido.CRIADO ;
 
-    @JoinColumn(name = "forma_pagamento_id" , nullable = false)
+    @ManyToOne
+    @JoinColumn(nullable = false)
     private FormaPagamento formaPagamento ;
 
-    @JoinColumn(name = "restaurante_id" , nullable = false)
-    private Restaurante restaurante ;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Restaurante restaurante;
 
-    @JoinColumn(name = "cliente_id" , nullable = false)
+    @ManyToOne
+    @JoinColumn(nullable = false , name = "cliente_usuario_id")
     private Usuario cliente ;
 
     @Embedded
     private Endereco enderecoEntrega ;
 
     @OneToMany(mappedBy = "pedido" , cascade = CascadeType.ALL , fetch = FetchType.LAZY)
-    private List<ItemPedido> itens ;
+    private List<ItemPedido> itens = new ArrayList<>();
 
 
 

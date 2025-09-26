@@ -22,11 +22,14 @@ public class ItemPedido {
     private BigDecimal precoTotal ;
     private String observacao ;
 
+    @ManyToOne
+    @JoinColumn(name = "pedido_id" , nullable = false)
+    private Pedido pedido;
+
+    @ManyToOne
     @JoinColumn(name = "produto_id" , nullable = false)
     private Produto produto;
 
-    @JoinColumn(name = "pedido_id" , nullable = false)
-    private Pedido pedido;
 
 
 }
