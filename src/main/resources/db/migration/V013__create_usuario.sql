@@ -1,7 +1,7 @@
-CREATE TABLE usuario (
+CREATE TABLE IF NOT EXISTS usuario (
     id BIGINT AUTO_INCREMENT PRIMARY KEY ,
     nome VARCHAR(255) NOT NULL ,
     email VARCHAR(255) NOT NULL ,
     senha VARCHAR(255) NOT NULL ,
     data_cadastro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-)
+) engine=InnoDB default charset=utf8;

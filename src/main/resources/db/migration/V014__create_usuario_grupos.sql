@@ -1,4 +1,4 @@
-CREATE TABLE usuario_grupo (
+CREATE TABLE IF NOT EXISTS usuario_grupo (
     usuario_id BIGINT NOT NULL,
     grupo_id BIGINT NOT NULL,
 
@@ -10,4 +10,4 @@ CREATE TABLE usuario_grupo (
     CONSTRAINT fk_grupo_usuario FOREIGN KEY (grupo_id)
             REFERENCES grupo(id)
             ON DELETE CASCADE
-);
+) engine=InnoDB default charset=utf8;

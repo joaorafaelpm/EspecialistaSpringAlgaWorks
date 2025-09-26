@@ -1,4 +1,4 @@
-CREATE TABLE grupo_permissao (
+CREATE TABLE IF NOT EXISTS grupo_permissao (
     grupo_id BIGINT NOT NULL,
     permissao_id BIGINT NOT NULL,
 
@@ -10,10 +10,6 @@ CREATE TABLE grupo_permissao (
     CONSTRAINT fk_permissao FOREIGN KEY (permissao_id)
             REFERENCES permissao(id)
             ON DELETE CASCADE
-);
-
-
-
-
+) engine=InnoDB default charset=utf8;
 
 

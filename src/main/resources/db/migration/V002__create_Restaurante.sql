@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS restaurante (
     nome VARCHAR(200) NOT NULL ,
     taxa_frete DECIMAL(9,2) NOT NULL ,
     cozinha_id BIGINT NOT NULL
-);
+) engine=InnoDB default charset=utf8;
 
 ALTER TABLE restaurante ADD CONSTRAINT fk_restaurante_cozinha
 FOREIGN KEY (cozinha_id) REFERENCES cozinha(id);

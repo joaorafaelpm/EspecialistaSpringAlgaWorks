@@ -1,1 +1,0 @@
-INSERT INTO grupo (nome) VALUE ("Devs") , ("Clientes") , ("Owner");
