@@ -3,6 +3,7 @@ package com.algaworks.algafood_api.api.controller;
 import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood_api.domain.exception.EntidadeInvalida;
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
+import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.algaworks.algafood_api.domain.model.Cozinha;
 import com.algaworks.algafood_api.domain.model.Produto;
 import com.algaworks.algafood_api.domain.model.Restaurante;
@@ -34,10 +35,8 @@ public class ProdutoController {
     }
     @GetMapping("/{produtoId}")
     public ResponseEntity<Produto> findById (@PathVariable Long produtoId) {
-        Produto produto = produtoRepository.findById(produtoId).orElse(null);
-        if (produto == null) {
-            return ResponseEntity.notFound().build();
-        }
+        Produto produto = produtoService.findById(produtoId);
+
         return ResponseEntity.ok(produto);
     }
 
@@ -48,31 +47,27 @@ public class ProdutoController {
                     .body(produtoService.save(produto));
         }
         catch (EntidadeNaoEncontradaException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            throw new NegocioException(e.getMessage());
         }
+
     }
 
     @PutMapping("/{produtoId}")
     public ResponseEntity<?> atualizar (@PathVariable Long produtoId ,@RequestBody Produto produto) {
+        Produto produtoAtualizado = produtoService.save(produtoId, produto);
         try {
-            Produto produtoAtualizado = produtoService.save(produtoId, produto);
             return ResponseEntity.ok(produtoAtualizado);
         }
-        catch (EntidadeInvalida e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }catch (EntidadeNaoEncontradaException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        catch (EntidadeNaoEncontradaException e) {
+            throw new NegocioException(e.getMessage());
         }
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{produtoId}")
-    public ResponseEntity<Produto> delete (@PathVariable Long id) {
-        Produto produto = produtoRepository.findById(id).orElse(null);
-        if(produto != null) {
+    public void delete (@PathVariable Long id) {
+        Produto produto = produtoService.findById(id);
             produtoRepository.delete(produto);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
     }
 
 }

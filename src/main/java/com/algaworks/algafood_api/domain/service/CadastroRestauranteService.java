@@ -2,13 +2,17 @@ package com.algaworks.algafood_api.domain.service;
 
 import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
+import com.algaworks.algafood_api.domain.exception.NegocioException;
+import com.algaworks.algafood_api.domain.model.Cidade;
 import com.algaworks.algafood_api.domain.model.Cozinha;
 import com.algaworks.algafood_api.domain.model.Restaurante;
 import com.algaworks.algafood_api.domain.repository.CozinhaRepository;
 import com.algaworks.algafood_api.domain.repository.RestauranteRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,24 +22,35 @@ public class CadastroRestauranteService {
     RestauranteRepository restauranteRepository;
     CozinhaRepository cozinhaRepository ;
 
+    public Restaurante findById (Long id ) {
+        return restauranteRepository.findById(id).orElseThrow(() ->
+                new EntidadeNaoEncontradaException(
+                        String.format("Não foi encontrado um restaurante com id de %d!" , id)
+                ));
+    }
+
     public Restaurante save (Restaurante restaurante) {
         Long cozinhaId = restaurante.getCozinha().getId();
-        Cozinha cozinha = cozinhaRepository.findById(cozinhaId).orElseThrow(() ->
+        restaurante.setCozinha(cozinhaRepository.findById(cozinhaId).orElseThrow(() ->
                 new EntidadeNaoEncontradaException(
                         String.format("Não existe cozinha com o código de %d!" , cozinhaId))
-        );
-        restaurante.setCozinha(cozinha);
+        ));
         return restauranteRepository.save(restaurante) ;
+
+    }
+
+    public Restaurante save (Long id ,Restaurante restaurante) {
+        Restaurante restauranteAntigo = findById(id);
+        BeanUtils.copyProperties(restaurante, restauranteAntigo ,
+                "id" , "endereco" , "dataCadastro", "data_cadastro" , "formasPagamento");
+        restaurante.setId(id);
+        return save(restauranteAntigo);
     }
 
     public void remove (Long id) {
         try {
-            restauranteRepository.deleteById(id);
-        }
-        catch (EmptyResultDataAccessException e) {
-            throw new EntidadeNaoEncontradaException(
-                    String.format("Restaurante de código %d não foi encontrada!" , id)
-            );
+            Restaurante restaurante = findById(id);
+            restauranteRepository.delete(restaurante);
         }
         catch (DataIntegrityViolationException e) {
             throw new EntidadeEmUsoException(

@@ -1,6 +1,7 @@
 package com.algaworks.algafood_api.domain.service;
 
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
+import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.algaworks.algafood_api.domain.model.Cidade;
 import com.algaworks.algafood_api.domain.model.Estado;
 import com.algaworks.algafood_api.domain.repository.CidadeRepository;
@@ -13,14 +14,17 @@ import org.springframework.stereotype.Service;
 public class CadastroCidadeService {
 
     CidadeRepository cidadeRepository;
-    EstadoRepository estadoRepository;
+    CadastroEstadoService estadoService;
+
+    public Cidade findById (Long id ) {
+        return cidadeRepository.findById(id).orElseThrow(() ->
+                    new EntidadeNaoEncontradaException(
+                        String.format("Não foi encontrado uma cidade com id de %d!" , id)
+                ));
+    }
 
     public Cidade save (Cidade cidade) {
-        Estado estado = estadoRepository.findById(cidade.getEstado().getId()).orElseThrow(
-                () -> new EntidadeNaoEncontradaException(
-                    String.format("Não foi encontrado um estado com id de %d!" , cidade.getEstado().getId())
-            ));
-
+        Estado estado = estadoService.findById(cidade.getEstado().getId());
         cidade.setEstado(estado);
         return cidadeRepository.save(cidade);
     }

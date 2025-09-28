@@ -32,11 +32,7 @@ public class GrupoController {
 
     @GetMapping("/{grupoId}")
     public ResponseEntity<Grupo> findById (@PathVariable Long grupoId) {
-        Optional<Grupo> grupo = grupoRepository.findById(grupoId);
-        if (grupo.isPresent()) {
-            return ResponseEntity.ok(grupo.get());
-        }
-        return ResponseEntity.notFound().build() ;
+        return ResponseEntity.ok(grupoService.findById(grupoId));
     }
 
     @PostMapping
@@ -47,14 +43,10 @@ public class GrupoController {
 
     @PutMapping("/{grupoId}")
     public ResponseEntity<Grupo> save (@PathVariable Long grupoId , @RequestBody Grupo grupo) {
-        log.info(grupo.toString());
-        Optional<Grupo> grupoAntigo = grupoRepository.findById(grupoId);
-        if (grupoAntigo.isPresent()) {
-            BeanUtils.copyProperties(grupo , grupoAntigo.get() , "id");
-            Grupo grupoAtualizado = grupoService.save(grupoAntigo.get());
-            return ResponseEntity.ok(grupoAtualizado);
-        }
-        return ResponseEntity.notFound().build();
+        Grupo grupoAntigo = grupoService.findById(grupoId);
+        BeanUtils.copyProperties(grupo , grupoAntigo , "id");
+        Grupo grupoAtualizado = grupoService.save(grupoAntigo);
+        return ResponseEntity.ok(grupoAtualizado);
         }
     }
 

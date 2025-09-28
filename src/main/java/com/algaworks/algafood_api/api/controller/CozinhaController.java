@@ -31,11 +31,7 @@ public class CozinhaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Cozinha> getById (@PathVariable Long id) {
-        Optional<Cozinha> cozinha = cozinhaRepository.findById(id) ;
-        if (cozinha.isPresent()) {
-            return ResponseEntity.ok(cozinha.get());
-        }
-        return ResponseEntity.notFound().build() ;
+        return ResponseEntity.ok().body(cadastroCozinha.findById(id));
     }
 
     @PostMapping
@@ -46,28 +42,15 @@ public class CozinhaController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Cozinha> save (@PathVariable Long id , @RequestBody Cozinha cozinha) {
-        Optional<Cozinha> cozinhaAtualizada = cozinhaRepository.findById(id);
-        if (cozinhaAtualizada.isPresent()) {
-            BeanUtils.copyProperties(cozinha , cozinhaAtualizada , "id");
-            Cozinha cozinhaSalva = cadastroCozinha.save(cozinhaAtualizada.get());
-            return ResponseEntity.ok(cozinhaSalva);
-        }
-        return ResponseEntity.notFound().build();
+        Cozinha cozinhaAtualizada = cadastroCozinha.findById(id);
+        BeanUtils.copyProperties(cozinha , cozinhaAtualizada , "id");
+        Cozinha cozinhaSalva = cadastroCozinha.save(cozinhaAtualizada);
+        return ResponseEntity.ok(cozinhaSalva);
     }
-
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Cozinha> remove (@PathVariable Long id) {
-        try {
-            cadastroCozinha.remove(id);
-            return ResponseEntity.noContent().build();
-        }
-        catch (EntidadeEmUsoException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-        catch (EntidadeNaoEncontradaException e) {
-            return ResponseEntity.notFound().build();
-        }
-
+    public void remove (@PathVariable Long id) {
+        cadastroCozinha.remove(id);
     }
 
 

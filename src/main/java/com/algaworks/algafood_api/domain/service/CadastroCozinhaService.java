@@ -7,7 +7,9 @@ import com.algaworks.algafood_api.domain.repository.CozinhaRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @AllArgsConstructor
@@ -19,19 +21,21 @@ public class CadastroCozinhaService {
         return cozinhaRepository.save(cozinha);
     }
 
+    public Cozinha findById (Long id) {
+        return cozinhaRepository.findById(id).orElseThrow(() -> new EntidadeNaoEncontradaException(
+                String.format("Entidade de id '%s' não encontrada" , id)
+        ));
+    }
+
     public void remove (Long id) {
         try {
-            cozinhaRepository.deleteById(id);
-        }
-        catch (EmptyResultDataAccessException e) {
-            throw new EntidadeNaoEncontradaException(
-                    String.format("Cozinha de código %d não foi encontrada!" , id)
-            );
+            Cozinha cozinha = findById(id);
+            cozinhaRepository.delete(cozinha);
         }
         catch (DataIntegrityViolationException e) {
-            throw new EntidadeEmUsoException(
-                    String.format("Cozinha de código %d está em uso, logo, não pode ser removida!" , id)
-            ) ;
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST ,  String.format("Cozinha de código %d está em uso, logo, não pode ser removida!" , id)
+            );
         }
     }
 

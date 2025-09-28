@@ -31,10 +31,7 @@ public class UsuarioController {
 
     @GetMapping("/{usuarioId}")
     public ResponseEntity<Usuario> findById (@PathVariable Long usuarioId) {
-        Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
-        if (usuario == null) {
-            return ResponseEntity.notFound().build();
-        }
+        Usuario usuario = usuarioService.findById(usuarioId);
         return ResponseEntity.ok(usuario);
     }
 
@@ -46,12 +43,8 @@ public class UsuarioController {
 
     @PutMapping("/{usuarioId}")
     public ResponseEntity<?> save (@PathVariable Long usuarioId , @RequestBody Usuario usuario) {
-        Usuario usuarioAntigo = usuarioRepository.findById(usuarioId).orElse(null);
-        if (usuarioAntigo != null) {
+        Usuario usuarioAntigo = usuarioService.findById(usuarioId);
             BeanUtils.copyProperties(usuario , usuarioAntigo , "id" , "dataCadastro");
             return ResponseEntity.ok(usuarioService.save(usuarioAntigo));
-        }
-        return ResponseEntity.notFound().build();
     }
-
 }

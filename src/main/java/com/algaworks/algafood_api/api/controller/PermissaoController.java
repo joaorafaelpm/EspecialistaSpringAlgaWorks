@@ -25,11 +25,7 @@ public class PermissaoController {
 
     @GetMapping("/{permissaoId}")
     public ResponseEntity<Permissao> findById (@PathVariable Long permissaoId) {
-        Permissao permissao = permissaoRepository.findById(permissaoId).orElse(null);
-        if (permissao != null) {
-            return ResponseEntity.ok(permissao);
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(permissaoService.findById(permissaoId));
     }
 
     @PostMapping
