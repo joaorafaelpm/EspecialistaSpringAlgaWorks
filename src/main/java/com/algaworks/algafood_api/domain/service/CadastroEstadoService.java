@@ -1,8 +1,7 @@
 package com.algaworks.algafood_api.domain.service;
 
 import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
-import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
-import com.algaworks.algafood_api.domain.model.Cidade;
+import com.algaworks.algafood_api.domain.exception.EstadoNaoEncontradoException;
 import com.algaworks.algafood_api.domain.model.Estado;
 import com.algaworks.algafood_api.domain.repository.EstadoRepository;
 import lombok.AllArgsConstructor;
@@ -17,9 +16,7 @@ public class CadastroEstadoService {
 
     public Estado findById (Long id ) {
         return estadoRepository.findById(id).orElseThrow(() ->
-                new EntidadeNaoEncontradaException(
-                        String.format("Não foi encontrado um estado com id de %d!" , id)
-                ));
+                new EstadoNaoEncontradoException(id));
     }
 
     public Estado save (Estado estado) {
@@ -29,9 +26,7 @@ public class CadastroEstadoService {
     public void remove (Long id) {
         try {
             estadoRepository.findById(id).orElseThrow(() ->
-                    new EntidadeNaoEncontradaException(
-                        String.format("Estado de código %d não foi encontrado!" , id)
-                ));
+                    new EstadoNaoEncontradoException(id));
             estadoRepository.deleteById(id);
         }
         catch (DataIntegrityViolationException e) {

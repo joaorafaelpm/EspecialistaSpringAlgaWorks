@@ -1,5 +1,7 @@
 package com.algaworks.algafood_api.api.controller;
 
+import com.algaworks.algafood_api.domain.exception.CidadeNaoEncontradaException;
+import com.algaworks.algafood_api.domain.exception.CozinhaNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.algaworks.algafood_api.domain.model.Restaurante;
@@ -37,12 +39,7 @@ public class RestauranteController {
     @GetMapping("/{id}")
     public ResponseEntity<Restaurante> getById (@PathVariable Long id) {
         Restaurante restaurante = restauranteService.findById(id);
-        try {
-            return ResponseEntity.ok(restaurante);
-        }
-        catch (EntidadeNaoEncontradaException e) {
-            throw new NegocioException(e.getMessage());
-        }
+        return ResponseEntity.ok(restaurante);
     }
 
 
@@ -52,14 +49,19 @@ public class RestauranteController {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(restauranteService.save(restaurante));
         }
-        catch (EntidadeNaoEncontradaException e) {
-            throw new NegocioException(e.getMessage());
+        catch (CozinhaNaoEncontradaException e) {
+            throw new NegocioException(e.getMessage() , e);
         }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> save (@PathVariable Long id , @RequestBody Restaurante restaurante) {
-        return ResponseEntity.ok(restauranteService.save(id , restaurante));
+        try {
+          return ResponseEntity.ok(restauranteService.save(id , restaurante));
+        }
+        catch (CozinhaNaoEncontradaException e) {
+            throw new NegocioException(e.getMessage() , e);
+        }
     }
 
     @PatchMapping("/{id}")

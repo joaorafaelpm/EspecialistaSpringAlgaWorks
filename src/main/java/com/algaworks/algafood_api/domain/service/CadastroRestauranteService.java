@@ -1,7 +1,8 @@
 package com.algaworks.algafood_api.domain.service;
 
+import com.algaworks.algafood_api.domain.exception.CozinhaNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
-import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
+import com.algaworks.algafood_api.domain.exception.RestauranteNaoEncontradoException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.algaworks.algafood_api.domain.model.Cidade;
 import com.algaworks.algafood_api.domain.model.Cozinha;
@@ -24,17 +25,13 @@ public class CadastroRestauranteService {
 
     public Restaurante findById (Long id ) {
         return restauranteRepository.findById(id).orElseThrow(() ->
-                new EntidadeNaoEncontradaException(
-                        String.format("Não foi encontrado um restaurante com id de %d!" , id)
-                ));
+                new RestauranteNaoEncontradoException(id));
     }
 
     public Restaurante save (Restaurante restaurante) {
         Long cozinhaId = restaurante.getCozinha().getId();
         restaurante.setCozinha(cozinhaRepository.findById(cozinhaId).orElseThrow(() ->
-                new EntidadeNaoEncontradaException(
-                        String.format("Não existe cozinha com o código de %d!" , cozinhaId))
-        ));
+                new CozinhaNaoEncontradaException(cozinhaId)));
         return restauranteRepository.save(restaurante) ;
 
     }
@@ -45,6 +42,7 @@ public class CadastroRestauranteService {
                 "id" , "endereco" , "dataCadastro", "data_cadastro" , "formasPagamento");
         restaurante.setId(id);
         return save(restauranteAntigo);
+
     }
 
     public void remove (Long id) {
