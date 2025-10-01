@@ -66,22 +66,6 @@ public class CidadeController {
         cidadeService.remove(id);
     }
 
-//    Embora esse tipo de exception handler capture as exceções do tipo EntidadeNaoEncontrada, no meu caso atual, em que eu passo a causa junto da menssagem, ele acaba capturando somente como EntidadeNaoEncontrada e não como NegocioException, basta eu retirar a causa de EstadoNaoEncontrado por exemplo, que ele já reconhece o NegocioException
-    @ExceptionHandler(EntidadeNaoEncontradaException.class)
-    public ResponseEntity<?> resolveEstadoNaoEncontrado(EntidadeNaoEncontradaException e) {
-        APIError apiError = APIError.builder()
-                .dataHora(LocalDateTime.now())
-                .message(e.getMessage())
-                .build();
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
-    }
-    @ExceptionHandler(NegocioException.class)
-    public ResponseEntity<?> resolveNegocioException(NegocioException e) {
-        APIError apiError = APIError.builder()
-                .dataHora(LocalDateTime.now())
-                .message(e.getMessage())
-                .build();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
-    }
+
 
 }
