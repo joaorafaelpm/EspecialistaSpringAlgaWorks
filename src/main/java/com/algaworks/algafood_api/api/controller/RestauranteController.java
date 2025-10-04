@@ -1,9 +1,7 @@
 package com.algaworks.algafood_api.api.controller;
 
-import com.algaworks.algafood_api.Groups;
-import com.algaworks.algafood_api.domain.exception.CidadeNaoEncontradaException;
+import com.algaworks.algafood_api.core.validation.ValidacaoException;
 import com.algaworks.algafood_api.domain.exception.CozinhaNaoEncontradaException;
-import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.algaworks.algafood_api.domain.model.Restaurante;
 import com.algaworks.algafood_api.domain.repository.RestauranteRepository;
@@ -15,20 +13,18 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.aspectj.bridge.Message;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.SmartValidator;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -39,6 +35,8 @@ public class RestauranteController {
     RestauranteRepository restauranteRepository;
 
     CadastroRestauranteService restauranteService;
+
+    private SmartValidator validator;
 
     @GetMapping
     public List<Restaurante> all () {
@@ -75,10 +73,25 @@ public class RestauranteController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<?> savePatch (@PathVariable Long id , @RequestBody Map<String , Object> campos , HttpServletRequest request) {
-        Restaurante restauranteAntigo = restauranteService.findById(id);
-        merge(campos , restauranteAntigo , request);
-        return save(id , restauranteAntigo);
+        Restaurante restauranteAtual = restauranteService.findById(id);
+        merge(campos , restauranteAtual , request);
+
+
+        validate(restauranteAtual , "restaurante") ;
+        return save(id , restauranteAtual);
     }
+
+    private void validate(Restaurante restauranteAtual , String objectName) {
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(restauranteAtual , objectName);
+        validator.validate(restauranteAtual , bindingResult);
+
+        if (bindingResult.hasErrors()) {
+            throw new ValidacaoException(bindingResult);
+        }
+
+    }
+
+
 
     public void merge (Map<String , Object> dadosOrigem , Restaurante restauranteDestino , HttpServletRequest request) {
 //        Precisamos desse parâmetro para usar no construtor da nossa exceção, já que o construtor atual dela está depreciado

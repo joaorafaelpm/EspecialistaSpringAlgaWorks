@@ -1,4 +1,4 @@
-package com.algaworks.algafood_api;
+package com.algaworks.algafood_api.core.validation;
 
 // Definindo grupos para especificar melhor as validações, afinal para ocasiões diferentes nós temos que ter validações diferentes
 public interface Groups {

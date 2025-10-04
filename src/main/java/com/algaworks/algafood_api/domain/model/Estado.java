@@ -1,7 +1,7 @@
 package com.algaworks.algafood_api.domain.model;
 
 
-import com.algaworks.algafood_api.Groups;
+import com.algaworks.algafood_api.core.validation.Groups;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

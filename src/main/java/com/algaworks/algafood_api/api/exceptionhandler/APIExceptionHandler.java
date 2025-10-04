@@ -1,6 +1,7 @@
 package com.algaworks.algafood_api.api.exceptionhandler;
 
 import com.algaworks.algafood_api.api.model.enuns.ProblemType;
+import com.algaworks.algafood_api.core.validation.ValidacaoException;
 import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
@@ -9,10 +10,13 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.PropertyBindingException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.TypeMismatchException;
-import org.springframework.cglib.core.Local;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,13 +30,13 @@ import java.util.stream.Collectors;
 
 /**
  * Classe responsável por capturar e tratar exceções de forma centralizada.
- *
+ * <p>
  * A anotação @RestControllerAdvice indica ao Spring que esta classe será
  * aplicada globalmente a todos os controladores REST da aplicação.
- *
+ * <p>
  * Isso garante respostas consistentes para erros e evita duplicação
  * de código de tratamento em cada controlador.
- *
+ * <p>
  * O uso do ProblemDetail segue a especificação RFC 7807,
  * que define um formato padronizado para representar erros HTTP.
  */
@@ -40,29 +44,39 @@ import java.util.stream.Collectors;
 public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     public static final String SYSTEM_ERROR_MESSAGE = String.format("Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde ou contate o administrador do sistema.");
 
+    @Autowired
+    private MessageSource messageSource ;
 
+    private ResponseEntity<Object> handleMultipleErrorsValidation(Exception ex ,BindingResult bindingResult , HttpHeaders headers,HttpStatus status , WebRequest request) {
+        String detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente.";
+//        A gente faz um mapeamento simples para pegar cada campo e passar para a nossa classe
+        List<APIError.Object> problemObjects = bindingResult.getAllErrors()
+                .stream().map(objectError -> {
+                    String message = messageSource.getMessage(objectError , LocaleContextHolder.getLocale());
+                    String name = objectError.getObjectName() ;
+                    if (objectError instanceof FieldError) {
+                        name = ((FieldError) objectError).getField() ;
+                    }
+                    return APIError.Object.builder()
+                            .name(name)
+                            .userMessage(message)
+                            .build() ;
+                }).collect(Collectors.toList());
+        APIError apiError = createAPIErrorBuilder(status, ProblemType.DADOS_INVALIDOS, detail, detail)
+                .objects(problemObjects)
+                .build();
+        return handleExceptionInternal(ex , apiError , headers ,status , request);
+    }
 //    Vamos capturar e mapear todas as violações das especificações do BeanValidation e mostrar ao usuário
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        return handleMultipleErrorsValidation(ex, ex.getBindingResult() , headers ,HttpStatus.BAD_REQUEST, request);
+    }
 
-        String detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente.";
-
-//        Isso pega todas os parâmetros violados dentro do erro
-        BindingResult bindingResult = ex.getBindingResult();
-
-//        A gente faz um mapeamento simples para pegar cada campo e passar para a nossa classe
-        List<APIError.Field> problemFields = bindingResult.getFieldErrors()
-                .stream().map(fieldError -> APIError.Field.builder()
-                        .name(fieldError.getField())
-                        .userMessage(fieldError.getDefaultMessage())
-                        .build()
-                ).collect(Collectors.toList());
-
-        APIError apiError = createAPIErrorBuilder(status, ProblemType.DADOS_INVALIDOS, detail, detail)
-                .fields(problemFields)
-                .build();
-
-        return handleExceptionInternal(ex, apiError , headers, status, request);
+    @ExceptionHandler(ValidacaoException.class)
+    public ResponseEntity<?> handlValidacao(
+            ValidacaoException ex , WebRequest request) {
+        return handleMultipleErrorsValidation(ex , ex.getBindingResult() , new HttpHeaders(),HttpStatus.BAD_REQUEST , request );
     }
 
     //    Definindo um padrão de respostas para o tratamento de erro, seguindo o padrão do ResponseEntityExceptionHandler
@@ -87,6 +101,10 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         }
         return super.handleExceptionInternal(ex, body, headers, statusCode, request);
     }
+
+
+
+
 
     @ExceptionHandler(EntidadeNaoEncontradaException.class)
     public ResponseEntity<?> handlEntidadeNaoEncontrado(
@@ -133,14 +151,14 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     }
 //    Fazendo uma reescrita de função por que as classes de HttpStatus são diferentes (a do ResponseEntityExceptionHandler -> usa HttpStatusCode enquanto o padrão da aplicação é HttpStatus)
     private APIError.APIErrorBuilder createAPIErrorBuilder (
-            HttpStatusCode status , ProblemType problemType , String detail , String userMessage) {
+            HttpStatusCode status , ProblemType problemType , String detail) {
         return APIError.builder()
                 .timestamp(LocalDateTime.now())
                 .status(status.value())
                 .type(problemType.getPath())
                 .title(problemType.getTittle())
                 .detail(detail)
-                .userMessage(userMessage);
+                .userMessage(APIExceptionHandler.SYSTEM_ERROR_MESSAGE);
     }
 
 //    Verificando se o consumidor digitou o parâmetro da URL corretamente
@@ -150,7 +168,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         String detail = String.format("O parâmetro da URL '%s' recebeu o valor de '%s', que é um tipo inválido. Corrija e informe um valor compatível ao tipo '%s'." , ex.getPropertyName() , ex.getValue() , ex.getRequiredType().getSimpleName());
 
 
-        APIError apiError = createAPIErrorBuilder(status, ProblemType.PARAMETRO_INVALIDO , detail , SYSTEM_ERROR_MESSAGE).build();
+        APIError apiError = createAPIErrorBuilder(status, ProblemType.PARAMETRO_INVALIDO , detail).build();
         return handleExceptionInternal(ex,apiError , headers, status, request);
     }
 
@@ -158,7 +176,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         String detail = String.format("O recurso '%s' que você tentou acessar, é inexistente." , ex.getResourcePath());
 
-        APIError apiError = createAPIErrorBuilder(status, ProblemType.RECURSO_NAO_ENCONTRADO , detail , SYSTEM_ERROR_MESSAGE).build();
+        APIError apiError = createAPIErrorBuilder(status, ProblemType.RECURSO_NAO_ENCONTRADO , detail).build();
         return handleExceptionInternal(ex, apiError , headers, status, request);
     }
 
@@ -178,7 +196,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 
 
         APIError apiError = createAPIErrorBuilder(
-                status ,ProblemType.MENSSAGEM_INCOMPREESSIVEL , detail , SYSTEM_ERROR_MESSAGE
+                status ,ProblemType.MENSSAGEM_INCOMPREESSIVEL , detail
         )
         .build();
 
@@ -195,7 +213,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         String detail = String.format("A propriedade '%s' não consta na entidade original do tipo '%s' . Corrija ou remova e informe um valor compatível com " +
                 "a entidade original." , path , ex.getReferringClass().getSimpleName()) ;
 
-        APIError apiError = createAPIErrorBuilder(status, problemType, detail , SYSTEM_ERROR_MESSAGE)
+        APIError apiError = createAPIErrorBuilder(status, problemType, detail)
                 .build();
 
         return handleExceptionInternal(ex ,apiError , headers, status, request);
@@ -209,7 +227,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         String detail = String.format("A propriedade '%s' recebeu o valor " +
                 "'%s' que é um tipo inválido. Corrija e informe um valor compatível com " +
                 "o tipo '%s'" , path , ex.getValue() , ex.getTargetType().getSimpleName()) ;
-        APIError apiError = createAPIErrorBuilder(status, problemType, detail , SYSTEM_ERROR_MESSAGE)
+        APIError apiError = createAPIErrorBuilder(status, problemType, detail)
                 .build();
 
         return handleExceptionInternal(ex ,apiError , headers, status, request);
@@ -220,7 +238,6 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> handleDefaultException(
             Exception ex , WebRequest request) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR ;
-
 
         // Usando a StackTrace visivel durante o tempo de desenvolvimento para verificarmos as exceções e podemos trata-las mais facilmente
         ex.printStackTrace();
