@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 //Classe genérica de Erros para passar ao ExceptionHandler dentro do padrão RFC 7807
 //Eu incluo na minha menssagem de erro somente o que for passado dentro de exception handler
@@ -20,4 +21,16 @@ public class APIError {
 
     private String userMessage;
     private LocalDateTime timestamp;
+
+    private List<Field> fields;
+
+
+    @Getter
+    @Builder
+    public static class Field {
+        private String name;
+        private String userMessage;
+    }
 }
+
+

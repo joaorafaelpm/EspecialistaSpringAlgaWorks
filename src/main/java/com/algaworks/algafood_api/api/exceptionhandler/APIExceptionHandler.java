@@ -12,6 +12,8 @@ import org.springframework.beans.TypeMismatchException;
 import org.springframework.cglib.core.Local;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -36,9 +38,32 @@ import java.util.stream.Collectors;
  */
 @ControllerAdvice
 public class APIExceptionHandler extends ResponseEntityExceptionHandler {
-
-
     public static final String SYSTEM_ERROR_MESSAGE = String.format("Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde ou contate o administrador do sistema.");
+
+
+//    Vamos capturar e mapear todas as violações das especificações do BeanValidation e mostrar ao usuário
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+
+        String detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente.";
+
+//        Isso pega todas os parâmetros violados dentro do erro
+        BindingResult bindingResult = ex.getBindingResult();
+
+//        A gente faz um mapeamento simples para pegar cada campo e passar para a nossa classe
+        List<APIError.Field> problemFields = bindingResult.getFieldErrors()
+                .stream().map(fieldError -> APIError.Field.builder()
+                        .name(fieldError.getField())
+                        .userMessage(fieldError.getDefaultMessage())
+                        .build()
+                ).collect(Collectors.toList());
+
+        APIError apiError = createAPIErrorBuilder(status, ProblemType.DADOS_INVALIDOS, detail, detail)
+                .fields(problemFields)
+                .build();
+
+        return handleExceptionInternal(ex, apiError , headers, status, request);
+    }
 
     //    Definindo um padrão de respostas para o tratamento de erro, seguindo o padrão do ResponseEntityExceptionHandler
     @Override

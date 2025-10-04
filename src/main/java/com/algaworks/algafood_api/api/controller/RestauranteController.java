@@ -1,5 +1,6 @@
 package com.algaworks.algafood_api.api.controller;
 
+import com.algaworks.algafood_api.Groups;
 import com.algaworks.algafood_api.domain.exception.CidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.CozinhaNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
@@ -10,6 +11,7 @@ import com.algaworks.algafood_api.domain.service.CadastroRestauranteService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -20,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Field;
@@ -50,7 +53,7 @@ public class RestauranteController {
 
 
     @PostMapping
-    public ResponseEntity<?> add (@RequestBody Restaurante restaurante) {
+    public ResponseEntity<?> add (@RequestBody @Valid  Restaurante restaurante) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(restauranteService.save(restaurante));
@@ -61,7 +64,7 @@ public class RestauranteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> save (@PathVariable Long id , @RequestBody Restaurante restaurante) {
+    public ResponseEntity<?> save (@PathVariable Long id , @RequestBody @Valid Restaurante restaurante) {
         try {
           return ResponseEntity.ok(restauranteService.save(id , restaurante));
         }
