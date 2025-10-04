@@ -7,12 +7,18 @@ import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.algaworks.algafood_api.domain.model.Restaurante;
 import com.algaworks.algafood_api.domain.repository.RestauranteRepository;
 import com.algaworks.algafood_api.domain.service.CadastroRestauranteService;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.aspectj.bridge.Message;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,29 +71,44 @@ public class RestauranteController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> savePatch (@PathVariable Long id , @RequestBody Map<String , Object> campos) {
+    public ResponseEntity<?> savePatch (@PathVariable Long id , @RequestBody Map<String , Object> campos , HttpServletRequest request) {
         Restaurante restauranteAntigo = restauranteService.findById(id);
-        merge(campos , restauranteAntigo);
+        merge(campos , restauranteAntigo , request);
         return save(id , restauranteAntigo);
     }
 
-    public void merge (Map<String , Object> dadosOrigem , Restaurante restauranteDestino) {
-//        Instancia para mapear o objeto e modificar os valores do campo do body de acordo com os tipos da classe
-        ObjectMapper objectMapper = new ObjectMapper();
-        Restaurante restauranteOrigem = objectMapper.convertValue(dadosOrigem , Restaurante.class);
+    public void merge (Map<String , Object> dadosOrigem , Restaurante restauranteDestino , HttpServletRequest request) {
+//        Precisamos desse parâmetro para usar no construtor da nossa exceção, já que o construtor atual dela está depreciado
+        ServletServerHttpRequest serverHttpRequest = new ServletServerHttpRequest(request);
+        try{
+            //        Instancia para mapear o objeto e modificar os valores do campo do body de acordo com os tipos da classe
+            ObjectMapper objectMapper = new ObjectMapper();
+
+//        Eu defino que eu quero lançar uma exceção caso tenha alguma propriedade ignorada pelo @JsonIgnore
+//        Um problema que nós temos com isso é que a exception lançada é um IllegalArgumentException (que não faz parte do HttpMessageNotReadable então não é capturado pelo ExceptionHandler), então nós precisamos capturar com o try e fazer outro lançamento de um HttpMessageNotReadable
+            objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES , true);
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES , true);
+            Restaurante restauranteOrigem = objectMapper.convertValue(dadosOrigem , Restaurante.class);
 
 //        Mapeio todos os dados do body para reconhecer somente os valores especificados e altera-los
-        dadosOrigem.forEach((chave , valor) -> {
-            Field field = ReflectionUtils.findField(Restaurante.class , chave);
+            dadosOrigem.forEach((chave , valor) -> {
+                Field field = ReflectionUtils.findField(Restaurante.class , chave);
 //            Permito que ele acesse instâncias privadas
-            field.setAccessible(true);
+                field.setAccessible(true);
 
-            Object novoValor = ReflectionUtils.getField(field , restauranteOrigem);
+                Object novoValor = ReflectionUtils.getField(field , restauranteOrigem);
 
 //            Eu pego o meu restaurante antigo e defino que as instâncias que vão ser alterados nele são somente as que eu ofereci, usando o field como parâmetro.
 //            E como valor para substituir eu uso os que eu modifiquei com base nos padrões da classe usando o "novoValor"
-            ReflectionUtils.setField(field , restauranteDestino , novoValor);
-        });
+                ReflectionUtils.setField(field , restauranteDestino , novoValor);
+            });
+        }
+        catch (IllegalArgumentException e) {
+            Throwable cause = ExceptionUtils.getRootCause(e);
+//            Fazemos isso para evitar usar um construtor depreciado
+            throw new HttpMessageNotReadableException(e.getMessage() , cause , serverHttpRequest);
+        }
+
     }
 
 
