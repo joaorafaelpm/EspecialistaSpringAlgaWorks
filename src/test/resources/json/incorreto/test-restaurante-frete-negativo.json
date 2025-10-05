@@ -1,0 +1,7 @@
+{
+  "nome": "Pendezza's Pizza",
+  "taxaFrete": -1,
+  "cozinha": {
+    "id": 1
+  }
+}
