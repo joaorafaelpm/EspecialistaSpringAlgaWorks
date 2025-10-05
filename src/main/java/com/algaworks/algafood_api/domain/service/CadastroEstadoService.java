@@ -4,6 +4,7 @@ import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood_api.domain.exception.EstadoNaoEncontradoException;
 import com.algaworks.algafood_api.domain.model.Estado;
 import com.algaworks.algafood_api.domain.repository.EstadoRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -19,10 +20,12 @@ public class CadastroEstadoService {
                 new EstadoNaoEncontradoException(id));
     }
 
+    @Transactional
     public Estado save (Estado estado) {
         return estadoRepository.save(estado);
     }
 
+    @Transactional
     public void remove (Long id) {
         try {
             estadoRepository.findById(id).orElseThrow(() ->

@@ -3,17 +3,14 @@ package com.algaworks.algafood_api.domain.service;
 import com.algaworks.algafood_api.domain.exception.CozinhaNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood_api.domain.exception.RestauranteNaoEncontradoException;
-import com.algaworks.algafood_api.domain.exception.NegocioException;
-import com.algaworks.algafood_api.domain.model.Cidade;
-import com.algaworks.algafood_api.domain.model.Cozinha;
 import com.algaworks.algafood_api.domain.model.Restaurante;
 import com.algaworks.algafood_api.domain.repository.CozinhaRepository;
 import com.algaworks.algafood_api.domain.repository.RestauranteRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,6 +25,7 @@ public class CadastroRestauranteService {
                 new RestauranteNaoEncontradoException(id));
     }
 
+    @Transactional
     public Restaurante save (Restaurante restaurante) {
         Long cozinhaId = restaurante.getCozinha().getId();
         restaurante.setCozinha(cozinhaRepository.findById(cozinhaId).orElseThrow(() ->
@@ -36,6 +34,7 @@ public class CadastroRestauranteService {
 
     }
 
+    @Transactional
     public Restaurante save (Long id ,Restaurante restaurante) {
         Restaurante restauranteAntigo = findById(id);
         BeanUtils.copyProperties(restaurante, restauranteAntigo ,
@@ -45,6 +44,7 @@ public class CadastroRestauranteService {
 
     }
 
+    @Transactional
     public void remove (Long id) {
         try {
             Restaurante restaurante = findById(id);

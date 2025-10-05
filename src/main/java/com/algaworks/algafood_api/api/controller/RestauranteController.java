@@ -1,10 +1,15 @@
 package com.algaworks.algafood_api.api.controller;
 
+import com.algaworks.algafood_api.api.model.CozinhaModel;
+import com.algaworks.algafood_api.api.model.RestauranteModel;
+import com.algaworks.algafood_api.api.model.input.RestauranteDTO;
 import com.algaworks.algafood_api.core.validation.ValidacaoException;
 import com.algaworks.algafood_api.domain.exception.CozinhaNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
+import com.algaworks.algafood_api.domain.model.Cozinha;
 import com.algaworks.algafood_api.domain.model.Restaurante;
 import com.algaworks.algafood_api.domain.repository.RestauranteRepository;
+import com.algaworks.algafood_api.domain.service.CadastroPermissaoService;
 import com.algaworks.algafood_api.domain.service.CadastroRestauranteService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -39,22 +45,23 @@ public class RestauranteController {
     private SmartValidator validator;
 
     @GetMapping
-    public List<Restaurante> all () {
-        return restauranteRepository.findAll();
+    public List<RestauranteModel> all () {
+        return toCollection(restauranteRepository.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Restaurante> getById (@PathVariable Long id) {
+    public ResponseEntity<RestauranteModel> getById (@PathVariable Long id) {
         Restaurante restaurante = restauranteService.findById(id);
-        return ResponseEntity.ok(restaurante);
+        return ResponseEntity.ok(toModel(restaurante));
     }
 
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<?> add (@RequestBody @Valid  Restaurante restaurante) {
+    public RestauranteModel add (@RequestBody @Valid RestauranteDTO restauranteDTO) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(restauranteService.save(restaurante));
+            Restaurante restaurante = toDomainModel(restauranteDTO);
+            return toModel(restauranteService.save(restaurante));
         }
         catch (CozinhaNaoEncontradaException e) {
             throw new NegocioException(e.getMessage() , e);
@@ -62,73 +69,32 @@ public class RestauranteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> save (@PathVariable Long id , @RequestBody @Valid Restaurante restaurante) {
+    public ResponseEntity<?> save (@PathVariable Long id , @RequestBody @Valid RestauranteDTO restauranteDTO) {
         try {
-          return ResponseEntity.ok(restauranteService.save(id , restaurante));
+          return ResponseEntity.ok(toModel(restauranteService.save(id , toDomainModel(restauranteDTO))));
         }
         catch (CozinhaNaoEncontradaException e) {
             throw new NegocioException(e.getMessage() , e);
         }
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<?> savePatch (@PathVariable Long id , @RequestBody Map<String , Object> campos , HttpServletRequest request) {
-        Restaurante restauranteAtual = restauranteService.findById(id);
-        merge(campos , restauranteAtual , request);
+    private Restaurante toDomainModel (RestauranteDTO restauranteDTO) {
+        Cozinha cozinha = new Cozinha();
+        cozinha.setId(restauranteDTO.getCozinha().getId());
 
-
-        validate(restauranteAtual , "restaurante") ;
-        return save(id , restauranteAtual);
+        Restaurante restaurante = new Restaurante();
+        restaurante.setNome(restauranteDTO.getNome());
+        restaurante.setTaxaFrete(restauranteDTO.getTaxaFrete());
+        restaurante.setCozinha(cozinha);
+        return restaurante;
     }
 
-    private void validate(Restaurante restauranteAtual , String objectName) {
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(restauranteAtual , objectName);
-        validator.validate(restauranteAtual , bindingResult);
-
-        if (bindingResult.hasErrors()) {
-            throw new ValidacaoException(bindingResult);
-        }
-
+    private RestauranteModel toModel (Restaurante restaurante) {
+        CozinhaModel cozinhaModel = new CozinhaModel(restaurante.getCozinha().getId() , restaurante.getCozinha().getNome());
+        return new RestauranteModel(restaurante.getId() , restaurante.getNome() , restaurante.getTaxaFrete() , cozinhaModel);
     }
 
-
-
-    public void merge (Map<String , Object> dadosOrigem , Restaurante restauranteDestino , HttpServletRequest request) {
-//        Precisamos desse parâmetro para usar no construtor da nossa exceção, já que o construtor atual dela está depreciado
-        ServletServerHttpRequest serverHttpRequest = new ServletServerHttpRequest(request);
-        try{
-            //        Instancia para mapear o objeto e modificar os valores do campo do body de acordo com os tipos da classe
-            ObjectMapper objectMapper = new ObjectMapper();
-
-//        Eu defino que eu quero lançar uma exceção caso tenha alguma propriedade ignorada pelo @JsonIgnore
-//        Um problema que nós temos com isso é que a exception lançada é um IllegalArgumentException (que não faz parte do HttpMessageNotReadable então não é capturado pelo ExceptionHandler), então nós precisamos capturar com o try e fazer outro lançamento de um HttpMessageNotReadable
-            objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES , true);
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES , true);
-            Restaurante restauranteOrigem = objectMapper.convertValue(dadosOrigem , Restaurante.class);
-
-//        Mapeio todos os dados do body para reconhecer somente os valores especificados e altera-los
-            dadosOrigem.forEach((chave , valor) -> {
-                Field field = ReflectionUtils.findField(Restaurante.class , chave);
-//            Permito que ele acesse instâncias privadas
-                field.setAccessible(true);
-
-                Object novoValor = ReflectionUtils.getField(field , restauranteOrigem);
-
-//            Eu pego o meu restaurante antigo e defino que as instâncias que vão ser alterados nele são somente as que eu ofereci, usando o field como parâmetro.
-//            E como valor para substituir eu uso os que eu modifiquei com base nos padrões da classe usando o "novoValor"
-                ReflectionUtils.setField(field , restauranteDestino , novoValor);
-            });
-        }
-        catch (IllegalArgumentException e) {
-            Throwable cause = ExceptionUtils.getRootCause(e);
-//            Fazemos isso para evitar usar um construtor depreciado
-            throw new HttpMessageNotReadableException(e.getMessage() , cause , serverHttpRequest);
-        }
-
+    private List<RestauranteModel> toCollection (List<Restaurante> restaurantes) {
+        return restaurantes.stream().map(this::toModel).toList();
     }
-
-
-
-
-
 }

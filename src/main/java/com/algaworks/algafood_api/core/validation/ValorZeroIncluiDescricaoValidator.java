@@ -37,7 +37,6 @@ public class ValorZeroIncluiDescricaoValidator implements ConstraintValidator<Va
 
             return valido;
         }
-
         catch (Exception e) {
             throw new ValidationException(e);
         }

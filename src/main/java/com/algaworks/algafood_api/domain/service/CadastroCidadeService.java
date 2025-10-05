@@ -4,7 +4,7 @@ import com.algaworks.algafood_api.domain.exception.CidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.model.Cidade;
 import com.algaworks.algafood_api.domain.model.Estado;
 import com.algaworks.algafood_api.domain.repository.CidadeRepository;
-import com.algaworks.algafood_api.domain.repository.EstadoRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +20,14 @@ public class CadastroCidadeService {
                     new CidadeNaoEncontradaException(id));
     }
 
+    @Transactional
     public Cidade save (Cidade cidade) {
         Estado estado = estadoService.findById(cidade.getEstado().getId());
         cidade.setEstado(estado);
         return cidadeRepository.save(cidade);
     }
 
+    @Transactional
     public void remove (Long id) {
             cidadeRepository.findById(id).orElseThrow(() ->
                     new CidadeNaoEncontradaException(id));

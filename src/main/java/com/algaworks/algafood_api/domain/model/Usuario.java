@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +31,7 @@ public class Usuario {
 
     @CreationTimestamp
     @Column(columnDefinition = "datetime" , name = "data_cadastro" , nullable = false)
-    private LocalDateTime dataCadastro ;
+    private OffsetDateTime dataCadastro ;
 
     @ManyToMany
     @JoinTable(name = "usuario_grupo" ,

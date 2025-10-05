@@ -24,7 +24,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -85,7 +85,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 //        Se não tiver nenhum corpo de resposta disponível, a gente padroniza um.
         if (body == null) {
             body = APIError.builder()
-                    .timestamp(LocalDateTime.now())
+                    .timestamp(OffsetDateTime.now())
                     .title(ex.getLocalizedMessage())
                     .status(statusCode.value())
                     .build();
@@ -93,7 +93,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 //        Se existir um corpo e for um texto vindo diretamente da exceção, a gente passa ele como corpo.
         else if (body instanceof String) {
             body = APIError.builder()
-                    .timestamp(LocalDateTime.now())
+                    .timestamp(OffsetDateTime.now())
                     .userMessage(SYSTEM_ERROR_MESSAGE)
                     .title((String) body)
                     .status(statusCode.value())
@@ -142,7 +142,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     private APIError.APIErrorBuilder createAPIErrorBuilder (
             HttpStatus status , ProblemType problemType , String detail , String userMessage) {
         return APIError.builder()
-                .timestamp(LocalDateTime.now())
+                .timestamp(OffsetDateTime.now())
                 .status(status.value())
                 .type(problemType.getPath())
                 .title(problemType.getTittle())
@@ -153,7 +153,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     private APIError.APIErrorBuilder createAPIErrorBuilder (
             HttpStatusCode status , ProblemType problemType , String detail) {
         return APIError.builder()
-                .timestamp(LocalDateTime.now())
+                .timestamp(OffsetDateTime.now())
                 .status(status.value())
                 .type(problemType.getPath())
                 .title(problemType.getTittle())

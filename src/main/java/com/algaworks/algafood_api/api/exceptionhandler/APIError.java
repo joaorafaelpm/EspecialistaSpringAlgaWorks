@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 //Classe genérica de Erros para passar ao ExceptionHandler dentro do padrão RFC 7807
@@ -20,7 +21,7 @@ public class APIError {
     private String detail;
 
     private String userMessage;
-    private LocalDateTime timestamp;
+    private OffsetDateTime timestamp;
 
     private List<Object> objects;
 
