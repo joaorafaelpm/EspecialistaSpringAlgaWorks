@@ -24,13 +24,16 @@ public class CadastroEstadoService {
     public Estado save (Estado estado) {
         return estadoRepository.save(estado);
     }
+    @Transactional
+    public Estado save (Long id ,Estado estado) {
+        return estadoRepository.save(estado);
+    }
 
     @Transactional
     public void remove (Long id) {
         try {
-            estadoRepository.findById(id).orElseThrow(() ->
-                    new EstadoNaoEncontradoException(id));
             estadoRepository.deleteById(id);
+            estadoRepository.flush();
         }
         catch (DataIntegrityViolationException e) {
             throw new EntidadeEmUsoException(

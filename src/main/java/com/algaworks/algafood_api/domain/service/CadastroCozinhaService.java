@@ -26,10 +26,15 @@ public class CadastroCozinhaService {
     }
 
     @Transactional
+    public Cozinha save (Long id ,Cozinha cozinha) {
+        return cozinhaRepository.save(cozinha);
+    }
+
+    @Transactional
     public void remove (Long id) {
         try {
-            Cozinha cozinha = findById(id);
-            cozinhaRepository.delete(cozinha);
+            cozinhaRepository.deleteById(id);
+            cozinhaRepository.flush();
         }
         catch (DataIntegrityViolationException e) {
             throw new EntidadeEmUsoException(

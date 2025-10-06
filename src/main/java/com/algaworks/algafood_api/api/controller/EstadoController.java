@@ -1,22 +1,20 @@
 package com.algaworks.algafood_api.api.controller;
 
 
-import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
-import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
+import com.algaworks.algafood_api.api.assembler.EstadoAssembler;
+import com.algaworks.algafood_api.api.assembler.disassambler.EstadoDisassembler;
+import com.algaworks.algafood_api.api.model.EstadoModel;
+import com.algaworks.algafood_api.api.model.input.EstadoDTO;
 import com.algaworks.algafood_api.domain.model.Estado;
 import com.algaworks.algafood_api.domain.repository.EstadoRepository;
 import com.algaworks.algafood_api.domain.service.CadastroEstadoService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @ResponseBody
@@ -24,35 +22,37 @@ import java.util.Optional;
 @RequestMapping("/estados")
 public class EstadoController {
 
-    EstadoRepository estadoRepository ;
+    private final EstadoRepository estadoRepository ;
 
-    CadastroEstadoService estadoService;
+    private final CadastroEstadoService estadoService;
+
+    private final EstadoAssembler estadoAssembler ;
+    private final EstadoDisassembler estadoDisassembler ;
 
     @GetMapping
-    public List<Estado> all () {
-        return estadoRepository.findAll();
+    public List<EstadoModel> all () {
+        return estadoAssembler.toCollection(estadoRepository.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Estado> getById (@PathVariable Long id) {
-        return ResponseEntity.ok(estadoService.findById(id));
+    public ResponseEntity<EstadoModel> getById (@PathVariable Long id) {
+        return ResponseEntity.ok(estadoAssembler.estadoToEstadoModel(estadoService.findById(id)));
     }
 
     @PostMapping
-    public  Estado add (@RequestBody @Valid Estado estado) {
-        return estadoService.save(estado);
+    public EstadoModel add (@RequestBody @Valid EstadoDTO estadoDTO) {
+        Estado estado = estadoDisassembler.estadoDTOToEstado(estadoDTO);
+        return estadoAssembler.estadoToEstadoModel(estadoService.save(estado));
     }
 
     @PutMapping("/{id}")
-    public  ResponseEntity<Estado> save (@PathVariable Long id , @RequestBody @Valid Estado estado) {
+    public  ResponseEntity<EstadoModel> save (@PathVariable Long id , @RequestBody @Valid EstadoDTO estadoDTO) {
         Estado estadoAntigo = estadoService.findById(id);
-        BeanUtils.copyProperties(estado , estadoAntigo , "id");
-        Estado estadoSalvo = estadoService.save(estadoAntigo);
-        return ResponseEntity.ok(estadoSalvo);
+        estadoDisassembler.updateEstadoFromDto(estadoDTO , estadoAntigo);
+        return ResponseEntity.ok(estadoAssembler
+                .estadoToEstadoModel(estadoService
+                        .save(id , estadoAntigo)));
     }
-
-
-
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

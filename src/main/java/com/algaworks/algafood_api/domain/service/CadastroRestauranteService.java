@@ -3,6 +3,7 @@ package com.algaworks.algafood_api.domain.service;
 import com.algaworks.algafood_api.domain.exception.CozinhaNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood_api.domain.exception.RestauranteNaoEncontradoException;
+import com.algaworks.algafood_api.domain.model.Cozinha;
 import com.algaworks.algafood_api.domain.model.Restaurante;
 import com.algaworks.algafood_api.domain.repository.CozinhaRepository;
 import com.algaworks.algafood_api.domain.repository.RestauranteRepository;
@@ -35,14 +36,16 @@ public class CadastroRestauranteService {
     }
 
     @Transactional
-    public Restaurante save (Long id ,Restaurante restaurante) {
-        Restaurante restauranteAntigo = findById(id);
-        BeanUtils.copyProperties(restaurante, restauranteAntigo ,
-                "id" , "endereco" , "dataCadastro", "data_cadastro" , "formasPagamento");
-        restaurante.setId(id);
-        return save(restauranteAntigo);
+    public Restaurante save(Long id, Restaurante restauranteAtualizado) {
+        Restaurante restauranteExistente = findById(id);
+        Long cozinhaId = restauranteAtualizado.getCozinha().getId();
+        Cozinha cozinha = cozinhaRepository.findById(cozinhaId)
+                .orElseThrow(() -> new CozinhaNaoEncontradaException(cozinhaId));
+        restauranteExistente.setCozinha(cozinha);
 
+        return restauranteRepository.save(restauranteExistente);
     }
+
 
     @Transactional
     public void remove (Long id) {
