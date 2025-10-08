@@ -28,6 +28,7 @@ public class Restaurante {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @JoinColumn(nullable = false)
     private String nome ;
 
     @JoinColumn(name = "taxa_frete" , nullable = false)
@@ -39,6 +40,8 @@ public class Restaurante {
 
     @Embedded
     private Endereco endereco;
+
+    private Boolean ativo = true ;
 
     @CreationTimestamp
     @Column(columnDefinition = "datetime" , name = "data_cadastro")
@@ -58,5 +61,11 @@ public class Restaurante {
             inverseJoinColumns = @JoinColumn(name = "forma_pagamento_id"))
     private List<FormaPagamento> formasPagamento = new ArrayList<>();
 
+    public void ativar () {
+        setAtivo(true);
+    }
+    public void inativar () {
+        setAtivo(false);
+    }
 
 }

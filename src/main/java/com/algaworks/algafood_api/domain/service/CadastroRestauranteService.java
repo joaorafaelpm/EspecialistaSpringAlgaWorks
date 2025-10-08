@@ -60,6 +60,18 @@ public class CadastroRestauranteService {
         }
     }
 
+//    Enquanto o restaurante for chamado pelo JPA o restaurante entra em processo de gerênciamento pelo próprio JPA e entende que quando houver alguma mudança ele deve atualizar no banco automaticamente, então não é necessário salvar de novo
+    @Transactional
+    public void ativar (Long id) {
+        Restaurante restaurante = findById(id);
+        restaurante.ativar();
+    }
+    @Transactional
+    public void inativar (Long id) {
+        Restaurante restaurante = findById(id);
+        restaurante.inativar();
+    }
+
 
 
 }

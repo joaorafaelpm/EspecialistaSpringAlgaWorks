@@ -21,8 +21,6 @@ import java.util.List;
 @RequestMapping(value = "/cozinhas")
 public class CozinhaController {
 
-    CozinhaRepository cozinhaRepository ;
-
     CadastroCozinhaService cozinhaService ;
 
     CozinhaAssembler cozinhaAssembler ;
@@ -30,7 +28,7 @@ public class CozinhaController {
 
     @GetMapping
     public List<CozinhaModel> all () {
-        return cozinhaAssembler.toCollection(cozinhaRepository.findAll());
+        return cozinhaAssembler.toCollection(cozinhaService.findAll());
     }
 
     @GetMapping("/{id}")
@@ -40,7 +38,8 @@ public class CozinhaController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CozinhaModel add (@RequestBody @Valid Cozinha cozinha) {
+    public CozinhaModel add (@RequestBody @Valid CozinhaDTO cozinhaDTO) {
+        Cozinha cozinha = cozinhaDisassembler.cozinhaDTOToCozinha(cozinhaDTO);
         return cozinhaAssembler.cozinhaToCozinhaModel(cozinhaService.save(cozinha)) ;
     }
 

@@ -9,11 +9,17 @@ import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class CadastroCozinhaService {
 
     CozinhaRepository cozinhaRepository;
+
+    public List<Cozinha> findAll() {
+        return cozinhaRepository.findAll();
+    }
 
     public Cozinha findById (Long id) {
         return cozinhaRepository.findById(id).orElseThrow(() ->
@@ -42,5 +48,6 @@ public class CadastroCozinhaService {
             );
         }
     }
+
 
 }

@@ -27,7 +27,7 @@ public class Estado {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id ;
 
-    @NotBlank
+    @Column(nullable = false)
     private String nome ;
 
     @OneToMany(mappedBy = "estado")

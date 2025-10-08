@@ -1,6 +1,7 @@
 package com.algaworks.algafood_api.domain.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.Fetch;
 
@@ -19,7 +20,6 @@ public class Endereco {
     private String complemento ;
     @Column(name = "endereco_bairro")
     private String bairro ;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "endereco_cidade_id")
     private Cidade cidade ;

@@ -11,13 +11,11 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface RestauranteAssembler {
 
-//    Diferente do ModelMapper, o mapstruct é menos verboso para especificar um elemento de alguma entidade:
-//    Aqui eu simplesmente substitui o elemento "taxaFrete" por "precoFrete" e ao invés de adicionar um mapping como é no modelMapper, eu só anoto a entidade com o @Mapping, bem mais prático e menos mágico, porém com resultados mais previsíveis
     @Bean
-    @Mapping(source = "taxaFrete" , target = "precoFrete")
+    @Mapping(source = "endereco.cidade.estado.nome" , target = "endereco.cidade.estado")
     RestauranteModel restauranteToRestauranteModel(Restaurante restaurante);
 
     @Bean
-    List<RestauranteModel> toCollection(List<Restaurante> listaCozinha);
+    List<RestauranteModel> toCollection(List<Restaurante> listaFormaPagamento);
 
 }
