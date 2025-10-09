@@ -18,6 +18,16 @@ public interface RestauranteRepository
     @Query("from Restaurante r join r.cozinha join fetch r.formasPagamento")
     List<Restaurante> findAll ();
 
+    @Query("""
+    SELECT r FROM Restaurante r
+    JOIN FETCH r.cozinha
+    JOIN FETCH r.endereco.cidade c
+    JOIN FETCH c.estado
+    WHERE r.id = :id
+""")
+    Optional<Restaurante> findByIdMapperResolved(Long id);
+
+
     List<Restaurante> findByTaxaFreteBetween (BigDecimal taxaFreteMenor , BigDecimal taxaFreteMaior);
 
     List<Restaurante> consultarPorNome (String nome , @Param("id") Long cozinhaId);

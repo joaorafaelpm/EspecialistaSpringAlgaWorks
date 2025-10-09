@@ -1,6 +1,6 @@
 package com.algaworks.algafood_api.api.model.input;
 
-import com.algaworks.algafood_api.core.validation.PositivoOuZero;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,17 +8,27 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @AllArgsConstructor
-public class CidadeDTO {
+public class EnderecoDTO {
 
     @NotBlank
-    private String nome  ;
+    private String cep ;
 
-    @Valid
+    @NotBlank
+    private String logradouro ;
+    @NotBlank
+    private String numero ;
+
+    private String complemento ;
+
+    @NotBlank
+    private String bairro ;
+
     @NotNull
-    private EstadoIdDTO estadoId;
+    @Valid
+    private CidadeIdDTO cidade ;
+
 
 }

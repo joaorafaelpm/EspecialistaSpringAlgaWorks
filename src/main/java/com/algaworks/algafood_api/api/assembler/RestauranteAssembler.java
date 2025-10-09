@@ -16,6 +16,6 @@ public interface RestauranteAssembler {
     RestauranteModel restauranteToRestauranteModel(Restaurante restaurante);
 
     @Bean
-    List<RestauranteModel> toCollection(List<Restaurante> listaFormaPagamento);
+    List<RestauranteModel> toCollection(List<Restaurante> listaRestaurante);
 
 }

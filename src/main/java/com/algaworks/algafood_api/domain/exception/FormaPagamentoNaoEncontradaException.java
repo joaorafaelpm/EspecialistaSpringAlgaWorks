@@ -1,6 +1,6 @@
 package com.algaworks.algafood_api.domain.exception;
 
-public class FormaPagamentoNaoEncontradaException extends RuntimeException {
+public class FormaPagamentoNaoEncontradaException extends EntidadeNaoEncontradaException {
     public FormaPagamentoNaoEncontradaException(String message) {
         super(message);
     }

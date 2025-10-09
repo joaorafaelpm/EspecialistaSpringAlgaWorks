@@ -1,52 +1,64 @@
 package com.algaworks.algafood_api.api.controller;
 
-import com.algaworks.algafood_api.domain.model.Cozinha;
-import com.algaworks.algafood_api.domain.model.Estado;
+import com.algaworks.algafood_api.api.assembler.GrupoAssembler;
+import com.algaworks.algafood_api.api.assembler.disassambler.GrupoDisassembler;
+import com.algaworks.algafood_api.api.model.GrupoModel;
+import com.algaworks.algafood_api.api.model.input.GrupoDTO;
 import com.algaworks.algafood_api.domain.model.Grupo;
-import com.algaworks.algafood_api.domain.repository.GrupoRepository;
 import com.algaworks.algafood_api.domain.service.CadastroGrupoService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/grupos")
 @AllArgsConstructor
-@Slf4j
 public class GrupoController {
 
-    private final GrupoRepository grupoRepository ;
     private final CadastroGrupoService grupoService;
 
+    private final GrupoAssembler grupoAssembler;
+    private final GrupoDisassembler grupoDisassembler;
+
     @GetMapping
-    public List<Grupo> findAll () {
-        return grupoRepository.findAll();
+    public List<GrupoModel> findAll () {
+        return grupoAssembler.toCollection(grupoService.findAll());
     }
 
     @GetMapping("/{grupoId}")
-    public ResponseEntity<Grupo> findById (@PathVariable Long grupoId) {
-        return ResponseEntity.ok(grupoService.findById(grupoId));
+    public ResponseEntity<GrupoModel> findById (@PathVariable Long grupoId) {
+        return ResponseEntity.ok(grupoAssembler.grupoToGrupoModel(grupoService.findById(grupoId)));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Grupo save (@RequestBody Grupo grupo) {
-        return grupoService.save(grupo);
+    public GrupoModel save (@RequestBody @Valid GrupoDTO grupoDTO) {
+        Grupo grupo = grupoDisassembler.grupoDTOToGrupo(grupoDTO);
+        return grupoAssembler.grupoToGrupoModel(grupoService.save(grupo));
     }
 
-    @PutMapping("/{grupoId}")
-    public ResponseEntity<Grupo> save (@PathVariable Long grupoId , @RequestBody Grupo grupo) {
-        Grupo grupoAntigo = grupoService.findById(grupoId);
-        BeanUtils.copyProperties(grupo , grupoAntigo , "id");
-        Grupo grupoAtualizado = grupoService.save(grupoAntigo);
-        return ResponseEntity.ok(grupoAtualizado);
+    @PutMapping("/{id}")
+    public ResponseEntity<GrupoModel> save (@PathVariable Long id , @RequestBody @Valid GrupoDTO grupoDTO) {
+        Grupo grupoAntigo = grupoService.findById(id);
+        grupoDisassembler.updateGrupoFromDto(grupoDTO , grupoAntigo);
+
+        return ResponseEntity.ok(grupoAssembler.grupoToGrupoModel(grupoService.save(grupoAntigo)));
         }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void remover (@PathVariable Long id) {
+        grupoService.deleteById(id);
     }
+
+
+}
+
+
+
+
 

@@ -14,38 +14,44 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class CadastroRestauranteService {
 
     RestauranteRepository restauranteRepository;
-    CozinhaRepository cozinhaRepository ;
+    CadastroCozinhaService cozinhaService ;
+    CadastroCidadeService cidadeService ;
+
+    public List<Restaurante> findAll() {
+        return restauranteRepository.findAll();
+    }
 
     public Restaurante findById (Long id ) {
         return restauranteRepository.findById(id).orElseThrow(() ->
                 new RestauranteNaoEncontradoException(id));
     }
+    public Restaurante findByIdWithAllDependencies (Long id ) {
+        return restauranteRepository.findByIdMapperResolved(id).orElseThrow(() ->
+                new RestauranteNaoEncontradoException(id));
+    }
+
+
 
     @Transactional
     public Restaurante save (Restaurante restaurante) {
         Long cozinhaId = restaurante.getCozinha().getId();
-        restaurante.setCozinha(cozinhaRepository.findById(cozinhaId).orElseThrow(() ->
-                new CozinhaNaoEncontradaException(cozinhaId)));
-        return restauranteRepository.save(restaurante) ;
+        Long cidadeId = restaurante.getEndereco().getCidade().getId();
+        restaurante.setCozinha(cozinhaService.findById(cozinhaId));
+        restaurante.getEndereco().setCidade(cidadeService.findById(cidadeId));
+
+//        Eu faço um flush, para gerar um id assim que o comando save for processado, dessa forma eu sigo para o próximo passo com a entidade completa e carregada
+        Restaurante restauranteSalvo = restauranteRepository.saveAndFlush(restaurante);
+//        O hibernate precisa carregar todos os objetos para que o mapStruct forme eles de acordo com o modelo, então é absolutamente necessário, preparar uma query específica que traga todas as dependências do restaurante.
+        return  findByIdWithAllDependencies(restauranteSalvo.getId());
 
     }
-
-    @Transactional
-    public Restaurante save(Long id, Restaurante restauranteAtualizado) {
-        Restaurante restauranteExistente = findById(id);
-        Long cozinhaId = restauranteAtualizado.getCozinha().getId();
-        Cozinha cozinha = cozinhaRepository.findById(cozinhaId)
-                .orElseThrow(() -> new CozinhaNaoEncontradaException(cozinhaId));
-        restauranteExistente.setCozinha(cozinha);
-
-        return restauranteRepository.save(restauranteExistente);
-    }
-
 
     @Transactional
     public void remove (Long id) {

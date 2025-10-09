@@ -4,6 +4,7 @@ import com.algaworks.algafood_api.api.assembler.RestauranteAssembler;
 import com.algaworks.algafood_api.api.assembler.disassambler.RestauranteDisassembler;
 import com.algaworks.algafood_api.api.model.RestauranteModel;
 import com.algaworks.algafood_api.api.model.input.RestauranteDTO;
+import com.algaworks.algafood_api.domain.exception.CidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.CozinhaNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.algaworks.algafood_api.domain.model.Restaurante;
@@ -24,8 +25,6 @@ import java.util.List;
 @Slf4j
 public class RestauranteController {
 
-    private final RestauranteRepository restauranteRepository;
-
     private final CadastroRestauranteService restauranteService;
 
     private final RestauranteAssembler restauranteAssembler;
@@ -34,7 +33,7 @@ public class RestauranteController {
     @GetMapping
     public List<RestauranteModel> all () {
         return restauranteAssembler
-                .toCollection(restauranteRepository.findAll());
+                .toCollection(restauranteService.findAll());
     }
 
     @GetMapping("/{id}")
@@ -49,25 +48,34 @@ public class RestauranteController {
     @PostMapping
     public RestauranteModel add (@RequestBody @Valid RestauranteDTO restauranteDTO) {
         try {
-            Restaurante restaurante = restauranteDisessambler.restauranteDTOToRestaurante(restauranteDTO);
+            Restaurante restaurante = restauranteService.save(restauranteDisessambler.restauranteDTOToRestaurante(restauranteDTO));
+//        O hibernate precisa carregar todos os objetos para que o mapStruct forme eles de acordo com o modelo, então é absolutamente necessário, preparar uma query específica que traga todas as dependências do restaurante.
             return restauranteAssembler
-                    .restauranteToRestauranteModel(restauranteService.save(restaurante));
+                    .restauranteToRestauranteModel(restaurante);
+
         }
-        catch (CozinhaNaoEncontradaException e) {
-            throw new NegocioException(e.getMessage() , e);
+        catch (CozinhaNaoEncontradaException | CidadeNaoEncontradaException e) {
+            throw new NegocioException(e.getMessage()) ;
         }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> save (@PathVariable Long id , @RequestBody @Valid RestauranteDTO restauranteDTO) {
-        Restaurante restauranteAntigo = restauranteService.findById(id);
-        Restaurante restauranteAtualizado = restauranteDisessambler.restauranteDTOToRestaurante(restauranteDTO);
+        try {
+            Restaurante restauranteAntigo = restauranteService.findById(id);
+            Restaurante restauranteAtualizado = restauranteDisessambler.restauranteDTOToRestaurante(restauranteDTO);
 
-        restauranteDisessambler.updateRestauranteFromDto(restauranteDTO , restauranteAntigo);
-        restauranteAntigo.setCozinha(restauranteAtualizado.getCozinha());
-        return ResponseEntity.ok(restauranteAssembler
-              .restauranteToRestauranteModel(restauranteService
-                      .save(id , restauranteAntigo)));
+            restauranteDisessambler.updateRestauranteFromDto(restauranteDTO , restauranteAntigo);
+
+            restauranteAntigo.setCozinha(restauranteAtualizado.getCozinha());
+            restauranteAntigo.getEndereco().setCidade(restauranteAtualizado.getEndereco().getCidade());
+
+            return ResponseEntity.ok(restauranteAssembler
+                  .restauranteToRestauranteModel(restauranteService.save(restauranteAntigo)));
+        }
+        catch (CozinhaNaoEncontradaException | CidadeNaoEncontradaException e) {
+            throw new NegocioException(e.getMessage()) ;
+        }
     }
 
     @PutMapping("/{id}/ativo")
