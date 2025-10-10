@@ -9,13 +9,18 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Transactional
 @AllArgsConstructor
 public class CadastroPermissaoService {
 
     private final PermissaoRepository permissaoRepository;
-    private final CadastroGrupoService grupoService;
+
+    public List<Permissao> findAll () {
+        return permissaoRepository.findAll();
+    }
 
     public Permissao findById (Long id ) {
         return permissaoRepository.findById(id).orElseThrow(() ->

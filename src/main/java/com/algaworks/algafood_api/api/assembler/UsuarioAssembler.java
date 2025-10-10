@@ -5,6 +5,7 @@ import com.algaworks.algafood_api.domain.model.Usuario;
 import org.mapstruct.Mapper;
 import org.springframework.context.annotation.Bean;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
@@ -14,7 +15,7 @@ public interface UsuarioAssembler {
     UsuarioModel usuarioToUsuarioModel(Usuario usuario);
 
     @Bean
-    List<UsuarioModel> toCollection(List<Usuario> listaUsuario);
+    List<UsuarioModel> toCollection(Collection<Usuario> listaUsuario);
 
 }
 

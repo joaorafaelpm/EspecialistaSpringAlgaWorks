@@ -27,7 +27,6 @@ public class Permissao {
     public Permissao (String nome , String descricao) {
         this.nome = nome ;
         this.descricao = descricao ;
-
     }
 
 }

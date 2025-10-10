@@ -15,12 +15,11 @@ import java.util.List;
 @AllArgsConstructor
 public class PermissaoController {
 
-    private final PermissaoRepository permissaoRepository;
     private final CadastroPermissaoService permissaoService;
 
     @GetMapping
     public List<Permissao> findALl () {
-        return permissaoRepository.findAll();
+        return permissaoService.findAll();
     }
 
     @GetMapping("/{permissaoId}")

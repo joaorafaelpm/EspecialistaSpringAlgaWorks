@@ -1,16 +1,13 @@
 package com.algaworks.algafood_api.domain.service;
 
-import com.algaworks.algafood_api.domain.exception.CozinhaNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood_api.domain.exception.RestauranteNaoEncontradoException;
-import com.algaworks.algafood_api.domain.model.Cozinha;
+import com.algaworks.algafood_api.domain.model.FormaPagamento;
 import com.algaworks.algafood_api.domain.model.Restaurante;
-import com.algaworks.algafood_api.domain.repository.CozinhaRepository;
+import com.algaworks.algafood_api.domain.model.Usuario;
 import com.algaworks.algafood_api.domain.repository.RestauranteRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +20,8 @@ public class CadastroRestauranteService {
     RestauranteRepository restauranteRepository;
     CadastroCozinhaService cozinhaService ;
     CadastroCidadeService cidadeService ;
+    CadastroFormaPagamentoService formaPagamentoService ;
+    CadastroUsuarioService usuarioService ;
 
     public List<Restaurante> findAll() {
         return restauranteRepository.findAll();
@@ -77,7 +76,46 @@ public class CadastroRestauranteService {
         Restaurante restaurante = findById(id);
         restaurante.inativar();
     }
+    @Transactional
+    public void abrir (Long id) {
+        Restaurante restaurante = findById(id);
+        restaurante.abrir();
+    }
+    @Transactional
+    public void fechar (Long id) {
+        Restaurante restaurante = findById(id);
+        restaurante.fechar();
+    }
 
+    @Transactional
+    public void desassociarFormaPagamento(Long restauranteId , Long formaDePagamentoId) {
+        Restaurante restaurante = findById(restauranteId);
+        FormaPagamento formaPagamento = formaPagamentoService.findById(formaDePagamentoId);
+
+        restaurante.desassociarFormaPagamento(formaPagamento);
+    }
+    @Transactional
+    public void associarFormaPagamento(Long restauranteId , Long formaDePagamentoId) {
+        Restaurante restaurante = findById(restauranteId);
+        FormaPagamento formaPagamento = formaPagamentoService.findById(formaDePagamentoId);
+
+        restaurante.associarFormaPagamento(formaPagamento);
+    }
+
+    @Transactional
+    public void desassociarUsuarioResponsavel(Long restauranteId , Long usuarioId) {
+        Restaurante restaurante = findById(restauranteId);
+        Usuario usuario = usuarioService.findById(usuarioId);
+
+        restaurante.desassociarUsuario(usuario);
+    }
+    @Transactional
+    public void associarUsuarioResponsavel(Long restauranteId , Long usuarioId) {
+        Restaurante restaurante = findById(restauranteId);
+        Usuario usuario = usuarioService.findById(usuarioId);
+
+        restaurante.associarUsuario(usuario);
+    }
 
 
 }

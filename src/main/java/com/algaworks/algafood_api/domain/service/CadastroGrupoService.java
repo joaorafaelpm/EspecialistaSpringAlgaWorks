@@ -21,6 +21,9 @@ public class CadastroGrupoService {
 
     private final GrupoRepository grupoRepository ;
 
+    private final CadastroPermissaoService permissaoService;
+    private final CadastroUsuarioService usuarioService;
+
     public List<Grupo> findAll () {
         return grupoRepository.findAll();
     }
@@ -38,15 +41,33 @@ public class CadastroGrupoService {
     @Transactional
     public void deleteById (Long id) {
         try {
-            grupoRepository.deleteById(id);
+            grupoRepository.delete(findById(id));
             grupoRepository.flush();
-        }
-        catch (EmptyResultDataAccessException e) {
-            throw new GrupoNaoEncontradoException(id);
-        } catch (DataIntegrityViolationException e) {
+        }catch (DataIntegrityViolationException e) {
             throw new EntidadeEmUsoException(
                     String.format("Entidade de id '%s' está em uso, logo não pode ser deletada." , id));
         }
     }
+
+    @Transactional
+    public void associar (Long grupoId , Long permissaoId) {
+        Grupo grupo = findById(grupoId);
+        grupo.associarPermissao(permissaoService.findById(permissaoId));
+    }
+    @Transactional
+    public void desassociar (Long grupoId , Long permissaoId) {
+        Grupo grupo = findById(grupoId);
+        grupo.desassociarPermissao(permissaoService.findById(permissaoId));
+    }
+
+    @Transactional
+    public void associarGrupo (Long usuarioId , Long grupoId) {
+        usuarioService.findById(usuarioId).associar(findById(grupoId));
+    }
+    @Transactional
+    public void desassociarGrupo (Long usuarioId , Long grupoId) {
+        usuarioService.findById(usuarioId).desassociar(findById(grupoId));
+    }
+
 
 }

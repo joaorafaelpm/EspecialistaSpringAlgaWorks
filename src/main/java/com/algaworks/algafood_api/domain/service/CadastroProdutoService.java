@@ -1,58 +1,57 @@
 package com.algaworks.algafood_api.domain.service;
 
 
-import com.algaworks.algafood_api.domain.exception.EntidadeInvalida;
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
-import com.algaworks.algafood_api.domain.exception.NegocioException;
+import com.algaworks.algafood_api.domain.exception.ProdutoNaoEncontradoException;
 import com.algaworks.algafood_api.domain.exception.RestauranteNaoEncontradoException;
-import com.algaworks.algafood_api.domain.model.Cidade;
-import com.algaworks.algafood_api.domain.model.Cozinha;
 import com.algaworks.algafood_api.domain.model.Produto;
 import com.algaworks.algafood_api.domain.model.Restaurante;
 import com.algaworks.algafood_api.domain.repository.ProdutoRepository;
 import com.algaworks.algafood_api.domain.repository.RestauranteRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
-@Transactional
 public class CadastroProdutoService {
 
-    RestauranteRepository restauranteRepository ;
+    CadastroRestauranteService restauranteService ;
     ProdutoRepository produtoRepository;
 
-    public Produto findById (Long id ) {
-        return produtoRepository.findById(id).orElseThrow(() ->
-                new EntidadeNaoEncontradaException(
-                        String.format("Não foi encontrado um produto com id de %d!" , id)
-                ));
+    public List<Produto> findAll () {
+        return produtoRepository.findAll();
     }
 
-    public Produto save (Produto produto) {
-        Long restauranteId = produto.getRestaurante().getId();
-        Restaurante restaurante = restauranteRepository.findById(restauranteId).orElseThrow(() ->
-                new RestauranteNaoEncontradoException(restauranteId));
+    public List<Produto> findByRestaurante (Restaurante restaurante) {
+        return produtoRepository.findByRestaurante(restaurante);
+    }
+
+    public Produto findById (Long restauranteId , Long produtoId ) {
+        restauranteService.findById(restauranteId);
+        return produtoRepository.findById(restauranteId , produtoId).orElseThrow(() ->
+                new ProdutoNaoEncontradoException(restauranteId , produtoId));
+    }
+
+    @Transactional
+    public Produto save (Long restauranteId , Produto produto) {
+        Restaurante restaurante = restauranteService.findById(restauranteId);
         produto.setRestaurante(restaurante);
-        restaurante.getProdutos().add(produto);
+        restaurante.adicionarProduto(produto);
         return produtoRepository.save(produto) ;
     }
 
+    @Transactional
+    public void remove (Long restauranteId , Long produtoId) {
+        Restaurante restaurante = restauranteService.findById(restauranteId);
+        Produto produto = findById(restauranteId , produtoId);
 
-    public Produto save (Long produtoId , Produto produto) {
-        Produto produtoAntigo = findById(produtoId);
-        Restaurante restaurante = produto.getRestaurante();
-        if (produtoAntigo.getRestaurante().equals(produto.getRestaurante())) {
-            BeanUtils.copyProperties(produto , produtoAntigo , "id" , "restaurante");
-        }else {
-            BeanUtils.copyProperties(produto , produtoAntigo , "id");
-        }
-        var produtoAtualizado = produtoAntigo;
-        return save(produtoAtualizado);
+        restaurante.removerProduto(produto);
+        produtoRepository.delete(produto);
+        produtoRepository.flush();
     }
 
 

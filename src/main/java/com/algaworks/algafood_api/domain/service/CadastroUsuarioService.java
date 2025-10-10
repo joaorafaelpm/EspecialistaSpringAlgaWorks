@@ -30,6 +30,7 @@ public class CadastroUsuarioService  {
     }
     @Transactional
     public Usuario save (Usuario usuario) {
+//        A gente precisa fazer esse comando para o JPA parar de instanciar essa entidade, por que quando nós vamos copiar outro email o JPA já entende que aquele email foi alterado da classe original, e caso existam 2 emails daquele a nossa função de procurar pelo email não vai retornal um optional e sim uma lista, por isso precisamos "parar" o JPA
         usuarioRepository.detach(usuario);
 
         Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(usuario.getEmail());
@@ -58,6 +59,8 @@ public class CadastroUsuarioService  {
         }
         usuarioRepository.save(usuario);
     }
+
+
 
 
 
