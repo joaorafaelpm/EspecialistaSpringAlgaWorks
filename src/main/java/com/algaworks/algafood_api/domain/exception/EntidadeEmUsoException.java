@@ -8,8 +8,10 @@ public class EntidadeEmUsoException extends NegocioException {
     public EntidadeEmUsoException(String message) {
         super(message);
     }
-    public EntidadeEmUsoException(String message , Long id) {
-        super(message);
+    public EntidadeEmUsoException(Long id) {
+        super(String.format(
+                "Entidade de id '%s' está em uso, logo não pode ser removida!" , id
+        ));
     }
 
 }

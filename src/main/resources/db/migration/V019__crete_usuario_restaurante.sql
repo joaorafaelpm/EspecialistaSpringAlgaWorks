@@ -5,9 +5,7 @@ CREATE TABLE IF NOT EXISTS restaurante_usuario_responsavel (
     PRIMARY KEY (usuario_id , restaurante_id),
 
     CONSTRAINT fk_restaurante_usuario_usuario FOREIGN KEY (usuario_id)
-            REFERENCES usuario(id)
-            ON DELETE CASCADE,
+            REFERENCES usuario(id),
     CONSTRAINT fk_restaurante_usuario_restaurante FOREIGN KEY (restaurante_id)
             REFERENCES restaurante(id)
-            ON DELETE CASCADE
 ) engine=InnoDB default charset=utf8;

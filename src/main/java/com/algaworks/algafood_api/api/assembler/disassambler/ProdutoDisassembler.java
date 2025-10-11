@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 public interface ProdutoDisassembler {
 
     @Bean
+
     Produto produtoDTOToProduto (ProdutoDTO produtoDTO) ;
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

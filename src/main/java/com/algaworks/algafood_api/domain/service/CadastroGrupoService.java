@@ -44,8 +44,7 @@ public class CadastroGrupoService {
             grupoRepository.delete(findById(id));
             grupoRepository.flush();
         }catch (DataIntegrityViolationException e) {
-            throw new EntidadeEmUsoException(
-                    String.format("Entidade de id '%s' está em uso, logo não pode ser deletada." , id));
+            throw new EntidadeEmUsoException(id);
         }
     }
 

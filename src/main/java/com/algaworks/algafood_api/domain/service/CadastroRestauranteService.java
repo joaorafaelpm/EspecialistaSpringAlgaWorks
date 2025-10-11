@@ -65,6 +65,8 @@ public class CadastroRestauranteService {
         }
     }
 
+
+
 //    Enquanto o restaurante for chamado pelo JPA o restaurante entra em processo de gerênciamento pelo próprio JPA e entende que quando houver alguma mudança ele deve atualizar no banco automaticamente, então não é necessário salvar de novo
     @Transactional
     public void ativar (Long id) {
@@ -76,6 +78,17 @@ public class CadastroRestauranteService {
         Restaurante restaurante = findById(id);
         restaurante.inativar();
     }
+
+    @Transactional
+    public void ativar (List<Long> restauranteIds) {
+        restauranteIds.forEach(this::ativar);
+    }
+
+    @Transactional
+    public void inativar (List<Long> restauranteIds) {
+        restauranteIds.forEach(this::inativar);
+    }
+
     @Transactional
     public void abrir (Long id) {
         Restaurante restaurante = findById(id);
@@ -107,14 +120,14 @@ public class CadastroRestauranteService {
         Restaurante restaurante = findById(restauranteId);
         Usuario usuario = usuarioService.findById(usuarioId);
 
-        restaurante.desassociarUsuario(usuario);
+        restaurante.desassociarUsuarioResponsavel(usuario);
     }
     @Transactional
     public void associarUsuarioResponsavel(Long restauranteId , Long usuarioId) {
         Restaurante restaurante = findById(restauranteId);
         Usuario usuario = usuarioService.findById(usuarioId);
 
-        restaurante.associarUsuario(usuario);
+        restaurante.associarUsuarioResponsavel(usuario);
     }
 
 

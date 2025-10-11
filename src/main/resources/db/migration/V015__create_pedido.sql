@@ -1,13 +1,13 @@
 create table IF NOT EXISTS pedido (
 	id bigint not null auto_increment,
-    subTotal DECIMAL(9 ,2) NOT NULL ,
-    taxaFrete DECIMAL(9 ,2) NOT NULL ,
-    valorTotal DECIMAL(9 ,2) NOT NULL ,
+    subtotal DECIMAL(9 ,2) NOT NULL ,
+    taxa_frete DECIMAL(9 ,2) NOT NULL ,
+    valor_total DECIMAL(9 ,2) NOT NULL ,
 
     data_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    data_confirmacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    data_cancelamento DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    data_entrega DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    data_confirmacao DATETIME ,
+    data_cancelamento DATETIME ,
+    data_entrega DATETIME ,
 
     status_pedido VARCHAR(10) NOT NULL DEFAULT "CRIADO" ,
     forma_pagamento_id BIGINT NOT NULL ,

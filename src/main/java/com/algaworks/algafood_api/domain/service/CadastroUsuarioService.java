@@ -1,5 +1,6 @@
 package com.algaworks.algafood_api.domain.service;
 
+import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.algaworks.algafood_api.domain.exception.UsuarioNaoEncontradoException;
@@ -7,6 +8,7 @@ import com.algaworks.algafood_api.domain.model.Usuario;
 import com.algaworks.algafood_api.domain.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,8 +47,14 @@ public class CadastroUsuarioService  {
 
     @Transactional
     public void remove (Long id) {
-        usuarioRepository.deleteById(id);
-        usuarioRepository.flush();
+        try {
+            usuarioRepository.deleteById(id);
+            usuarioRepository.flush();
+        }
+        catch (DataIntegrityViolationException e) {
+            throw new EntidadeEmUsoException(id);
+        }
+
     }
 
     @Transactional

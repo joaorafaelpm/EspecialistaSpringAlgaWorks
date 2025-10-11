@@ -1,5 +1,6 @@
 package com.algaworks.algafood_api.domain.model;
 
+import com.algaworks.algafood_api.api.model.ProdutoModel;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,6 +31,21 @@ public class ItemPedido {
     @JoinColumn(name = "produto_id" , nullable = false)
     private Produto produto;
 
+    public BigDecimal definirPrecoTotal () {
+        BigDecimal precoUnitario = this.getPrecoUnitario();
+        Integer quantidade = this.getQuantidade();
 
+        if (precoUnitario == null) {
+            precoUnitario = BigDecimal.ZERO;
+        }
+
+        if (quantidade == null) {
+            quantidade = 0;
+        }
+
+        BigDecimal precoTotal = getPrecoUnitario().multiply(BigDecimal.valueOf(quantidade));
+        setPrecoTotal(precoTotal);
+        return precoTotal;
+    }
 
 }

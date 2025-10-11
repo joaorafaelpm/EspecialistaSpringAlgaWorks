@@ -43,9 +43,7 @@ public class CadastroFormaPagamentoService {
             formaPagamentoRepository.flush();
         }
         catch (DataIntegrityViolationException e) {
-            throw new EntidadeEmUsoException(
-                    String.format("FormaPagamento de código %d está em uso, logo, não pode ser removida!" , id)
-            );
+            throw new EntidadeEmUsoException(id);
         }
     }
 

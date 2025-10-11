@@ -83,10 +83,10 @@ public class Restaurante {
     public boolean desassociarFormaPagamento (FormaPagamento formaPagamento) {
         return getFormasPagamento().remove(formaPagamento);
     }
-    public boolean associarUsuario(Usuario usuario) {
+    public boolean associarUsuarioResponsavel(Usuario usuario) {
         return getUsuarios().add(usuario);
     }
-    public boolean desassociarUsuario (Usuario usuario) {
+    public boolean desassociarUsuarioResponsavel(Usuario usuario) {
         return getUsuarios().remove(usuario);
     }
 
@@ -95,6 +95,14 @@ public class Restaurante {
     }
     public boolean removerProduto (Produto produto) {
         return getProdutos().remove(produto);
+    }
+
+    public boolean aceitaFormaPagamento(FormaPagamento formaPagamento) {
+        return getFormasPagamento().contains(formaPagamento);
+    }
+
+    public boolean naoAceitaFormaPagamento(FormaPagamento formaPagamento) {
+        return !aceitaFormaPagamento(formaPagamento);
     }
 
 }

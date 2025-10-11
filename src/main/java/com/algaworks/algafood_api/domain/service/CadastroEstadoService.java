@@ -36,9 +36,7 @@ public class CadastroEstadoService {
             estadoRepository.flush();
         }
         catch (DataIntegrityViolationException e) {
-            throw new EntidadeEmUsoException(
-                    String.format("Estado de código %d está em uso, logo, não pode ser removida!" , id)
-            ) ;
+            throw new EntidadeEmUsoException(id) ;
         }
 
     }
