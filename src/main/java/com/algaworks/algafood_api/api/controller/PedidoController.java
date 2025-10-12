@@ -1,5 +1,6 @@
 package com.algaworks.algafood_api.api.controller;
 
+import ch.qos.logback.core.util.StringUtil;
 import com.algaworks.algafood_api.api.assembler.PedidoAssembler;
 import com.algaworks.algafood_api.api.assembler.disassambler.PedidoDisassembler;
 import com.algaworks.algafood_api.api.model.PedidoModel;
@@ -10,12 +11,19 @@ import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.algaworks.algafood_api.domain.model.Pedido;
 import com.algaworks.algafood_api.domain.service.CadastroPedidoService;
 import com.algaworks.algafood_api.domain.service.EmissaoPedidoService;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import io.micrometer.common.util.StringUtils;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static com.algaworks.algafood_api.core.replicacaoDoSquiggly.DynamicFilterUtils.applyFilter;
+
 
 @RestController
 @RequestMapping("/pedidos")
@@ -29,9 +37,18 @@ public class PedidoController {
     private final PedidoDisassembler pedidoDisassembler;
 
     @GetMapping
-    public List<PedidoResumoModel> listar () {
-        return pedidoAssembler.toCollection(pedidoService.findAll());
+    public MappingJacksonValue listar(@RequestParam(required = false) String campos) {
+        List<Pedido> listaPedido = pedidoService.findAll();
+        List<PedidoResumoModel> pedidosModel = pedidoAssembler.toCollection(listaPedido);
+
+        MappingJacksonValue wrapper = applyFilter(pedidosModel , campos);
+        return wrapper;
     }
+//    @GetMapping
+//    public List<PedidoResumoModel> listar () {
+//        return pedidoAssembler.toCollection(pedidoService.findAll());
+//    }
+
     @GetMapping("/{codigo}")
     public PedidoModel pegarUm (@PathVariable String codigo) {
         return pedidoAssembler.pedidoToPedidoModel(pedidoService.findByIdMapperSolver(codigo));

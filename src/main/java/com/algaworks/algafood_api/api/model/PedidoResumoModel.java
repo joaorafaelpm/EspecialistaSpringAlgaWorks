@@ -1,6 +1,7 @@
 package com.algaworks.algafood_api.api.model;
 
 import com.algaworks.algafood_api.domain.model.enuns.StatusPedido;
+import com.fasterxml.jackson.annotation.JsonFilter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
+@JsonFilter("pedidoFilter")
 public class PedidoResumoModel {
 
     private String codigo;
