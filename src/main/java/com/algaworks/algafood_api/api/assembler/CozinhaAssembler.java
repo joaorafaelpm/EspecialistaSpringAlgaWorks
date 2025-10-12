@@ -4,6 +4,7 @@ import com.algaworks.algafood_api.api.model.CozinhaModel;
 import com.algaworks.algafood_api.domain.model.Cozinha;
 import org.mapstruct.Mapper;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -16,4 +17,8 @@ public interface CozinhaAssembler {
     @Bean
     List<CozinhaModel> toCollection(List<Cozinha> listaCozinha);
 
+
+    default Page<CozinhaModel> toPageable(Page<Cozinha> listaCozinha) {
+        return listaCozinha.map(this::cozinhaToCozinhaModel);
+    }
 }

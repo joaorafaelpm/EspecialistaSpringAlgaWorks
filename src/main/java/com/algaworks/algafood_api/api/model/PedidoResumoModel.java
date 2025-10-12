@@ -13,7 +13,6 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-@JsonFilter("pedidoFilter")
 public class PedidoResumoModel {
 
     private String codigo;
@@ -27,6 +26,7 @@ public class PedidoResumoModel {
     private OffsetDateTime dataEntrega;
     private StatusPedido statusPedido ;
     private RestauranteResumoModel restaurante;
-    private UsuarioModel cliente ;
+//    private UsuarioModel cliente ;
+    private String nomeCliente ;
 
 }

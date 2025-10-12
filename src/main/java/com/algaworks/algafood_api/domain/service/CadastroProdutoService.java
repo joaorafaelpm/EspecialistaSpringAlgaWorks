@@ -29,6 +29,9 @@ public class CadastroProdutoService {
     public List<Produto> findByRestaurante (Restaurante restaurante) {
         return produtoRepository.findByRestaurante(restaurante);
     }
+    public List<Produto> findAtivosByRestaurante (Restaurante restaurante) {
+        return produtoRepository.findAtivosByRestaurante(restaurante);
+    }
 
     public Produto findById (Long restauranteId , Long produtoId ) {
         restauranteService.findById(restauranteId);

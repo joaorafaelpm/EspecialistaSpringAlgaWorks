@@ -10,6 +10,10 @@ public class ObjectFilterUtil {
     public static Object filter(Object data, List<String> allowedFields) {
         if (data == null) return null;
 
+        if (allowedFields == null || allowedFields.isEmpty()) {
+            return data;
+        }
+
         if (data instanceof Collection<?>) {
             List<Object> list = new ArrayList<>();
             for (Object item : (Collection<?>) data) {
@@ -32,7 +36,7 @@ public class ObjectFilterUtil {
     }
 
     private static Map<String, Object> filterObject(Object obj, List<String> allowedFields) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new LinkedHashMap<>();
         if (obj == null) return result;
 
         Map<String, List<String>> includeTree = new HashMap<>();

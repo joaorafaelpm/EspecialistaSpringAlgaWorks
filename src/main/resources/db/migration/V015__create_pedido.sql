@@ -4,7 +4,7 @@ create table IF NOT EXISTS pedido (
     taxa_frete DECIMAL(9 ,2) NOT NULL ,
     valor_total DECIMAL(9 ,2) NOT NULL ,
 
-    data_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    data_criacao DATETIME NOT NULL,
     data_confirmacao DATETIME ,
     data_cancelamento DATETIME ,
     data_entrega DATETIME ,

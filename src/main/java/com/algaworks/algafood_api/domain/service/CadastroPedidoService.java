@@ -1,13 +1,18 @@
 package com.algaworks.algafood_api.domain.service;
 
+import com.algaworks.algafood_api.api.assembler.PedidoAssembler;
 import com.algaworks.algafood_api.api.model.input.PedidoDTO;
 import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood_api.domain.exception.PedidoNaoEncontradoException;
 import com.algaworks.algafood_api.domain.model.Pedido;
 import com.algaworks.algafood_api.domain.repository.PedidoRepository;
+import com.algaworks.algafood_api.infrastructure.repository.spec.PedidoSpecs;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +30,9 @@ public class CadastroPedidoService {
 
     public List<Pedido> findAll () {
         return pedidoRepository.findAll();
+    }
+    public Page<Pedido> findAll (Specification<Pedido> specification , Pageable pageable) {
+        return pedidoRepository.findAll(specification , pageable);
     }
 
     public Pedido findById(String codigo) {

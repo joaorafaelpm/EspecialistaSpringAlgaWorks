@@ -25,9 +25,17 @@ public class RestauranteProdutosController {
     private final ProdutoAssembler produtoAssembler;
     private final ProdutoDisassembler produtoDisassembler;
 
+//    @GetMapping
+//    public List<ProdutoModel> pegarTodosDeUmRestaurante (@PathVariable Long restauranteId) {
+//        List<Produto> produtos = produtoService.findByRestaurante(restauranteService.findById(restauranteId));
+//        return produtoAssembler.toCollection(produtos);
+//    }
     @GetMapping
-    public List<ProdutoModel> pegarTodosDeUmRestaurante (@PathVariable Long restauranteId) {
-        List<Produto> produtos = produtoService.findByRestaurante(restauranteService.findById(restauranteId));
+    public List<ProdutoModel> pegarTodosDeUmRestaurante (@PathVariable Long restauranteId , @RequestParam(required = false) boolean incluirInativos) {
+        List<Produto> produtos = produtoService.findAtivosByRestaurante(restauranteService.findById(restauranteId));
+        if (incluirInativos) {
+            produtos = produtoService.findByRestaurante(restauranteService.findById(restauranteId));
+        }
         return produtoAssembler.toCollection(produtos);
     }
 

@@ -6,10 +6,11 @@ import com.algaworks.algafood_api.api.assembler.disassambler.CozinhaDisassembler
 import com.algaworks.algafood_api.api.model.CozinhaModel;
 import com.algaworks.algafood_api.api.model.input.CozinhaDTO;
 import com.algaworks.algafood_api.domain.model.Cozinha;
-import com.algaworks.algafood_api.domain.repository.CozinhaRepository;
 import com.algaworks.algafood_api.domain.service.CadastroCozinhaService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +28,10 @@ public class CozinhaController {
     CozinhaDisassembler cozinhaDisassembler ;
 
     @GetMapping
-    public List<CozinhaModel> all () {
-        return cozinhaAssembler.toCollection(cozinhaService.findAll());
+    public Page<CozinhaModel> all (Pageable pageable) {
+        Page<Cozinha> findAll = cozinhaService.findAll(pageable);
+        return cozinhaAssembler.toPageable(
+                findAll);
     }
 
     @GetMapping("/{id}")

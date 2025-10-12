@@ -7,6 +7,8 @@ import com.algaworks.algafood_api.domain.repository.CozinhaRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +21,9 @@ public class CadastroCozinhaService {
 
     public List<Cozinha> findAll() {
         return cozinhaRepository.findAll();
+    }
+    public Page<Cozinha> findAll(Pageable pageable) {
+        return cozinhaRepository.findAll(pageable);
     }
 
     public Cozinha findById (Long id) {
