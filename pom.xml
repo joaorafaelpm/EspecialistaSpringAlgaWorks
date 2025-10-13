@@ -34,6 +34,7 @@
 		<commons-lang3.version>3.18.0</commons-lang3.version>
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<guava.version>33.5.0-jre</guava.version>
+		<jasperreports.version>6.21.3</jasperreports.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -98,6 +99,11 @@
 			<version>${guava.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>${jasperreports.version}</version>
+		</dependency>
 
 	</dependencies>
 

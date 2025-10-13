@@ -1,9 +1,8 @@
-package com.algaworks.algafood_api.core.replicacaoDoSquiggly;
+package com.algaworks.algafood_api.core.replicacaoDoSquiggly.dynamicFilter;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
@@ -18,8 +17,8 @@ public class DynamicFieldResponseAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        // intercepta todas as respostas (poderia filtrar por pacote, se quiser)
-        return true;
+        // Ignora byte[] (PDF, binários) e outros tipos não JSON
+        return !returnType.getParameterType().equals(byte[].class);
     }
 
     @Override
@@ -35,8 +34,14 @@ public class DynamicFieldResponseAdvice implements ResponseBodyAdvice<Object> {
             return null;
         }
 
+        // Ignora se o content type for PDF (ou binário)
+        if (MediaType.APPLICATION_PDF.equals(selectedContentType)
+                || MediaType.APPLICATION_OCTET_STREAM.equals(selectedContentType)) {
+            return body;
+        }
+
+        // Aplica o filtro apenas em JSON
         String campos = request.getParameter("campos");
         return DynamicFilterUtils.applyFilter(body, campos);
     }
 }
-

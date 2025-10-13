@@ -1,5 +1,7 @@
-package com.algaworks.algafood_api.core.replicacaoDoSquiggly;
+package com.algaworks.algafood_api.core.replicacaoDoSquiggly.dynamicFilter;
 
+import com.algaworks.algafood_api.core.replicacaoDoSquiggly.field.FieldParser;
+import com.algaworks.algafood_api.core.replicacaoDoSquiggly.field.ObjectFilterUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

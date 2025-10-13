@@ -1,4 +1,4 @@
-package com.algaworks.algafood_api.core.replicacaoDoSquiggly;
+package com.algaworks.algafood_api.core.replicacaoDoSquiggly.tomcat;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.stereotype.Component;

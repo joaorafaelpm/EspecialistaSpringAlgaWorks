@@ -1,4 +1,4 @@
-package com.algaworks.algafood_api.domain.repository.filter;
+package com.algaworks.algafood_api.domain.filter;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +13,9 @@ public class PedidoFilter {
     private Long clienteId ;
     private Long restauranteId ;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private OffsetDateTime dataCriacaoInicio;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private OffsetDateTime dataCriacaoFim;
 
 

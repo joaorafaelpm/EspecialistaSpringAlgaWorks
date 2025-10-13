@@ -1,4 +1,4 @@
-package com.algaworks.algafood_api.core.replicacaoDoSquiggly;
+package com.algaworks.algafood_api.core.replicacaoDoSquiggly.field;
 
 public class FilterContext {
     private static final ThreadLocal<String> fields = new ThreadLocal<>();

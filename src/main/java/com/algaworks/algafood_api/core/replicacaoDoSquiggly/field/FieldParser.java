@@ -1,4 +1,4 @@
-package com.algaworks.algafood_api.core.replicacaoDoSquiggly;
+package com.algaworks.algafood_api.core.replicacaoDoSquiggly.field;
 
 import java.util.ArrayList;
 import java.util.List;

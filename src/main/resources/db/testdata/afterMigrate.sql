@@ -118,7 +118,7 @@ insert into pedido (id,codigo, restaurante_id, cliente_usuario_id, forma_pagamen
             endereco_logradouro, endereco_numero, endereco_complemento, endereco_bairro,
             status_pedido, data_criacao, data_confirmacao , data_entrega , subtotal, taxa_frete, valor_total)
 values (3, 'b5741512-8fbc-47fa-9ac1-b530354fc0ff', 1, 1, 1, 1, '38400-222', 'Rua Natal', '200', null, 'Brasil',
-        'ENTREGUE', '2019-10-30 21:10:00', '2019-10-30 21:10:45', '2019-10-30 21:55:44', 110, 10, 120);
+        'ENTREGUE', '2025-10-11 21:10:00', '2025-10-11 21:10:45', '2025-10-11 21:55:44', 110, 10, 120);
 
 insert into item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, preco_total, observacao)
 values (4, 3, 2, 1, 110, 110, null);
@@ -128,7 +128,7 @@ insert into pedido (id,codigo, restaurante_id, cliente_usuario_id, forma_pagamen
             endereco_logradouro, endereco_numero, endereco_complemento, endereco_bairro,
             status_pedido, data_criacao, data_confirmacao , data_entrega , subtotal, taxa_frete, valor_total)
 values (4, '5c621c9a-ba61-4454-8631-8aabefe58dc2', 1, 2, 1, 1, '38400-800', 'Rua Fortaleza', '900', 'Apto 504', 'Centro',
-        'ENTREGUE', '2019-11-02 20:34:04', '2019-11-02 20:35:10', '2019-11-02 21:10:32', 174.4, 5, 179.4);
+        'ENTREGUE', '2025-10-02 20:34:04', '2025-10-02 20:35:10', '2025-10-02 21:10:32', 174.4, 5, 179.4);
 
 insert into item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, preco_total, observacao)
 values (5, 4, 3, 2, 87.2, 174.4, null);
@@ -138,7 +138,7 @@ insert into pedido (id,codigo, restaurante_id, cliente_usuario_id, forma_pagamen
             endereco_logradouro, endereco_numero, endereco_complemento, endereco_bairro,
             status_pedido, data_criacao, data_confirmacao , data_entrega ,subtotal, taxa_frete, valor_total)
 values (5, '8d774bcf-b238-42f3-aef1-5fb388754d63', 1, 3, 2, 1, '38400-200', 'Rua 10', '930', 'Casa 20', 'Martins',
-        'ENTREGUE', '2019-11-02 21:00:30', '2019-11-02 21:01:21', '2019-11-02 21:20:10', 87.2, 10, 97.2);
+        'ENTREGUE', '2025-10-03 02:00:30', '2025-10-03 02:01:21', '2025-10-03 02:20:10', 87.2, 10, 97.2);
 
 insert into item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, preco_total, observacao)
 values (6, 5, 3, 1, 87.2, 87.2, null);
