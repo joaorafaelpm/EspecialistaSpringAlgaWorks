@@ -14,6 +14,6 @@ public interface EstadoAssembler {
     EstadoModel estadoToEstadoModel(Estado estado);
 
     @Bean
-    List<EstadoModel> toCollection(List<Estado> listaFormaPagamento);
+    List<EstadoModel> toCollection(List<Estado> listaEstados);
 
 }
