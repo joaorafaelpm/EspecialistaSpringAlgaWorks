@@ -1,13 +1,14 @@
 package com.algaworks.algafood_api.core.replicacaoDoSquiggly.dynamicFilter;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
-
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @ControllerAdvice
 public class DynamicFieldResponseAdvice implements ResponseBodyAdvice<Object> {
@@ -17,8 +18,8 @@ public class DynamicFieldResponseAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        // Ignora byte[] (PDF, binários) e outros tipos não JSON
-        return !returnType.getParameterType().equals(byte[].class);
+        // Aqui não limitamos ainda, apenas deixamos o beforeBodyWrite decidir com base no Content-Type
+        return true;
     }
 
     @Override
@@ -27,21 +28,30 @@ public class DynamicFieldResponseAdvice implements ResponseBodyAdvice<Object> {
             MethodParameter returnType,
             MediaType selectedContentType,
             Class<? extends HttpMessageConverter<?>> selectedConverterType,
-            org.springframework.http.server.ServerHttpRequest serverHttpRequest,
-            org.springframework.http.server.ServerHttpResponse serverHttpResponse) {
+            ServerHttpRequest serverHttpRequest,
+            ServerHttpResponse serverHttpResponse) {
 
         if (body == null) {
             return null;
         }
 
-        // Ignora se o content type for PDF (ou binário)
-        if (MediaType.APPLICATION_PDF.equals(selectedContentType)
-                || MediaType.APPLICATION_OCTET_STREAM.equals(selectedContentType)) {
+        // 🔒 Garante que o filtro só seja aplicado a respostas JSON
+        if (!isJsonMediaType(selectedContentType)) {
             return body;
         }
 
-        // Aplica o filtro apenas em JSON
+        // Aplica o filtro de campos (replicação do Squiggly)
         String campos = request.getParameter("campos");
         return DynamicFilterUtils.applyFilter(body, campos);
+    }
+
+    /**
+     * Verifica se o Content-Type é JSON (application/json ou variações).
+     */
+    private boolean isJsonMediaType(MediaType mediaType) {
+        return mediaType != null &&
+                (MediaType.APPLICATION_JSON.includes(mediaType) ||
+                        MediaType.APPLICATION_JSON_UTF8.includes(mediaType) ||
+                        (mediaType.getSubtype() != null && mediaType.getSubtype().contains("json")));
     }
 }
