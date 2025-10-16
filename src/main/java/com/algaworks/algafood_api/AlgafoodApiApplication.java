@@ -14,13 +14,14 @@ public class AlgafoodApiApplication {
 
 	public static void main(String[] args) {
 		Dotenv dotenv = Dotenv.configure()
-				// .directory("./backend") // opcional
 				.load();
-
 		System.setProperty("API_EMAIL_KEY", dotenv.get("API_EMAIL_KEY"));
 
+
+
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
 		SpringApplication.run(AlgafoodApiApplication.class, args);
-	}
+		}
 
 }
