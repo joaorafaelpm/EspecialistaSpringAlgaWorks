@@ -1,11 +1,14 @@
 package com.algaworks.algafood_api.domain.model;
 
+import com.algaworks.algafood_api.domain.event.PedidoCanceladoEvent;
+import com.algaworks.algafood_api.domain.event.PedidoConfirmadoEvent;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.algaworks.algafood_api.domain.model.enuns.StatusPedido;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
+
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.domain.AbstractAggregateRoot;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -13,12 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
 @Entity
 @Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true , callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class Pedido {
+public class Pedido extends AbstractAggregateRoot<Pedido> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,6 +76,8 @@ public class Pedido {
     public void confirmar () {
         setStatusPedido(StatusPedido.CONFIRMADO);
         setDataConfirmacao(OffsetDateTime.now());
+
+        registerEvent(new PedidoConfirmadoEvent(this));
     }
     public void entregar () {
         setStatusPedido(StatusPedido.ENTREGUE);
@@ -80,6 +86,8 @@ public class Pedido {
     public void cancelar () {
         setStatusPedido(StatusPedido.CANCELADO);
         setDataCancelamento(OffsetDateTime.now());
+
+        registerEvent(new PedidoCanceladoEvent(this));
     }
 
 //    Sobrescrevendo o set para se tornar privado
