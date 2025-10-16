@@ -86,8 +86,8 @@ insert into grupo_permissao (grupo_id , permissao_id) values (1 , 1) , (1 , 2) ,
 insert into usuario (id, nome, email, senha, data_cadastro) values
 (1, 'João da Silva', 'joao.ger@algafood.com', '123', utc_timestamp),
 (2, 'Maria Joaquina', 'maria.vnd@algafood.com', '123', utc_timestamp),
-(3, 'José Souza', 'jose.aux@algafood.com', '123', utc_timestamp),
-(4, 'Sebastião Martins', 'sebastiao.cad@algafood.com', '123', utc_timestamp);
+(3, 'José Souza', 'email.teste.pendezzapizza.tcc+hubert@gmail.com', '123', utc_timestamp),
+(4, 'Sebastião Martins', 'email.teste.pendezzapizza.tcc+sebastiao@gmail.com', '123', utc_timestamp);
 
 insert into usuario_grupo (usuario_id, grupo_id) values (1, 1), (1, 2), (2, 2);
 
@@ -140,6 +140,17 @@ insert into pedido (id,codigo, restaurante_id, cliente_usuario_id, forma_pagamen
             status_pedido, data_criacao, data_confirmacao , data_entrega ,subtotal, taxa_frete, valor_total)
 values (5, '8d774bcf-b238-42f3-aef1-5fb388754d63', 1, 3, 2, 1, '38400-200', 'Rua 10', '930', 'Casa 20', 'Martins',
         'ENTREGUE', '2025-10-03 02:00:30', '2025-10-03 02:01:21', '2025-10-03 02:20:10', 87.2, 10, 97.2);
+
+insert into pedido (id,codigo, restaurante_id, cliente_usuario_id, forma_pagamento_id, endereco_cidade_id, endereco_cep,
+            endereco_logradouro, endereco_numero, endereco_complemento, endereco_bairro,
+            status_pedido, data_criacao,subtotal, taxa_frete, valor_total)
+
+values (6, 'a26b8850-453e-4ffb-bc71-4165f26c288c', 1, 3, 2, 1, '38400-200', 'Rua 10', '930', 'Casa 20', 'Martins',
+        'CRIADO', '2025-10-03 02:00:30', 110, 10, 120.0);
+
+insert into item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, preco_total, observacao)
+values (7, 6, 2, 1, 110, 110, null);
+
 
 insert into item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, preco_total, observacao)
 values (6, 5, 3, 1, 87.2, 87.2, null);
