@@ -1,21 +1,13 @@
 package com.algaworks.algafood_api.api.model;
 
 
-import com.algaworks.algafood_api.core.validation.Groups;
-import com.algaworks.algafood_api.domain.model.Cidade;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.hateoas.RepresentationModel;
 
 @Getter
 @Setter
 @AllArgsConstructor
-public class EstadoModel {
+public class EstadoModel extends RepresentationModel<EstadoModel> {
 
     private Long id ;
     private String nome ;

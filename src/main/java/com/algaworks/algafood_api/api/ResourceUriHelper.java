@@ -25,12 +25,5 @@ public class ResourceUriHelper {
         response.setHeader(HttpHeaders.LOCATION , uri.toString());
     }
 
-//    Para somente gerar a Uri e usar com ResponseEntity
-    public static URI generateUri (Object resourceId) {
-        return ServletUriComponentsBuilder.fromCurrentRequestUri()
-                .path("/{id}")
-                .buildAndExpand(resourceId)
-                .toUri();
-    }
 
 }
