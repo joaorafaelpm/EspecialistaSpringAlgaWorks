@@ -8,11 +8,15 @@ import com.algaworks.algafood_api.domain.model.FormaPagamento;
 import com.algaworks.algafood_api.domain.service.CadastroFormaPagamentoService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import net.sf.jasperreports.engine.export.draw.Offset;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.filter.ShallowEtagHeaderFilter;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -27,29 +31,47 @@ public class FormaPagamentoController {
     FormaPagamentoDisassembler formaPagamentoDisassembler ;
 
     @GetMapping
-    public ResponseEntity<List<FormaPagamentoModel>> all () {
+    public ResponseEntity<List<FormaPagamentoModel>> all (ServletWebRequest request) {
+//        Gerando eTag personalizado...
+        ShallowEtagHeaderFilter.disableContentCaching(request.getRequest());
+        String eTag = "0";
+        OffsetDateTime dataUltimaAtualizacao = formaPagamentoService.getUltimaDataAtualizacao();
 
-        List<FormaPagamentoModel> formaPagamentoModels = formaPagamentoAssembler.toCollection(formaPagamentoService.findAll());
+        if (dataUltimaAtualizacao != null) {
+            eTag = String.valueOf(dataUltimaAtualizacao.toEpochSecond());
+        }
+//        Se a etag não alterar, já não precisamos continuar com o processamento, aqui a gente já tem condição se continua ou não o processamento
+//        o checkNotModified == a if-none-match
+        if (request.checkNotModified(eTag)) {
+            return null;
+        }
+        List<FormaPagamentoModel> formaPagamentoModels = formaPagamentoAssembler
+                .toCollection(formaPagamentoService.findAll());
         return ResponseEntity.ok()
-//*                Esse é o padrão, define o tempo de vida de 10 segundos e o cach por padrão é público
-                //  .cacheControl(CacheControl.maxAge(10 , TimeUnit.SECONDS))
-//*                O tempo continua em 10 segundos, porém esse .cachePrivate não permite cache compartilhado com outros servidores se não o local, é recomendado para informações "pessoais" de um único usuário, por que nesses casos não tem  necessidade de expor esse cache para a possibilidade de um proxy reverso, já que a informação só deve ser passada para 1 local
-                //  .cacheControl(CacheControl.maxAge(10 , TimeUnit.SECONDS).cachePrivate())
-//*                O padrão é publico, permite cache compartilhado
                 .cacheControl(CacheControl.maxAge(10 , TimeUnit.SECONDS).cachePublic())
-//*                É controverso pelo nome, mas basicamente esse tipo de cache determina que sempre que for feito uma requisição é necessário validar o cache. Mesmo que a gente use uma etag ou o maxAge ele sempre vai bater no servidor, porém ele ainda vai cachear a informação
-                // .cacheControl(CacheControl.noCache())
-//*               Esse sim não permite nenhum tipo de cache armazenável e sempre bate no servidor e retorna informações puramente do servidor
-                // .cacheControl(CacheControl.noStore())
+                .eTag(eTag)
                 .body(formaPagamentoModels);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FormaPagamentoModel> getById (@PathVariable Long id) {
-        FormaPagamentoModel formaPagamentoModel = formaPagamentoAssembler.formaPagamentoToFormaPagamentoModel(formaPagamentoService.findById(id));
+    public ResponseEntity<FormaPagamentoModel> getById (@PathVariable Long id , ServletWebRequest request) {
+        ShallowEtagHeaderFilter.disableContentCaching(request.getRequest());
+        String eTag = "0";
+        OffsetDateTime dataUltimaAtualizacao = formaPagamentoService.getUltimaDataAtualizacaoById(id);
+
+        if (dataUltimaAtualizacao != null) {
+            eTag = String.valueOf(dataUltimaAtualizacao.toEpochSecond());
+        }
+
+        if (request.checkNotModified(eTag)) {
+            return null;
+        }
+        FormaPagamentoModel formaPagamentoModels = formaPagamentoAssembler
+                .formaPagamentoToFormaPagamentoModel(formaPagamentoService.findById(id));
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(10 , TimeUnit.SECONDS).cachePublic())
-                .body(formaPagamentoModel);
+                .eTag(eTag)
+                .body(formaPagamentoModels);
     }
 
     @PostMapping
