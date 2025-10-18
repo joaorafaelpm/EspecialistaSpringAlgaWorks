@@ -1,4 +1,4 @@
-package com.algaworks.algafood_api.api.model.input;
+package com.algaworks.algafood_api.api.model.DTO;
 
 import com.algaworks.algafood_api.core.validation.PositivoOuZero;
 import jakarta.validation.constraints.NotNull;

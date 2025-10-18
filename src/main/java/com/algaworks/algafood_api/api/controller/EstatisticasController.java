@@ -25,7 +25,6 @@ public class EstatisticasController {
 
     @GetMapping(path = "/vendas-diarias", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<VendaDiaria> consultarVendasJson (VendaDiariaFilter filter ,
-//                          O padrão é o UTC
                           @RequestParam(required = false , defaultValue = "+00:00") String timeOffSet) {
         return vendaQueryService.consultarVendasDiarias(filter , timeOffSet);
     }

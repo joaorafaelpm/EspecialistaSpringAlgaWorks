@@ -1,10 +1,5 @@
-package com.algaworks.algafood_api.api.model.input;
+package com.algaworks.algafood_api.api.model.DTO;
 
-import com.algaworks.algafood_api.api.model.EnderecoModel;
-import com.algaworks.algafood_api.api.model.FormaPagamentoModel;
-import com.algaworks.algafood_api.api.model.ItemPedidoModel;
-import com.algaworks.algafood_api.core.validation.PositivoOuZero;
-import com.algaworks.algafood_api.domain.model.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

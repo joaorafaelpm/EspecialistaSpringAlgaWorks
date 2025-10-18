@@ -1,7 +1,7 @@
 package com.algaworks.algafood_api.api.assembler.disassambler;
 
-import com.algaworks.algafood_api.api.model.input.ItemPedidoDTO;
-import com.algaworks.algafood_api.api.model.input.PedidoDTO;
+import com.algaworks.algafood_api.api.model.DTO.ItemPedidoDTO;
+import com.algaworks.algafood_api.api.model.DTO.PedidoDTO;
 import com.algaworks.algafood_api.domain.model.ItemPedido;
 import com.algaworks.algafood_api.domain.model.Pedido;
 import org.mapstruct.*;

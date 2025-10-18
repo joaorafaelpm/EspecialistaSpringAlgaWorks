@@ -35,6 +35,7 @@
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<guava.version>33.5.0-jre</guava.version>
 		<jasperreports.version>6.21.3</jasperreports.version>
+		<hateoas.version>2.6.4</hateoas.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -98,27 +99,29 @@
 			<artifactId>guava</artifactId>
 			<version>${guava.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
 			<version>${jasperreports.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>io.github.cdimascio</groupId>
 			<artifactId>dotenv-java</artifactId>
 			<version>3.0.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-freemarker</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+			<version>${hateoas.version}</version>
 		</dependency>
 
 	</dependencies>

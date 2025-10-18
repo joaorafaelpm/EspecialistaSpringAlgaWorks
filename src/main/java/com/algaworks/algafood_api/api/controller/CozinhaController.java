@@ -4,7 +4,7 @@ package com.algaworks.algafood_api.api.controller;
 import com.algaworks.algafood_api.api.assembler.CozinhaAssembler;
 import com.algaworks.algafood_api.api.assembler.disassambler.CozinhaDisassembler;
 import com.algaworks.algafood_api.api.model.CozinhaModel;
-import com.algaworks.algafood_api.api.model.input.CozinhaDTO;
+import com.algaworks.algafood_api.api.model.DTO.CozinhaDTO;
 import com.algaworks.algafood_api.domain.model.Cozinha;
 import com.algaworks.algafood_api.domain.service.CadastroCozinhaService;
 import jakarta.validation.Valid;
@@ -14,8 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @AllArgsConstructor

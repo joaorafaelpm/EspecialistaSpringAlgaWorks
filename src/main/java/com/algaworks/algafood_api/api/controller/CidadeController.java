@@ -1,28 +1,22 @@
 package com.algaworks.algafood_api.api.controller;
 
+import com.algaworks.algafood_api.api.ResourceUriHelper;
 import com.algaworks.algafood_api.api.assembler.CidadeAssembler;
 import com.algaworks.algafood_api.api.assembler.disassambler.CidadeDisassembler;
-import com.algaworks.algafood_api.api.exceptionhandler.APIError;
 import com.algaworks.algafood_api.api.model.CidadeModel;
-import com.algaworks.algafood_api.api.model.input.CidadeDTO;
-import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
+import com.algaworks.algafood_api.api.model.DTO.CidadeDTO;
 import com.algaworks.algafood_api.domain.exception.EstadoNaoEncontradoException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.algaworks.algafood_api.domain.model.Cidade;
-import com.algaworks.algafood_api.domain.model.Restaurante;
 import com.algaworks.algafood_api.domain.repository.CidadeRepository;
 import com.algaworks.algafood_api.domain.service.CadastroCidadeService;
-import com.algaworks.algafood_api.domain.service.CadastroRestauranteService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -43,14 +37,44 @@ public class CidadeController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CidadeModel> getById (@PathVariable Long id) {
-        return ResponseEntity.ok(cidadeAssembler.cidadeToCidadeModel(cidadeService.findById(id)));
+        CidadeModel cidadeModel = cidadeAssembler.cidadeToCidadeModel(cidadeService.findById(id));
+        return ResponseEntity.ok(cidadeModel);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<?> add (@RequestBody @Valid CidadeDTO cidadeDTO) {
-        Cidade cidade = cidadeDisassembler.cidadeDTOToCidade(cidadeDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(cidadeAssembler.cidadeToCidadeModel(cidadeService.save(cidade)));
+    public CidadeModel add (@RequestBody @Valid CidadeDTO cidadeDTO) {
+        try {
+            Cidade cidade = cidadeDisassembler.cidadeDTOToCidade(cidadeDTO);
+            CidadeModel cidadeModel = cidadeAssembler.cidadeToCidadeModel(cidadeService.save(cidade));
+
+            ResourceUriHelper.addUriResponseHeader(cidadeModel.getId());
+
+            return cidadeModel;
+        }
+        catch (EstadoNaoEncontradoException e) {
+            throw new NegocioException(e.getMessage() , e);
+        }
     }
+
+//    Usando ResponseEntity
+
+//    @PostMapping
+//    public ResponseEntity<?> add (@RequestBody @Valid CidadeDTO cidadeDTO) {
+//        try {
+//            Cidade cidade = cidadeDisassembler.cidadeDTOToCidade(cidadeDTO);
+//            CidadeModel cidadeModel = cidadeAssembler.cidadeToCidadeModel(cidadeService.save(cidade));
+//
+//            URI uri = ResourceUriHelper.generateUri(cidadeModel.getId());
+//
+//            return ResponseEntity.status(HttpStatus.CREATED)
+//                    .location(uri)
+//                    .body(cidadeModel);
+//        }
+//        catch (EstadoNaoEncontradoException e) {
+//            throw new NegocioException(e.getMessage() , e);
+//        }
+//    }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> save (@PathVariable Long id , @RequestBody @Valid CidadeDTO cidadeDTO) {

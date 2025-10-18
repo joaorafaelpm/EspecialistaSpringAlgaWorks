@@ -4,7 +4,7 @@ import com.algaworks.algafood_api.api.assembler.PedidoAssembler;
 import com.algaworks.algafood_api.api.assembler.disassambler.PedidoDisassembler;
 import com.algaworks.algafood_api.api.model.PedidoModel;
 import com.algaworks.algafood_api.api.model.PedidoResumoModel;
-import com.algaworks.algafood_api.api.model.input.PedidoDTO;
+import com.algaworks.algafood_api.api.model.DTO.PedidoDTO;
 import com.algaworks.algafood_api.core.data.PageableTranslator;
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;

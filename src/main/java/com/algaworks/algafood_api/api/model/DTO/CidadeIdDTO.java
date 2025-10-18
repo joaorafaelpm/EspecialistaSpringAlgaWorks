@@ -1,4 +1,4 @@
-package com.algaworks.algafood_api.api.model.input;
+package com.algaworks.algafood_api.api.model.DTO;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -8,9 +8,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UsuarioIdDTO {
+public class CidadeIdDTO {
 
     @NotNull
-    private Long id;
+    private Long id ;
 
 }

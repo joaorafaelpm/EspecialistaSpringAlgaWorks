@@ -4,7 +4,7 @@ package com.algaworks.algafood_api.api.controller;
 import com.algaworks.algafood_api.api.assembler.EstadoAssembler;
 import com.algaworks.algafood_api.api.assembler.disassambler.EstadoDisassembler;
 import com.algaworks.algafood_api.api.model.EstadoModel;
-import com.algaworks.algafood_api.api.model.input.EstadoDTO;
+import com.algaworks.algafood_api.api.model.DTO.EstadoDTO;
 import com.algaworks.algafood_api.domain.model.Estado;
 import com.algaworks.algafood_api.domain.repository.EstadoRepository;
 import com.algaworks.algafood_api.domain.service.CadastroEstadoService;

@@ -1,8 +1,6 @@
 package com.algaworks.algafood_api.api.assembler.disassambler;
 
-import com.algaworks.algafood_api.api.model.input.CidadeIdDTO;
-import com.algaworks.algafood_api.api.model.input.RestauranteDTO;
-import com.algaworks.algafood_api.domain.model.Cidade;
+import com.algaworks.algafood_api.api.model.DTO.RestauranteDTO;
 import com.algaworks.algafood_api.domain.model.Restaurante;
 import org.mapstruct.*;
 import org.springframework.context.annotation.Bean;

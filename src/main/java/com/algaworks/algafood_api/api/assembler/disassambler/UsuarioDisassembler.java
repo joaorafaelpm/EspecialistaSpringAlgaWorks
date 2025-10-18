@@ -1,7 +1,7 @@
 package com.algaworks.algafood_api.api.assembler.disassambler;
 
-import com.algaworks.algafood_api.api.model.input.UsuarioComSenhaDTO;
-import com.algaworks.algafood_api.api.model.input.UsuarioDTO;
+import com.algaworks.algafood_api.api.model.DTO.UsuarioComSenhaDTO;
+import com.algaworks.algafood_api.api.model.DTO.UsuarioDTO;
 import com.algaworks.algafood_api.domain.model.Usuario;
 import org.mapstruct.*;
 import org.springframework.context.annotation.Bean;

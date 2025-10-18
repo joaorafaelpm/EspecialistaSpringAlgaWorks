@@ -3,7 +3,7 @@ package com.algaworks.algafood_api.api.controller;
 import com.algaworks.algafood_api.api.assembler.GrupoAssembler;
 import com.algaworks.algafood_api.api.assembler.disassambler.GrupoDisassembler;
 import com.algaworks.algafood_api.api.model.GrupoModel;
-import com.algaworks.algafood_api.api.model.input.GrupoDTO;
+import com.algaworks.algafood_api.api.model.DTO.GrupoDTO;
 import com.algaworks.algafood_api.domain.model.Grupo;
 import com.algaworks.algafood_api.domain.service.CadastroGrupoService;
 import jakarta.validation.Valid;

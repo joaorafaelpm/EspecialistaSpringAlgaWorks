@@ -1,6 +1,6 @@
 package com.algaworks.algafood_api.api.assembler.disassambler;
 
-import com.algaworks.algafood_api.api.model.input.FotoProdutoDTO;
+import com.algaworks.algafood_api.api.model.DTO.FotoProdutoDTO;
 import com.algaworks.algafood_api.domain.model.FotoProduto;
 import org.mapstruct.*;
 import org.springframework.context.annotation.Bean;

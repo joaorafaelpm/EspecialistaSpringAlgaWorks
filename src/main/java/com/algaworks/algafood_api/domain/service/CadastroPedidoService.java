@@ -1,12 +1,9 @@
 package com.algaworks.algafood_api.domain.service;
 
-import com.algaworks.algafood_api.api.assembler.PedidoAssembler;
-import com.algaworks.algafood_api.api.model.input.PedidoDTO;
 import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood_api.domain.exception.PedidoNaoEncontradoException;
 import com.algaworks.algafood_api.domain.model.Pedido;
 import com.algaworks.algafood_api.domain.repository.PedidoRepository;
-import com.algaworks.algafood_api.infrastructure.repository.spec.PedidoSpecs;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;

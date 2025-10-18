@@ -1,10 +1,8 @@
 package com.algaworks.algafood_api.domain.service;
 
 
-import com.algaworks.algafood_api.api.model.input.ItemPedidoDTO;
 import com.algaworks.algafood_api.domain.exception.ItemPedidoNaoEncontradoException;
 import com.algaworks.algafood_api.domain.model.ItemPedido;
-import com.algaworks.algafood_api.domain.model.Produto;
 import com.algaworks.algafood_api.domain.repository.ItemPedidoRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

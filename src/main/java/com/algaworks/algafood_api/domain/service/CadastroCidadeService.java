@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class CadastroCidadeService {
 
     CidadeRepository cidadeRepository;
-    EstadoRepository estadoRepository;
+    CadastroEstadoService estadoService;
 
     public Cidade findById (Long id ) {
         return cidadeRepository.findById(id).orElseThrow(() ->
@@ -25,10 +25,7 @@ public class CadastroCidadeService {
     @Transactional
     public Cidade save (Cidade cidade) {
         Long estadoId = cidade.getEstado().getId();
-        Estado estado = estadoRepository.findById(estadoId)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException(
-                        String.format("Não foi encontrado estado de id '%s'" , estadoId)
-                ));
+        Estado estado = estadoService.findById(estadoId);
         cidade.setEstado(estado);
         return cidadeRepository.save(cidade);
     }
@@ -36,10 +33,7 @@ public class CadastroCidadeService {
     public Cidade save(Long id, Cidade cidadeAtualizado) {
         Cidade cidadeExistente = findById(id);
         Long estadoId = cidadeAtualizado.getEstado().getId();
-        Estado estado = estadoRepository.findById(estadoId)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException(
-                        String.format("Não foi encontrado estado de id '%s'" , estadoId)
-                ));
+        Estado estado = estadoService.findById(estadoId);
         cidadeExistente.setEstado(estado);
 
         return cidadeRepository.save(cidadeExistente);

@@ -1,4 +1,4 @@
-package com.algaworks.algafood_api.api.model.input;
+package com.algaworks.algafood_api.api.model.DTO;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -8,9 +8,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class CozinhaDTO {
+public class SenhaDTO {
 
     @NotBlank
-    private String nome ;
+    private String senhaAtual ;
+    @NotBlank
+    private String novaSenha ;
 
 }

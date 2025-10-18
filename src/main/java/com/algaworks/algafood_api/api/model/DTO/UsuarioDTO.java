@@ -1,5 +1,6 @@
-package com.algaworks.algafood_api.api.model.input;
+package com.algaworks.algafood_api.api.model.DTO;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,12 +9,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PermissaoDTO {
+public class UsuarioDTO {
 
     @NotBlank
-    private String nome;
-
+    private String nome ;
     @NotBlank
-    private String descricao;
+    @Email
+    private String email;
 
 }

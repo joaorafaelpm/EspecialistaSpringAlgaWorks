@@ -1,6 +1,6 @@
 package com.algaworks.algafood_api.api.assembler.disassambler;
 
-import com.algaworks.algafood_api.api.model.input.EstadoDTO;
+import com.algaworks.algafood_api.api.model.DTO.EstadoDTO;
 import com.algaworks.algafood_api.domain.model.Estado;
 import org.mapstruct.*;
 import org.springframework.context.annotation.Bean;

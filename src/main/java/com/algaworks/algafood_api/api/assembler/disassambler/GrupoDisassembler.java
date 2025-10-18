@@ -1,6 +1,6 @@
 package com.algaworks.algafood_api.api.assembler.disassambler;
 
-import com.algaworks.algafood_api.api.model.input.GrupoDTO;
+import com.algaworks.algafood_api.api.model.DTO.GrupoDTO;
 import com.algaworks.algafood_api.domain.model.Grupo;
 import org.mapstruct.*;
 import org.springframework.context.annotation.Bean;
