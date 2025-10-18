@@ -1,0 +1,52 @@
+package com.algaworks.algafood_api.api.assembler;
+
+import com.algaworks.algafood_api.api.assembler.mapper.UsuarioMapper;
+import com.algaworks.algafood_api.api.controller.*;
+import com.algaworks.algafood_api.api.model.UsuarioModel;
+import com.algaworks.algafood_api.domain.model.Usuario;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+@Component
+public class UsuarioModelAssembler extends RepresentationModelAssemblerSupport<Usuario, UsuarioModel> {
+
+    private UsuarioMapper usuarioMapper;
+
+    public UsuarioModelAssembler (UsuarioMapper usuarioMapper) {
+        super(UsuarioController.class, UsuarioModel.class);
+        this.usuarioMapper = usuarioMapper;
+    }
+
+    @Override
+    public UsuarioModel toModel(Usuario entity) {
+        UsuarioModel usuarioModel = usuarioMapper.toModel(entity);
+
+        usuarioModel.add(linkTo(methodOn(UsuarioController.class).findById(usuarioModel.getId()))
+                .withSelfRel());
+        usuarioModel.add(linkTo(UsuarioController.class)
+                .withRel(IanaLinkRelations.COLLECTION));
+        usuarioModel.add(linkTo(methodOn(UsuarioGrupoController.class)
+                .pegarTodosGruposDeUmUsuario(usuarioModel.getId())).withRel("grupos-usuario"));
+
+        return usuarioModel;
+    }
+
+    public CollectionModel<UsuarioModel> toCollection (List<Usuario> listaUsuario) {
+        List<UsuarioModel> listaUsuarioModel = listaUsuario.stream().map(this::toModel).toList();
+        CollectionModel<UsuarioModel> usuarioModels = CollectionModel.of(listaUsuarioModel);
+
+        usuarioModels.add(linkTo(UsuarioController.class).withSelfRel());
+
+        return usuarioModels;
+
+
+    }
+
+}

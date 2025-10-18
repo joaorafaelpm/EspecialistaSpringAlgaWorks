@@ -1,4 +1,4 @@
-package com.algaworks.algafood_api.api.assembler;
+package com.algaworks.algafood_api.api.assembler.mapper;
 
 import com.algaworks.algafood_api.api.model.UsuarioModel;
 import com.algaworks.algafood_api.domain.model.Usuario;
@@ -9,10 +9,10 @@ import java.util.Collection;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface UsuarioAssembler {
+public interface UsuarioMapper {
 
     @Bean
-    UsuarioModel usuarioToUsuarioModel(Usuario usuario);
+    UsuarioModel toModel(Usuario usuario);
 
     @Bean
     List<UsuarioModel> toCollection(Collection<Usuario> listaUsuario);

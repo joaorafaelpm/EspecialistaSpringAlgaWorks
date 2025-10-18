@@ -1,8 +1,6 @@
 package com.algaworks.algafood_api.api.controller;
 
-import com.algaworks.algafood_api.api.assembler.FormaPagamentoAssembler;
-import com.algaworks.algafood_api.api.assembler.UsuarioAssembler;
-import com.algaworks.algafood_api.api.model.FormaPagamentoModel;
+import com.algaworks.algafood_api.api.assembler.mapper.UsuarioMapper;
 import com.algaworks.algafood_api.api.model.UsuarioModel;
 import com.algaworks.algafood_api.domain.model.Restaurante;
 import com.algaworks.algafood_api.domain.service.CadastroRestauranteService;
@@ -20,12 +18,12 @@ public class RestauranteUsuarioController {
 
     private final CadastroRestauranteService restauranteService;
 
-    private final UsuarioAssembler usuarioAssembler;
+    private final UsuarioMapper usuarioMapper;
 
     @GetMapping
     public List<UsuarioModel> listar (@PathVariable Long restauranteId) {
         Restaurante restaurante = restauranteService.findById(restauranteId);
-        return usuarioAssembler.toCollection(restaurante.getUsuarios());
+        return usuarioMapper.toCollection(restaurante.getUsuarios());
     }
 
     @PutMapping("/{usuarioId}")
