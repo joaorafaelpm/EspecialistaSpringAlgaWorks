@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
@@ -24,6 +25,10 @@ public class CadastroFormaPagamentoService {
     public FormaPagamento findById (Long id) {
         return formaPagamentoRepository.findById(id).orElseThrow(() ->
                 new FormaPagamentoNaoEncontradaException(id));
+    }
+
+    public OffsetDateTime getUltimaDataAtualizacao () {
+        return formaPagamentoRepository.getDataUltimaAtualizacao();
     }
 
     @Transactional

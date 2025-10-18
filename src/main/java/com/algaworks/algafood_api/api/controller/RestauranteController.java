@@ -35,38 +35,17 @@ public class RestauranteController {
     private final RestauranteAssembler restauranteAssembler;
     private final RestauranteDisassembler restauranteDisessambler;
 
+    @JsonView(RestauranteView.RestauranteResumo.class)
     @GetMapping
-    public MappingJacksonValue all (@RequestParam(required = false) String projecao) {
-        List<Restaurante> restaurantes = restauranteService.findAll();
-        List<RestauranteModel> restauranteModels = restauranteAssembler
-                .toCollection(restaurantes);
-        MappingJacksonValue restaurantesWrapper = new MappingJacksonValue(restauranteModels);
-
-//        Padrão:
-        restaurantesWrapper.setSerializationView(RestauranteView.RestauranteResumo.class);
-
-        if ("apenas_nome".equals(projecao)) {
-            restaurantesWrapper.setSerializationView(RestauranteView.ApenasNome.class);
-        } else if ("completo".equals(projecao)){
-            restaurantesWrapper.setSerializationView(null);
-        }
-
-        return restaurantesWrapper;
+    public List<RestauranteModel> listar() {
+        return restauranteAssembler.toCollection(restauranteService.findAll());
     }
 
-//    Nós podemos fazer dessa outra forma também, duplicando o Controller com um parâmetro na uri específica
-//    separando os métodos por parâmetro e mudando o JacksonView de cada um
-
-//    @GetMapping(params = "projecao=resumo")
-//    @JsonView(value = RestauranteView.RestauranteResumo.class)
-//    public List<RestauranteModel> allResumido () {
-//        return all();
-//    }
-//    @GetMapping(params = "projecao=apenas_nome")
-//    @JsonView(value = RestauranteView.ApenasNome.class)
-//    public List<RestauranteModel> allApenasNome () {
-//        return all();
-//    }
+    @JsonView(RestauranteView.ApenasNome.class)
+    @GetMapping(params = "projecao=apenas-nome")
+    public List<RestauranteModel> listarApenasNomes() {
+        return listar();
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<RestauranteModel> getById (@PathVariable Long id) {
