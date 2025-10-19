@@ -12,6 +12,8 @@ import java.io.IOException;
 @JsonComponent
 public class PageJsonSerializer extends JsonSerializer<Page<?>> {
 
+//    A partir de agora (agora que adaptamos o padrão de HATEOAS nos endpoints) não precisamos mais disso, por que o próprio PagedRepresentation do HATEOAS aplica esse padrão. Eu só não tiro isso agora por que a gente ainda usa em alguns pontos do projeto e quebraria muita coisa por enquanto, porém eu não vou manter no projeto!
+
     @Override
     public void serialize(Page<?> page, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
 //        Inicia o objeto ({)

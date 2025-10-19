@@ -9,6 +9,7 @@ import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -38,7 +39,7 @@ public class UsuarioModelAssembler extends RepresentationModelAssemblerSupport<U
         return usuarioModel;
     }
 
-    public CollectionModel<UsuarioModel> toCollection (List<Usuario> listaUsuario) {
+    public CollectionModel<UsuarioModel> toCollection (Collection<Usuario> listaUsuario) {
         List<UsuarioModel> listaUsuarioModel = listaUsuario.stream().map(this::toModel).toList();
         CollectionModel<UsuarioModel> usuarioModels = CollectionModel.of(listaUsuarioModel);
 

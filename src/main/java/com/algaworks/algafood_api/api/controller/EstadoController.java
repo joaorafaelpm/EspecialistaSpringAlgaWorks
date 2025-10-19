@@ -1,7 +1,8 @@
 package com.algaworks.algafood_api.api.controller;
 
 
-import com.algaworks.algafood_api.api.assembler.EstadoAssembler;
+import com.algaworks.algafood_api.api.assembler.EstadoModelAssembler;
+import com.algaworks.algafood_api.api.assembler.mapper.EstadoMapper;
 import com.algaworks.algafood_api.api.assembler.disassambler.EstadoDisassembler;
 import com.algaworks.algafood_api.api.model.EstadoModel;
 import com.algaworks.algafood_api.api.model.DTO.EstadoDTO;
@@ -10,6 +11,7 @@ import com.algaworks.algafood_api.domain.repository.EstadoRepository;
 import com.algaworks.algafood_api.domain.service.CadastroEstadoService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,32 +28,32 @@ public class EstadoController {
 
     private final CadastroEstadoService estadoService;
 
-    private final EstadoAssembler estadoAssembler ;
+    private final EstadoModelAssembler estadoModelAssembler;
     private final EstadoDisassembler estadoDisassembler ;
 
     @GetMapping
-    public List<EstadoModel> all () {
-        return estadoAssembler.toCollection(estadoRepository.findAll());
+    public CollectionModel<EstadoModel> all () {
+        return estadoModelAssembler.toCollection(estadoRepository.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EstadoModel> getById (@PathVariable Long id) {
-        return ResponseEntity.ok(estadoAssembler.estadoToEstadoModel(estadoService.findById(id)));
+    public EstadoModel getById (@PathVariable Long id) {
+        return estadoModelAssembler.toModel(estadoService.findById(id));
     }
 
     @PostMapping
     public EstadoModel add (@RequestBody @Valid EstadoDTO estadoDTO) {
         Estado estado = estadoDisassembler.estadoDTOToEstado(estadoDTO);
-        return estadoAssembler.estadoToEstadoModel(estadoService.save(estado));
+        return estadoModelAssembler.toModel(estadoService.save(estado));
     }
 
     @PutMapping("/{id}")
-    public  ResponseEntity<EstadoModel> save (@PathVariable Long id , @RequestBody @Valid EstadoDTO estadoDTO) {
+    public  EstadoModel save (@PathVariable Long id , @RequestBody @Valid EstadoDTO estadoDTO) {
         Estado estadoAntigo = estadoService.findById(id);
         estadoDisassembler.updateEstadoFromDto(estadoDTO , estadoAntigo);
-        return ResponseEntity.ok(estadoAssembler
-                .estadoToEstadoModel(estadoService
-                        .save(id , estadoAntigo)));
+        Estado estadoSalvo = estadoService.save(id, estadoAntigo);
+        return estadoModelAssembler
+                .toModel(estadoSalvo);
     }
 
     @DeleteMapping("/{id}")

@@ -1,4 +1,4 @@
-package com.algaworks.algafood_api.api.assembler;
+package com.algaworks.algafood_api.api.assembler.mapper;
 
 import com.algaworks.algafood_api.api.model.CozinhaModel;
 import com.algaworks.algafood_api.domain.model.Cozinha;
@@ -9,16 +9,12 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface CozinhaAssembler {
+public interface CozinhaMapper {
 
     @Bean
-    CozinhaModel cozinhaToCozinhaModel(Cozinha cozinha);
+    CozinhaModel toModel(Cozinha cozinha);
 
     @Bean
     List<CozinhaModel> toCollection(List<Cozinha> listaCozinha);
 
-
-    default Page<CozinhaModel> toPageable(Page<Cozinha> listaCozinha) {
-        return listaCozinha.map(this::cozinhaToCozinhaModel);
-    }
 }

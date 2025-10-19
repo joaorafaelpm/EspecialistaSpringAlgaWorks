@@ -26,7 +26,6 @@ public class UsuarioController {
 
     private final CadastroUsuarioService usuarioService;
 
-    private final UsuarioMapper usuarioMapper;
     private final UsuarioModelAssembler usuarioModelAssembler;
     private final UsuarioDisassembler usuarioDisassembler;
 
@@ -46,15 +45,15 @@ public class UsuarioController {
     public UsuarioModel save (@RequestBody @Valid UsuarioComSenhaDTO usuarioSenhaDTO) {
         Usuario usuario = usuarioDisassembler.usuarioComSenhaDTOToUsuario(usuarioSenhaDTO);
         usuarioService.save(usuario);
-        return usuarioMapper.toModel(usuario);
+        return usuarioModelAssembler.toModel(usuario);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> save (@PathVariable Long id , @RequestBody @Valid UsuarioDTO usuarioDTO) {
+    public UsuarioModel save (@PathVariable Long id , @RequestBody @Valid UsuarioDTO usuarioDTO) {
         Usuario usuarioAntigo = usuarioService.findById(id);
         usuarioDisassembler.updateUsuarioFromDto(usuarioDTO , usuarioAntigo);
         usuarioService.save(usuarioAntigo);
-        return ResponseEntity.ok(usuarioMapper.toModel(usuarioAntigo));
+        return usuarioModelAssembler.toModel(usuarioAntigo);
     }
 
     @PutMapping("/{id}/senha")

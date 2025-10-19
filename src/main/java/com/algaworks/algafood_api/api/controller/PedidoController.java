@@ -1,10 +1,12 @@
 package com.algaworks.algafood_api.api.controller;
 
-import com.algaworks.algafood_api.api.assembler.PedidoAssembler;
+import com.algaworks.algafood_api.api.assembler.PedidoModelAssembler;
+import com.algaworks.algafood_api.api.assembler.PedidoResumoModelAssembler;
 import com.algaworks.algafood_api.api.assembler.disassambler.PedidoDisassembler;
 import com.algaworks.algafood_api.api.model.PedidoModel;
 import com.algaworks.algafood_api.api.model.PedidoResumoModel;
 import com.algaworks.algafood_api.api.model.DTO.PedidoDTO;
+import com.algaworks.algafood_api.core.data.PageWrapper;
 import com.algaworks.algafood_api.core.data.PageableTranslator;
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
@@ -16,15 +18,15 @@ import com.algaworks.algafood_api.infrastructure.repository.spec.PedidoSpecs;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
+import static com.algaworks.algafood_api.core.data.PageableTranslator.translate;
 
 
 @RestController
@@ -35,36 +37,29 @@ public class PedidoController {
     private final CadastroPedidoService pedidoService;
     private final EmissaoPedidoService emitirPedidoService;
 
-    private final PedidoAssembler pedidoAssembler;
+    private final PedidoModelAssembler pedidoModelAssembler;
+    private final PedidoResumoModelAssembler pedidoResumoModelAssembler;
     private final PedidoDisassembler pedidoDisassembler;
+    private final PagedResourcesAssembler<Pedido> pagedResourcesAssembler;
+
 
     @GetMapping
-    public Page<PedidoResumoModel> pesquisar(
-            PedidoFilter pedidoFilter,
-            @PageableDefault(size = 10) Pageable pageable) {
-        pageable = traduzirPageable(pageable);
-        Page<Pedido> paginaPedidos = pedidoService.findAll(PedidoSpecs.usandoFiltro(pedidoFilter), pageable);
-        List<PedidoResumoModel> listaPedido = pedidoAssembler.toCollection(paginaPedidos.getContent());
-        return new PageImpl<>(listaPedido, pageable, paginaPedidos.getTotalElements());
-    }
-//  Eu particularmente prefiro não precisar desse nível de especificação nas minhas consultas, por que acredito que fazer esse tipo de mapper é extremamente desagradável quando eu for especificar o ordenamento dos recursos
-//  Então talvez seja uma prática mais agradável limitar isso dentro do DTO e não precisando dessa especificação.
-//  É lógico que isso depende do pedido do cliente, e se for necessário é o que eu vou fazer, além de que talvez existam formas mais agradáveis de fazer esse map de "de-para" como o reflections do java e etc
-    private Pageable traduzirPageable (Pageable pageable) {
-        var mapeamento = ImmutableMap.of(
-                "nomeCliente", "cliente.nome" ,
-                "codigo", "codigo",
-                "valorTotal", "valorTotal",
-                "taxaFrete", "taxaFrete",
-                "subtotal", "subtotal"
-        ) ;
-        return PageableTranslator.tanslate(pageable , mapeamento);
+    public PagedModel<PedidoResumoModel> pesquisar(
+            PedidoFilter pedidoFilter, Pageable pageable) {
+//    Pra fins educacionais eu vou alterar o sort de ordenamento do nome do restaurante de restaurante.nome para nomerestaurante durante esse commit simulando uma especificação de um cliente para resolver o problema de ordenação do linl
+        Pageable pageableTraduzido = traduzirPageable(pageable);
+
+        Page<Pedido> paginaPedidos = pedidoService.findAll(PedidoSpecs.usandoFiltro(pedidoFilter), pageableTraduzido);
+
+        paginaPedidos = new PageWrapper<>(paginaPedidos , pageable);
+
+        return pagedResourcesAssembler.toModel(paginaPedidos , pedidoResumoModelAssembler);
     }
 
     @GetMapping("/{codigo}")
 
     public PedidoModel pegarUm (@PathVariable String codigo) {
-        return pedidoAssembler.pedidoToPedidoModel(pedidoService.findByIdMapperSolver(codigo));
+        return pedidoModelAssembler.toModel(pedidoService.findByIdMapperSolver(codigo));
     }
 
     @PostMapping
@@ -72,26 +67,26 @@ public class PedidoController {
     public  PedidoModel salvar (@RequestBody @Valid PedidoDTO pedidoDTO) {
         try{
             Pedido pedido = pedidoDisassembler.pedidoDTOToPedido(pedidoDTO);
-            return pedidoAssembler.pedidoToPedidoModel(emitirPedidoService.emitirPedido(pedido));
+            return pedidoModelAssembler.toModel(emitirPedidoService.emitirPedido(pedido));
         }catch (EntidadeNaoEncontradaException e) {
             throw new NegocioException(e.getMessage(), e);
         }
     }
 
-    @PutMapping("/{codigo}")
-    public  PedidoModel atualizar (@PathVariable String codigo , @RequestBody @Valid PedidoDTO pedidoDTO) {
-        Pedido pedido = pedidoService.findByIdMapperSolver(codigo);
+    private Pageable traduzirPageable(Pageable apiPageable) {
+        var mapeamento = Map.of(
+                "codigo", "codigo",
+                "subtotal", "subtotal",
+                "taxaFrete", "taxaFrete",
+                "valorTotal", "valorTotal",
+                "dataCriacao", "dataCriacao",
+                "nomerestaurante", "restaurante.nome",
+                "restaurante.id", "restaurante.id",
+                "cliente.id", "cliente.id",
+                "cliente.nome", "cliente.nome"
+        );
 
-        pedidoDisassembler.updatePedidoFromDto(pedidoDTO , pedido);
-
-        return pedidoAssembler.pedidoToPedidoModel(pedidoService.save(pedido));
+        return PageableTranslator.translate(apiPageable, mapeamento);
     }
-
-    @DeleteMapping("/{codigo}")
-    public void delete (@PathVariable String codigo) {
-        pedidoService.remove(codigo);
-    }
-
-
 
 }

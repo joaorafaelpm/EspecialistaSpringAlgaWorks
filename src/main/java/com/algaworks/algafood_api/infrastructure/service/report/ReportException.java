@@ -1,6 +1,11 @@
 package com.algaworks.algafood_api.infrastructure.service.report;
 
+import java.io.Serial;
+
 public class ReportException extends RuntimeException {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     public ReportException(String message) {
         super(message);

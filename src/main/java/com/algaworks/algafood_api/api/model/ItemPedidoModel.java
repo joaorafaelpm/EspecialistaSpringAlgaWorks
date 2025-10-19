@@ -3,14 +3,17 @@ package com.algaworks.algafood_api.api.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import java.math.BigDecimal;
 
 
+@Relation(collectionRelation = "itens-pedido")
 @Getter
 @Setter
 @AllArgsConstructor
-public class ItemPedidoModel {
+public class ItemPedidoModel extends RepresentationModel<ItemPedidoModel> {
 
     private Long produtoId ;
     private String produtoNome ;

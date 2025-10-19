@@ -1,4 +1,4 @@
-package com.algaworks.algafood_api.api.assembler;
+package com.algaworks.algafood_api.api.assembler.mapper;
 
 import com.algaworks.algafood_api.api.model.EstadoModel;
 import com.algaworks.algafood_api.domain.model.Estado;
@@ -8,10 +8,10 @@ import org.springframework.context.annotation.Bean;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface EstadoAssembler {
+public interface EstadoMapper {
 
     @Bean
-    EstadoModel estadoToEstadoModel(Estado estado);
+    EstadoModel toModel(Estado estado);
 
     @Bean
     List<EstadoModel> toCollection(List<Estado> listaEstados);

@@ -32,7 +32,6 @@ public class CidadeController {
 
     CadastroCidadeService cidadeService;
 
-    CidadeMapper cidadeMapper ;
     CidadeModelAssembler cidadeAssembler;
     CidadeDisassembler cidadeDisassembler;
 
@@ -51,7 +50,7 @@ public class CidadeController {
     public CidadeModel add (@RequestBody @Valid CidadeDTO cidadeDTO) {
         try {
             Cidade cidade = cidadeDisassembler.cidadeDTOToCidade(cidadeDTO);
-            CidadeModel cidadeModel = cidadeMapper.toModel(cidadeService.save(cidade));
+            CidadeModel cidadeModel = cidadeAssembler.toModel(cidadeService.save(cidade));
 
             ResourceUriHelper.addUriResponseHeader(cidadeModel.getId());
 
@@ -63,15 +62,15 @@ public class CidadeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> save (@PathVariable Long id , @RequestBody @Valid CidadeDTO cidadeDTO) {
+    public CidadeModel save (@PathVariable Long id , @RequestBody @Valid CidadeDTO cidadeDTO) {
         Cidade cidadeAntiga = cidadeService.findById(id);
         Cidade cidadeAtualizada = cidadeDisassembler.cidadeDTOToCidade(cidadeDTO);
 
         cidadeDisassembler.updateCidadeFromDto(cidadeDTO , cidadeAntiga);
         cidadeAntiga.setEstado(cidadeAtualizada.getEstado());
-        return ResponseEntity.ok(cidadeMapper
+        return cidadeAssembler
                 .toModel(cidadeService
-                        .save(id , cidadeAntiga)));
+                        .save(id , cidadeAntiga));
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
