@@ -1,6 +1,6 @@
 package com.algaworks.algafood_api.api.exceptionhandler;
 
-import com.algaworks.algafood_api.api.model.enuns.ProblemType;
+import com.algaworks.algafood_api.api.exceptionhandler.enuns.ProblemType;
 import com.algaworks.algafood_api.core.validation.ValidacaoException;
 import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
@@ -20,7 +20,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -45,6 +44,7 @@ import java.util.stream.Collectors;
  */
 @ControllerAdvice
 public class APIExceptionHandler extends ResponseEntityExceptionHandler {
+
     public static final String SYSTEM_ERROR_MESSAGE = String.format("Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde ou contate o administrador do sistema.");
 
     @Autowired
@@ -179,7 +179,6 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
         String detail = String.format("O parâmetro da URL '%s' recebeu o valor de '%s', que é um tipo inválido. Corrija e informe um valor compatível ao tipo '%s'." , ex.getPropertyName() , ex.getValue() , ex.getRequiredType().getSimpleName());
-
 
         APIError apiError = createAPIErrorBuilder(status, ProblemType.PARAMETRO_INVALIDO , detail).build();
         return handleExceptionInternal(ex,apiError , headers, status, request);

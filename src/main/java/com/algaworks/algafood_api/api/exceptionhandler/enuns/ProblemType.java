@@ -1,4 +1,4 @@
-package com.algaworks.algafood_api.api.model.enuns;
+package com.algaworks.algafood_api.api.exceptionhandler.enuns;
 
 import lombok.Getter;
 

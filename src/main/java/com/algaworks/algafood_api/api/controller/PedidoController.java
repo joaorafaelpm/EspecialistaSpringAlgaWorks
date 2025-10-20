@@ -48,9 +48,7 @@ public class PedidoController {
             PedidoFilter pedidoFilter, Pageable pageable) {
 //    Pra fins educacionais eu vou alterar o sort de ordenamento do nome do restaurante de restaurante.nome para nomerestaurante durante esse commit simulando uma especificação de um cliente para resolver o problema de ordenação do linl
         Pageable pageableTraduzido = traduzirPageable(pageable);
-
         Page<Pedido> paginaPedidos = pedidoService.findAll(PedidoSpecs.usandoFiltro(pedidoFilter), pageableTraduzido);
-
         paginaPedidos = new PageWrapper<>(paginaPedidos , pageable);
 
         return pagedResourcesAssembler.toModel(paginaPedidos , pedidoResumoModelAssembler);
@@ -80,7 +78,7 @@ public class PedidoController {
                 "taxaFrete", "taxaFrete",
                 "valorTotal", "valorTotal",
                 "dataCriacao", "dataCriacao",
-                "nomerestaurante", "restaurante.nome",
+                "restaurante.nome", "restaurante.nome",
                 "restaurante.id", "restaurante.id",
                 "cliente.id", "cliente.id",
                 "cliente.nome", "cliente.nome"

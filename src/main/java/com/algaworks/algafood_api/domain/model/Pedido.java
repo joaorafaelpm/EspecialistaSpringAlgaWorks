@@ -90,6 +90,16 @@ public class Pedido extends AbstractAggregateRoot<Pedido> {
         registerEvent(new PedidoCanceladoEvent(this));
     }
 
+    public boolean podeSerConfirmado() {
+        return getStatusPedido().podeAlterarPara(StatusPedido.CONFIRMADO);
+    }
+    public boolean podeSerEntregue() {
+        return getStatusPedido().podeAlterarPara(StatusPedido.ENTREGUE);
+    }
+    public boolean podeSerCancelado() {
+        return getStatusPedido().podeAlterarPara(StatusPedido.CANCELADO);
+    }
+
 //    Sobrescrevendo o set para se tornar privado
     private void setStatusPedido (StatusPedido novoStatus){
 //        Só posso alterar se o status atual receber o status antigo necessário, ou seja se o status atual for CONFIRMADO ele já deve ter recebido o status de CRIADO
@@ -103,7 +113,10 @@ public class Pedido extends AbstractAggregateRoot<Pedido> {
         this.statusPedido = novoStatus;
     }
 
+
+
 //    Antes de persistir essa entidade no banco de dados, execute essa função:
+//    Isso salva um código automaticamente na entidade
     @PrePersist
     private void gerarCodigo () {
         setCodigo(UUID.randomUUID().toString());

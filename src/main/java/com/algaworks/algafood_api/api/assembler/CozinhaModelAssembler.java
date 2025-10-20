@@ -1,9 +1,11 @@
 package com.algaworks.algafood_api.api.assembler;
 
+import com.algaworks.algafood_api.api.AlgaLinks;
 import com.algaworks.algafood_api.api.assembler.mapper.CozinhaMapper;
 import com.algaworks.algafood_api.api.controller.CozinhaController;
 import com.algaworks.algafood_api.api.model.CozinhaModel;
 import com.algaworks.algafood_api.domain.model.Cozinha;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
@@ -19,6 +21,9 @@ public class CozinhaModelAssembler extends RepresentationModelAssemblerSupport<C
 
     private final CozinhaMapper cozinhaMapper ;
 
+    @Autowired
+    private AlgaLinks algaLinks ;
+
     public CozinhaModelAssembler(CozinhaMapper cozinhaMapper) {
         super(CozinhaController.class, CozinhaModel.class);
         this.cozinhaMapper = cozinhaMapper;
@@ -28,10 +33,9 @@ public class CozinhaModelAssembler extends RepresentationModelAssemblerSupport<C
     public CozinhaModel toModel(Cozinha cozinha) {
         CozinhaModel cozinhaModel = cozinhaMapper.toModel(cozinha);
 
-        cozinhaModel.add(linkTo(methodOn(CozinhaController.class).getById(cozinhaModel.getId()))
-                .withSelfRel());
-        cozinhaModel.add(linkTo(CozinhaController.class)
-                .withRel(IanaLinkRelations.COLLECTION));
+        cozinhaModel.add(algaLinks.linkToCozinha(cozinhaModel.getId()));
+
+        cozinhaModel.add(algaLinks.linkToCozinhas());
 
         return cozinhaModel;
     }
@@ -39,7 +43,8 @@ public class CozinhaModelAssembler extends RepresentationModelAssemblerSupport<C
     public CollectionModel<CozinhaModel> toCollection (List<Cozinha> listaCozinha) {
         var listaCozinhaModel = listaCozinha.stream().map(this::toModel).toList();
         CollectionModel<CozinhaModel> cozinhasCollectionModel = CollectionModel.of(listaCozinhaModel);
-        cozinhasCollectionModel.add(linkTo(CozinhaController.class).withSelfRel());
+
+        cozinhasCollectionModel.add(algaLinks.linkToCozinhas());
 
         return cozinhasCollectionModel;
     }

@@ -1,9 +1,11 @@
 package com.algaworks.algafood_api.api.assembler;
 
+import com.algaworks.algafood_api.api.AlgaLinks;
 import com.algaworks.algafood_api.api.assembler.mapper.EstadoMapper;
 import com.algaworks.algafood_api.api.controller.EstadoController;
 import com.algaworks.algafood_api.api.model.EstadoModel;
 import com.algaworks.algafood_api.domain.model.Estado;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
@@ -19,6 +21,9 @@ public class EstadoModelAssembler extends RepresentationModelAssemblerSupport<Es
 
     private final EstadoMapper estadoMapper;
 
+    @Autowired
+    private AlgaLinks algaLinks;
+
     public EstadoModelAssembler(EstadoMapper estadoMapper) {
         super(EstadoController.class, EstadoModel.class);
         this.estadoMapper = estadoMapper;
@@ -28,10 +33,8 @@ public class EstadoModelAssembler extends RepresentationModelAssemblerSupport<Es
     public EstadoModel toModel(Estado estado) {
         EstadoModel estadoModel = estadoMapper.toModel(estado);
 
-        estadoModel.add(linkTo(methodOn(EstadoController.class).getById(estadoModel.getId()))
-                .withSelfRel());
-        estadoModel.add(linkTo(methodOn(EstadoController.class).all())
-                .withRel(IanaLinkRelations.COLLECTION));
+        estadoModel.add(algaLinks.linkToEstado(estadoModel.getId()));
+        estadoModel.add(algaLinks.linkToEstados());
 
         return estadoModel;
     }
@@ -39,7 +42,7 @@ public class EstadoModelAssembler extends RepresentationModelAssemblerSupport<Es
     public CollectionModel<EstadoModel> toCollection (List<Estado> listaEstado) {
         var listaEstadoModel = listaEstado.stream().map(this::toModel).toList();
         CollectionModel<EstadoModel> estadosCollectionModel = CollectionModel.of(listaEstadoModel);
-        estadosCollectionModel.add(linkTo(EstadoController.class).withSelfRel());
+        estadosCollectionModel.add(algaLinks.linkToEstados());
 
         return estadosCollectionModel;
     }

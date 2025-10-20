@@ -1,9 +1,11 @@
 package com.algaworks.algafood_api.api.assembler;
 
+import com.algaworks.algafood_api.api.AlgaLinks;
 import com.algaworks.algafood_api.api.assembler.mapper.UsuarioMapper;
 import com.algaworks.algafood_api.api.controller.*;
 import com.algaworks.algafood_api.api.model.UsuarioModel;
 import com.algaworks.algafood_api.domain.model.Usuario;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
@@ -20,6 +22,9 @@ public class UsuarioModelAssembler extends RepresentationModelAssemblerSupport<U
 
     private UsuarioMapper usuarioMapper;
 
+    @Autowired
+    private AlgaLinks algaLinks;
+
     public UsuarioModelAssembler (UsuarioMapper usuarioMapper) {
         super(UsuarioController.class, UsuarioModel.class);
         this.usuarioMapper = usuarioMapper;
@@ -29,12 +34,9 @@ public class UsuarioModelAssembler extends RepresentationModelAssemblerSupport<U
     public UsuarioModel toModel(Usuario entity) {
         UsuarioModel usuarioModel = usuarioMapper.toModel(entity);
 
-        usuarioModel.add(linkTo(methodOn(UsuarioController.class).findById(usuarioModel.getId()))
-                .withSelfRel());
-        usuarioModel.add(linkTo(UsuarioController.class)
-                .withRel(IanaLinkRelations.COLLECTION));
-        usuarioModel.add(linkTo(methodOn(UsuarioGrupoController.class)
-                .pegarTodosGruposDeUmUsuario(usuarioModel.getId())).withRel("grupos-usuario"));
+        usuarioModel.add(algaLinks.linkToUsuario(usuarioModel.getId()));
+        usuarioModel.add(algaLinks.linkToUsuarios());
+        usuarioModel.add(algaLinks.linkToGruposUsuario(usuarioModel.getId() ,"grupos-usuario" ));
 
         return usuarioModel;
     }
@@ -43,7 +45,7 @@ public class UsuarioModelAssembler extends RepresentationModelAssemblerSupport<U
         List<UsuarioModel> listaUsuarioModel = listaUsuario.stream().map(this::toModel).toList();
         CollectionModel<UsuarioModel> usuarioModels = CollectionModel.of(listaUsuarioModel);
 
-        usuarioModels.add(linkTo(UsuarioController.class).withSelfRel());
+        usuarioModels.add(algaLinks.linkToUsuarios("usuarios"));
 
         return usuarioModels;
 
