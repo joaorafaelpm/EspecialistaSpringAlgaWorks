@@ -22,12 +22,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/cozinhas")
 public class CozinhaController {
 
-    private final CadastroCozinhaService cozinhaService ;
+    private CadastroCozinhaService cozinhaService ;
 
-    private final CozinhaModelAssembler cozinhaModelAssembler;
-    private final CozinhaDisassembler cozinhaDisassembler ;
+    private CozinhaModelAssembler cozinhaModelAssembler;
+    private CozinhaDisassembler cozinhaDisassembler ;
 
-    private final PagedResourcesAssembler<Cozinha> pagedResourcesAssembler;
+    private PagedResourcesAssembler<Cozinha> pagedResourcesAssembler;
 
     @GetMapping
     public PagedModel<CozinhaModel> all (Pageable pageable) {

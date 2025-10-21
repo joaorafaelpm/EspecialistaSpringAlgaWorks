@@ -13,20 +13,17 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 @Component
 public class EstadoModelAssembler extends RepresentationModelAssemblerSupport<Estado, EstadoModel> {
 
-    private final EstadoMapper estadoMapper;
+    @Autowired
+    private EstadoMapper estadoMapper;
 
     @Autowired
     private AlgaLinks algaLinks;
 
-    public EstadoModelAssembler(EstadoMapper estadoMapper) {
+    public EstadoModelAssembler() {
         super(EstadoController.class, EstadoModel.class);
-        this.estadoMapper = estadoMapper;
     }
 
     @Override

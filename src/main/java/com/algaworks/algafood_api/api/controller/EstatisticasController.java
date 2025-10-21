@@ -20,8 +20,8 @@ import java.util.List;
 @AllArgsConstructor
 public class EstatisticasController {
 
-    private final VendaQueryService vendaQueryService;
-    private final VendaReportService vendaReportService;
+    private VendaQueryService vendaQueryService;
+    private VendaReportService vendaReportService;
 
     @GetMapping(path = "/vendas-diarias", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<VendaDiaria> consultarVendasJson (VendaDiariaFilter filter ,

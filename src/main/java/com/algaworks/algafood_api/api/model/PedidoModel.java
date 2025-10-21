@@ -30,7 +30,7 @@ public class PedidoModel extends RepresentationModel<PedidoModel> {
 
     private StatusPedido statusPedido ;
 
-    private RestauranteResumoModel restaurante;
+    private RestauranteApenasNomeModel restaurante;
 
     private UsuarioModel cliente ;
 

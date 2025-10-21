@@ -19,17 +19,12 @@ import java.util.List;
 @AllArgsConstructor
 public class RestauranteProdutosController {
 
-    private final CadastroProdutoService produtoService;
-    private final CadastroRestauranteService restauranteService;
+    private CadastroProdutoService produtoService;
+    private CadastroRestauranteService restauranteService;
 
-    private final ProdutoAssembler produtoAssembler;
-    private final ProdutoDisassembler produtoDisassembler;
+    private ProdutoAssembler produtoAssembler;
+    private ProdutoDisassembler produtoDisassembler;
 
-//    @GetMapping
-//    public List<ProdutoModel> pegarTodosDeUmRestaurante (@PathVariable Long restauranteId) {
-//        List<Produto> produtos = produtoService.findByRestaurante(restauranteService.findById(restauranteId));
-//        return produtoAssembler.toCollection(produtos);
-//    }
     @GetMapping
     public List<ProdutoModel> pegarTodosDeUmRestaurante (@PathVariable Long restauranteId , @RequestParam(required = false) boolean incluirInativos) {
         List<Produto> produtos = produtoService.findAtivosByRestaurante(restauranteService.findById(restauranteId));

@@ -8,6 +8,7 @@ import com.algaworks.algafood_api.domain.model.FormaPagamento;
 import com.algaworks.algafood_api.domain.service.CadastroFormaPagamentoService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,6 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.filter.ShallowEtagHeaderFilter;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -24,13 +24,13 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor
 public class FormaPagamentoController {
 
-    CadastroFormaPagamentoService formaPagamentoService ;
+    private CadastroFormaPagamentoService formaPagamentoService ;
 
-    FormaPagamentoAssembler formaPagamentoAssembler ;
-    FormaPagamentoDisassembler formaPagamentoDisassembler ;
+    private FormaPagamentoAssembler formaPagamentoAssembler ;
+    private FormaPagamentoDisassembler formaPagamentoDisassembler ;
 
     @GetMapping
-    public ResponseEntity<List<FormaPagamentoModel>> all (ServletWebRequest request) {
+    public ResponseEntity<CollectionModel<FormaPagamentoModel>> all (ServletWebRequest request) {
 //        Gerando eTag personalizado...
         ShallowEtagHeaderFilter.disableContentCaching(request.getRequest());
         String eTag = "0";
@@ -44,7 +44,7 @@ public class FormaPagamentoController {
         if (request.checkNotModified(eTag)) {
             return null;
         }
-        List<FormaPagamentoModel> formaPagamentoModels = formaPagamentoAssembler
+        CollectionModel<FormaPagamentoModel> formaPagamentoModels = formaPagamentoAssembler
                 .toCollection(formaPagamentoService.findAll());
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(10 , TimeUnit.SECONDS).cachePublic())
@@ -66,7 +66,7 @@ public class FormaPagamentoController {
             return null;
         }
         FormaPagamentoModel formaPagamentoModels = formaPagamentoAssembler
-                .formaPagamentoToFormaPagamentoModel(formaPagamentoService.findById(id));
+                .toModel(formaPagamentoService.findById(id));
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(10 , TimeUnit.SECONDS).cachePublic())
                 .eTag(eTag)
@@ -77,7 +77,7 @@ public class FormaPagamentoController {
     @ResponseStatus(HttpStatus.CREATED)
     public FormaPagamentoModel add (@RequestBody @Valid FormaPagamentoDTO formaPagamentoDTO) {
         FormaPagamento formaPagamento = formaPagamentoDisassembler.formaPagamentoDTOToFormaPagamento(formaPagamentoDTO);
-        return formaPagamentoAssembler.formaPagamentoToFormaPagamentoModel(formaPagamentoService.save(formaPagamento)) ;
+        return formaPagamentoAssembler.toModel(formaPagamentoService.save(formaPagamento)) ;
     }
 
     @PutMapping("/{id}")
@@ -85,7 +85,7 @@ public class FormaPagamentoController {
         FormaPagamento formaPagamentoAntigo = formaPagamentoService.findById(id);
         formaPagamentoDisassembler.updateFormaPagamentoFromDto(formaPagamentoDTO , formaPagamentoAntigo);
         return ResponseEntity.ok(formaPagamentoAssembler
-                .formaPagamentoToFormaPagamentoModel(formaPagamentoService
+                .toModel(formaPagamentoService
                         .save(id , formaPagamentoAntigo)));
     }
     @ResponseStatus(HttpStatus.NO_CONTENT)

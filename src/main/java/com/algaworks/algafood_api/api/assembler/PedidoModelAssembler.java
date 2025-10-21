@@ -14,14 +14,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class PedidoModelAssembler extends RepresentationModelAssemblerSupport<Pedido, PedidoModel> {
 
-    private final PedidoMapper pedidoMapper;
+    @Autowired
+    private PedidoMapper pedidoMapper;
 
     @Autowired
     private AlgaLinks algaLinks;
 
-    public PedidoModelAssembler(PedidoMapper pedidoMapper) {
+    public PedidoModelAssembler() {
         super(PedidoController.class, PedidoModel.class);
-        this.pedidoMapper = pedidoMapper;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class PedidoModelAssembler extends RepresentationModelAssemblerSupport<Pe
         }
 
 
-        pedidoModel.add(algaLinks.linkToPedidos());
+        pedidoModel.add(algaLinks.linkToPedidos("pedidos"));
         pedidoModel.getRestaurante().add(algaLinks.linkToRestaurante(restauranteId));
         pedidoModel.getEnderecoEntrega().getCidade().add(algaLinks.linkToCidade(cidadeId));
         pedidoModel.getFormaPagamento().add(algaLinks.linkToFormaPagamento(formaPagamentoId));
@@ -53,7 +53,7 @@ public class PedidoModelAssembler extends RepresentationModelAssemblerSupport<Pe
 
         pedidoModel.getItens().forEach(item -> {
             item.add(algaLinks.linkToProduto(
-                    pedidoModel.getRestaurante().getId(), item.getProdutoId(), IanaLinkRelations.COLLECTION_VALUE));
+                    pedidoModel.getRestaurante().getId(), item.getProdutoId(), IanaLinkRelations.SELF.value()));
         });
 
         return pedidoModel;

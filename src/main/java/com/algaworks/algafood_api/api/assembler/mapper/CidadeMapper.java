@@ -14,7 +14,4 @@ public interface CidadeMapper {
     CidadeModel toModel(Cidade cidade);
 
 
-    @Bean
-    List<CidadeModel> toCollection(List<Cidade> listaCidade);
-
 }

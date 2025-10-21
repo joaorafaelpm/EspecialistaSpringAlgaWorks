@@ -30,12 +30,12 @@ import java.util.List;
 @AllArgsConstructor
 public class RestauranteProdutoFotoController {
 
-    private final CatalogoFotoProdutoService fotoProdutoService ;
-    private final CadastroProdutoService produtoService ;
-    private final FotoStorageService fotoStorageService;
+    private CatalogoFotoProdutoService fotoProdutoService ;
+    private CadastroProdutoService produtoService ;
+    private FotoStorageService fotoStorageService;
 
-    private final FotoProdutoAssembler fotoProdutoAssembler;
-    private final FotoProdutoDisassembler fotoProdutoDisassembler;
+    private FotoProdutoAssembler fotoProdutoAssembler;
+    private FotoProdutoDisassembler fotoProdutoDisassembler;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public FotoProdutoModel pegarFoto (@PathVariable Long restauranteId , @PathVariable Long produtoId) {

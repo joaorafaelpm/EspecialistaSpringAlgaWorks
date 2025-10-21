@@ -9,9 +9,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.domain.Page;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,9 +20,6 @@ public interface PedidoMapper {
     @Mapping(source = "enderecoEntrega.cidade.estado.nome" , target = "enderecoEntrega.cidade.estado")
     @Mapping(source = "itens" , target = "itens" , qualifiedByName = "mapItens")
     PedidoModel toModel(Pedido pedido);
-
-    @Bean
-    List<PedidoResumoModel> toCollection(Collection<Pedido> listaPedido);
 
     @Bean
     @Mapping(target = "produtoId" , source = "produto.id")

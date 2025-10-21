@@ -14,7 +14,4 @@ public interface CozinhaMapper {
     @Bean
     CozinhaModel toModel(Cozinha cozinha);
 
-    @Bean
-    List<CozinhaModel> toCollection(List<Cozinha> listaCozinha);
-
 }

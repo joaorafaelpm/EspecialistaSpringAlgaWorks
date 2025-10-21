@@ -1,20 +1,22 @@
 package com.algaworks.algafood_api.api.controller;
 
-import com.algaworks.algafood_api.api.assembler.RestauranteAssembler;
+import com.algaworks.algafood_api.api.assembler.RestauranteApenasNomeModelAssembler;
+import com.algaworks.algafood_api.api.assembler.RestauranteModelAssembler;
+import com.algaworks.algafood_api.api.assembler.RestauranteResumoModelAssembler;
 import com.algaworks.algafood_api.api.assembler.disassambler.RestauranteDisassembler;
+import com.algaworks.algafood_api.api.model.RestauranteApenasNomeModel;
 import com.algaworks.algafood_api.api.model.RestauranteModel;
 import com.algaworks.algafood_api.api.model.DTO.RestauranteDTO;
-import com.algaworks.algafood_api.api.model.view.RestauranteView;
+import com.algaworks.algafood_api.api.model.RestauranteResumoModel;
 import com.algaworks.algafood_api.domain.exception.CidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.CozinhaNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.algaworks.algafood_api.domain.exception.RestauranteNaoEncontradoException;
 import com.algaworks.algafood_api.domain.model.Restaurante;
 import com.algaworks.algafood_api.domain.service.CadastroRestauranteService;
-import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,31 +26,31 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/restaurantes")
-@Slf4j
 public class RestauranteController {
 
-    private final CadastroRestauranteService restauranteService;
+    private CadastroRestauranteService restauranteService;
 
-    private final RestauranteAssembler restauranteAssembler;
-    private final RestauranteDisassembler restauranteDisessambler;
+    private RestauranteResumoModelAssembler restauranteResumoAssembler;
+    private RestauranteApenasNomeModelAssembler restauranteApenasNomeAssembler;
+    private RestauranteModelAssembler restauranteAssembler;
 
-    @JsonView(RestauranteView.RestauranteResumo.class)
+    private RestauranteDisassembler restauranteDisessambler;
+
     @GetMapping
-    public List<RestauranteModel> listar() {
-        return restauranteAssembler.toCollection(restauranteService.findAll());
+    public CollectionModel<RestauranteResumoModel> listar() {
+        return restauranteResumoAssembler.toCollection(restauranteService.findAll());
     }
 
-    @JsonView(RestauranteView.ApenasNome.class)
     @GetMapping(params = "projecao=apenas-nome")
-    public List<RestauranteModel> listarApenasNomes() {
-        return listar();
+    public CollectionModel<RestauranteApenasNomeModel> listarApenasNomes() {
+        return restauranteApenasNomeAssembler.toCollection(restauranteService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RestauranteModel> getById (@PathVariable Long id) {
+    public RestauranteModel getById (@PathVariable Long id) {
         Restaurante restaurante = restauranteService.findById(id);
-        return ResponseEntity.ok(restauranteAssembler
-                .restauranteToRestauranteModel(restaurante));
+        return restauranteAssembler
+                .toModel(restaurante);
     }
 
 
@@ -59,7 +61,7 @@ public class RestauranteController {
             Restaurante restaurante = restauranteService.save(restauranteDisessambler.restauranteDTOToRestaurante(restauranteDTO));
 //        O hibernate precisa carregar todos os objetos para que o mapStruct forme eles de acordo com o modelo, então é absolutamente necessário, preparar uma query específica que traga todas as dependências do restaurante.
             return restauranteAssembler
-                    .restauranteToRestauranteModel(restaurante);
+                    .toModel(restaurante);
 
         }
         catch (CozinhaNaoEncontradaException | CidadeNaoEncontradaException e) {
@@ -79,7 +81,7 @@ public class RestauranteController {
             restauranteAntigo.getEndereco().setCidade(restauranteAtualizado.getEndereco().getCidade());
 
             return ResponseEntity.ok(restauranteAssembler
-                  .restauranteToRestauranteModel(restauranteService.save(restauranteAntigo)));
+                  .toModel(restauranteService.save(restauranteAntigo)));
         }
         catch (CozinhaNaoEncontradaException | CidadeNaoEncontradaException e) {
             throw new NegocioException(e.getMessage()) ;
@@ -88,21 +90,24 @@ public class RestauranteController {
 
     @PutMapping("/{id}/ativo")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void ativar (@PathVariable Long id) {
+    public ResponseEntity<Void> ativar (@PathVariable Long id) {
         restauranteService.ativar(id);
+        return ResponseEntity.noContent().build();
     }
     @DeleteMapping("/{id}/ativo")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void inativar (@PathVariable Long id) {
+    public ResponseEntity<Void> inativar (@PathVariable Long id) {
         restauranteService.inativar(id);
+        return ResponseEntity.noContent().build();
     }
 
 //    Recebemos uma lista para ativar vários restaurantes de uma vez
     @PutMapping("/ativacoes")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void ativarMultiplos (@RequestBody List<Long> restauranteIds) {
+    public ResponseEntity<Void> ativarMultiplos (@RequestBody List<Long> restauranteIds) {
         try {
             restauranteService.ativar(restauranteIds);
+            return ResponseEntity.noContent().build();
         }
         catch (RestauranteNaoEncontradoException e) {
             throw new NegocioException(e.getMessage() , e);
@@ -110,9 +115,10 @@ public class RestauranteController {
     }
     @DeleteMapping("/ativacoes")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void inativarMultiplos (@RequestBody List<Long> restauranteIds) {
+    public ResponseEntity<Void> inativarMultiplos (@RequestBody List<Long> restauranteIds) {
         try {
             restauranteService.inativar(restauranteIds);
+            return ResponseEntity.noContent().build();
         }
         catch (RestauranteNaoEncontradoException e) {
             throw new NegocioException(e.getMessage() , e);
@@ -121,14 +127,16 @@ public class RestauranteController {
 
     @PutMapping("/{id}/abertura")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void abrir (@PathVariable Long id) {
+    public ResponseEntity<Void> abrir (@PathVariable Long id) {
         restauranteService.abrir(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/fechamento")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void fechar (@PathVariable Long id) {
+    public ResponseEntity<Void> fechar (@PathVariable Long id) {
         restauranteService.fechar(id);
+        return ResponseEntity.noContent().build();
     }
 
 

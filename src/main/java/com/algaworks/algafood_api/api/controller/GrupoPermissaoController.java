@@ -16,9 +16,9 @@ import java.util.List;
 @AllArgsConstructor
 public class GrupoPermissaoController {
 
-    private final CadastroGrupoService grupoService;
+    private CadastroGrupoService grupoService;
 
-    private final PermissaoAssembler produtoAssembler;
+    private PermissaoAssembler produtoAssembler;
 
     @GetMapping
     public List<PermissaoModel> listarPermissao (@PathVariable Long grupoId) {

@@ -14,8 +14,6 @@ public interface UsuarioMapper {
     @Bean
     UsuarioModel toModel(Usuario usuario);
 
-    @Bean
-    List<UsuarioModel> toCollection(Collection<Usuario> listaUsuario);
 
 }
 

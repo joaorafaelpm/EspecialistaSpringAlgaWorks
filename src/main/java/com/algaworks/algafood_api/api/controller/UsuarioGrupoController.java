@@ -15,10 +15,10 @@ import java.util.List;
 @AllArgsConstructor
 public class UsuarioGrupoController {
 
-    private final CadastroGrupoService grupoService;
-    private final CadastroUsuarioService usuarioService;
+    private CadastroGrupoService grupoService;
+    private CadastroUsuarioService usuarioService;
 
-    private final GrupoAssembler grupoAssembler;
+    private GrupoAssembler grupoAssembler;
 
     @GetMapping
     public List<GrupoModel> pegarTodosGruposDeUmUsuario (@PathVariable Long usuarioId) {

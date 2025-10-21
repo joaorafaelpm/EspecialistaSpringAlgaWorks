@@ -34,13 +34,13 @@ import static com.algaworks.algafood_api.core.data.PageableTranslator.translate;
 @AllArgsConstructor
 public class PedidoController {
 
-    private final CadastroPedidoService pedidoService;
-    private final EmissaoPedidoService emitirPedidoService;
+    private CadastroPedidoService pedidoService;
+    private EmissaoPedidoService emitirPedidoService;
 
-    private final PedidoModelAssembler pedidoModelAssembler;
-    private final PedidoResumoModelAssembler pedidoResumoModelAssembler;
-    private final PedidoDisassembler pedidoDisassembler;
-    private final PagedResourcesAssembler<Pedido> pagedResourcesAssembler;
+    private PedidoModelAssembler pedidoModelAssembler;
+    private PedidoResumoModelAssembler pedidoResumoModelAssembler;
+    private PedidoDisassembler pedidoDisassembler;
+    private PagedResourcesAssembler<Pedido> pagedResourcesAssembler;
 
 
     @GetMapping
@@ -55,7 +55,6 @@ public class PedidoController {
     }
 
     @GetMapping("/{codigo}")
-
     public PedidoModel pegarUm (@PathVariable String codigo) {
         return pedidoModelAssembler.toModel(pedidoService.findByIdMapperSolver(codigo));
     }

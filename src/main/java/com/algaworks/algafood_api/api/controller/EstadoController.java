@@ -24,12 +24,12 @@ import java.util.List;
 @RequestMapping("/estados")
 public class EstadoController {
 
-    private final EstadoRepository estadoRepository ;
+    private EstadoRepository estadoRepository ;
 
-    private final CadastroEstadoService estadoService;
+    private CadastroEstadoService estadoService;
 
-    private final EstadoModelAssembler estadoModelAssembler;
-    private final EstadoDisassembler estadoDisassembler ;
+    private EstadoModelAssembler estadoModelAssembler;
+    private EstadoDisassembler estadoDisassembler ;
 
     @GetMapping
     public CollectionModel<EstadoModel> all () {

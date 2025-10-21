@@ -28,12 +28,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("/cidades")
 public class CidadeController {
 
-    CidadeRepository cidadeRepository;
+    private CidadeRepository cidadeRepository;
 
-    CadastroCidadeService cidadeService;
+    private CadastroCidadeService cidadeService;
 
-    CidadeModelAssembler cidadeAssembler;
-    CidadeDisassembler cidadeDisassembler;
+    private CidadeModelAssembler cidadeAssembler;
+    private CidadeDisassembler cidadeDisassembler;
 
     @GetMapping
     public CollectionModel<CidadeModel> all () {

@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PermissaoController {
 
-    private final CadastroPermissaoService permissaoService;
+    private CadastroPermissaoService permissaoService;
 
     @GetMapping
     public List<Permissao> findALl () {

@@ -10,7 +10,7 @@ import org.springframework.hateoas.server.core.Relation;
 @Getter
 @Setter
 @AllArgsConstructor
-public class FormaPagamentoModel extends RepresentationModel {
+public class FormaPagamentoModel extends RepresentationModel<FormaPagamentoModel> {
 
     private Long id ;
     private String descricao;

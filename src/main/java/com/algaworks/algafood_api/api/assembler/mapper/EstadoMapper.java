@@ -13,7 +13,4 @@ public interface EstadoMapper {
     @Bean
     EstadoModel toModel(Estado estado);
 
-    @Bean
-    List<EstadoModel> toCollection(List<Estado> listaEstados);
-
 }

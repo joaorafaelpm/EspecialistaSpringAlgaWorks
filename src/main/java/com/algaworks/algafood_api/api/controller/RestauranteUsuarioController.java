@@ -21,9 +21,9 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("/restaurantes/{restauranteId}/usuarios")
 public class RestauranteUsuarioController {
 
-    private final CadastroRestauranteService restauranteService;
+    private CadastroRestauranteService restauranteService;
 
-    private final UsuarioModelAssembler usuarioModelAssembler;
+    private UsuarioModelAssembler usuarioModelAssembler;
 
     @GetMapping
     public CollectionModel<UsuarioModel> listar (@PathVariable Long restauranteId) {

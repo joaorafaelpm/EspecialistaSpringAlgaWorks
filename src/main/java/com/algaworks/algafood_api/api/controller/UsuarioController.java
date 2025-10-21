@@ -24,10 +24,10 @@ import java.util.List;
 
 public class UsuarioController {
 
-    private final CadastroUsuarioService usuarioService;
+    private CadastroUsuarioService usuarioService;
 
-    private final UsuarioModelAssembler usuarioModelAssembler;
-    private final UsuarioDisassembler usuarioDisassembler;
+    private UsuarioModelAssembler usuarioModelAssembler;
+    private UsuarioDisassembler usuarioDisassembler;
 
     @GetMapping
     public CollectionModel<UsuarioModel> findAll () {

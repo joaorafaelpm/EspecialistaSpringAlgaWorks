@@ -5,6 +5,7 @@ import com.algaworks.algafood_api.api.assembler.mapper.CozinhaMapper;
 import com.algaworks.algafood_api.api.controller.CozinhaController;
 import com.algaworks.algafood_api.api.model.CozinhaModel;
 import com.algaworks.algafood_api.domain.model.Cozinha;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -13,20 +14,17 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 @Component
 public class CozinhaModelAssembler extends RepresentationModelAssemblerSupport<Cozinha, CozinhaModel> {
 
-    private final CozinhaMapper cozinhaMapper ;
+    @Autowired
+    private CozinhaMapper cozinhaMapper ;
 
     @Autowired
     private AlgaLinks algaLinks ;
 
-    public CozinhaModelAssembler(CozinhaMapper cozinhaMapper) {
+    public CozinhaModelAssembler() {
         super(CozinhaController.class, CozinhaModel.class);
-        this.cozinhaMapper = cozinhaMapper;
     }
 
     @Override

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class FluxoPedidoController {
 
-    private final FluxoPedidoService fluxoPedidoService;
+    private FluxoPedidoService fluxoPedidoService;
 
     @PutMapping("/confirmacao")
     @ResponseStatus(HttpStatus.NO_CONTENT)

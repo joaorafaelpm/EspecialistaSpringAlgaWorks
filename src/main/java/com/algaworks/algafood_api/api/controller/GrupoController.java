@@ -19,10 +19,10 @@ import java.util.List;
 @AllArgsConstructor
 public class GrupoController {
 
-    private final CadastroGrupoService grupoService;
+    private CadastroGrupoService grupoService;
 
-    private final GrupoAssembler grupoAssembler;
-    private final GrupoDisassembler grupoDisassembler;
+    private GrupoAssembler grupoAssembler;
+    private GrupoDisassembler grupoDisassembler;
 
     @GetMapping
     public List<GrupoModel> findAll () {
