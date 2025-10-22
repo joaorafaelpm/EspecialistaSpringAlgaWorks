@@ -30,7 +30,7 @@ public class FormaPagamentoAssembler extends RepresentationModelAssemblerSupport
         FormaPagamentoModel formaPagamentoModel = formaPagamentoMapper.toModel(entity);
 
         formaPagamentoModel.add(algaLinks.linkToFormaPagamento(formaPagamentoModel.getId()));
-        formaPagamentoModel.add(algaLinks.linkToFormasPagamento());
+        formaPagamentoModel.add(algaLinks.linkToFormasPagamento("formasPagamento"));
 
         return formaPagamentoModel;
     }
@@ -39,7 +39,25 @@ public class FormaPagamentoAssembler extends RepresentationModelAssemblerSupport
         List<FormaPagamentoModel> list = listaFormaPagamento.stream().map(this::toModel).toList();
         CollectionModel<FormaPagamentoModel> formasPagamentoModels = CollectionModel.of(list);
 
-        formasPagamentoModels.add(algaLinks.linkToFormasPagamento("formas-pagamento"));
+        formasPagamentoModels.add(algaLinks.linkToFormasPagamento("formasPagamento"));
         return formasPagamentoModels;
+    }
+
+//    Eu crio essa função extra para reduzir o número de funções do controlador, aqui eu faço o mesmo collection, porém modelado para a representação de formas de pagamento do restaurante
+    public CollectionModel<FormaPagamentoModel> toCollectionRefRestaurante (Long restauranteId , Collection<FormaPagamento> listaFormaPagamento) {
+        CollectionModel<FormaPagamentoModel> listaFormaPagentoModel = toCollection(listaFormaPagamento);
+        listaFormaPagentoModel.forEach(
+                formaPagamentoModel ->
+                        formaPagamentoModel.add(algaLinks.
+                                linkToRestauranteFormaPagamentoDesassociacao(
+                                        restauranteId , formaPagamentoModel.getId() , "desassociar"))
+        );
+
+        return listaFormaPagentoModel
+//                Removo os links antigos do collection ("/formas-pagamento") para passar o novo ("/restaurante/{restauranteId}/formas-pagamento")
+                .removeLinks()
+                .add(algaLinks.linkToRestauranteFormasPagamento(restauranteId))
+                .add(algaLinks.linkToRestauranteFormaPagamentoAssociacao(restauranteId , "associacao"));
+
     }
 }

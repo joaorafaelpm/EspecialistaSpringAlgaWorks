@@ -32,7 +32,7 @@ public class UsuarioModelAssembler extends RepresentationModelAssemblerSupport<U
 
         usuarioModel.add(algaLinks.linkToUsuario(usuarioModel.getId()));
         usuarioModel.add(algaLinks.linkToUsuarios());
-        usuarioModel.add(algaLinks.linkToGruposUsuario(usuarioModel.getId() ,"grupos-usuario" ));
+        usuarioModel.add(algaLinks.linkToGruposUsuario(usuarioModel.getId() ,"gruposUsuario" ));
 
         return usuarioModel;
     }
@@ -44,8 +44,17 @@ public class UsuarioModelAssembler extends RepresentationModelAssemblerSupport<U
         usuarioModels.add(algaLinks.linkToUsuarios("usuarios"));
 
         return usuarioModels;
+    }
 
+    public CollectionModel<UsuarioModel> toCollectionRefRestaurante (Long restauranteId , Collection<Usuario> listaUsuario) {
+        CollectionModel<UsuarioModel> listaUsuarioModel = toCollection(listaUsuario);
 
+        listaUsuarioModel.forEach(usuarioModel ->
+                usuarioModel.add(algaLinks.linkToResponsaveisRestauranteDesassociacao(restauranteId, usuarioModel.getId() , "desassociar")));
+        return listaUsuarioModel
+                .removeLinks()
+                .add(algaLinks.linkToResponsaveisRestaurante(restauranteId))
+                .add(algaLinks.linkToResponsaveisRestauranteAssociacao(restauranteId , "associar"));
     }
 
 }

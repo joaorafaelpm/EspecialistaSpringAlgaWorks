@@ -8,6 +8,7 @@ import com.algaworks.algafood_api.domain.service.CadastroRestauranteService;
 import lombok.AllArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,22 +29,19 @@ public class RestauranteUsuarioController {
     @GetMapping
     public CollectionModel<UsuarioModel> listar (@PathVariable Long restauranteId) {
         Restaurante restaurante = restauranteService.findById(restauranteId);
-        return usuarioModelAssembler.toCollection(restaurante.getUsuarios())
-                .removeLinks()
-                .add(linkTo(methodOn(RestauranteUsuarioController.class)
-                        .listar(restauranteId)).withSelfRel());
+        return usuarioModelAssembler.toCollectionRefRestaurante(restauranteId , restaurante.getUsuarios());
     }
 
     @PutMapping("/{usuarioId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void associar (@PathVariable Long restauranteId , @PathVariable Long usuarioId) {
-        restauranteService.associarUsuarioResponsavel(restauranteId , usuarioId);
+    public ResponseEntity<Void> associar (@PathVariable Long restauranteId , @PathVariable Long usuarioId) {
+        restauranteService.associarUsuarioResponsavel(restauranteId , usuarioId) ;
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{usuarioId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void desassociar (@PathVariable Long restauranteId , @PathVariable Long usuarioId) {
+    public ResponseEntity<Void> desassociar (@PathVariable Long restauranteId , @PathVariable Long usuarioId) {
         restauranteService.desassociarUsuarioResponsavel(restauranteId , usuarioId);
+        return ResponseEntity.noContent().build();
     }
 
 

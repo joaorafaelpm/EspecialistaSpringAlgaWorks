@@ -1,20 +1,41 @@
 package com.algaworks.algafood_api.api.assembler;
 
+import com.algaworks.algafood_api.api.AlgaLinks;
+import com.algaworks.algafood_api.api.assembler.mapper.ProdutoMapper;
 import com.algaworks.algafood_api.api.model.ProdutoModel;
 import com.algaworks.algafood_api.domain.model.Produto;
-import org.mapstruct.Mapper;
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
-@Mapper(componentModel = "spring")
-public interface ProdutoAssembler {
+@Component
+public class ProdutoAssembler extends RepresentationModelAssemblerSupport<Produto , ProdutoModel> {
+    @Autowired
+    private AlgaLinks algaLinks;
 
-    @Bean
-    ProdutoModel produtoToProdutoModel(Produto produto);
+    @Autowired
+    private ProdutoMapper produtoMapper;
 
-    @Bean
-    List<ProdutoModel> toCollection(Collection<Produto> listaProduto);
+    public ProdutoAssembler () {
+        super(Produto.class , ProdutoModel.class);
+    }
 
+
+    @Override
+    public ProdutoModel toModel(Produto entity) {
+        ProdutoModel produtoModel = produtoMapper.toModel(entity);
+
+        produtoModel.add(algaLinks.linkToProdutosRestaurante(entity.getRestaurante().getId() , "produtos"));
+        produtoModel.add(algaLinks.linkToProduto(entity.getRestaurante().getId() , entity.getId()));
+
+        return produtoModel;
+    }
+
+    public List<ProdutoModel> toCollection(Collection<Produto> listaProdutos) {
+        return listaProdutos.stream().map(this::toModel).toList();
+    }
 }

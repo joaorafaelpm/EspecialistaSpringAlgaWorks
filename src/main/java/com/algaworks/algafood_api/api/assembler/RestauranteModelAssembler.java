@@ -32,29 +32,33 @@ public class RestauranteModelAssembler extends RepresentationModelAssemblerSuppo
 
         restauranteModel.getCozinha().add(algaLinks.
                 linkToCozinha(restauranteModel.getCozinha().getId()));
-        restauranteModel.getEndereco().getCidade().add(algaLinks.
-                linkToCidade(restauranteModel.getEndereco().getCidade().getId()));
-
+        if (restauranteModel.getEndereco() != null) {
+            restauranteModel.getEndereco().getCidade().add(algaLinks.
+                    linkToCidade(restauranteModel.getEndereco().getCidade().getId()));
+        }
         restauranteModel.add(algaLinks.
                 linkToRestaurante(restauranteModel.getId()));
+
+        restauranteModel.add(algaLinks.
+                linkToProdutosRestaurante(restauranteModel.getId() , "produtos"));
         restauranteModel.add(algaLinks.
                 linkToRestaurantes("restaurantes"));
 
         if (entity.podeAbrir()) {
             restauranteModel.add(algaLinks.
-                    linkToRestauranteAbrir(restauranteModel.getId() , "abrir"));
+                    linkToRestauranteAbertura(restauranteModel.getId() , "abrir"));
         }
         if (entity.podeFechar()) {
             restauranteModel.add(algaLinks.
-                    linkToRestauranteFechar(restauranteModel.getId() , "fechar"));
+                    linkToRestauranteFechamento(restauranteModel.getId() , "fechar"));
         }
         if (entity.podeAtivar()) {
             restauranteModel.add(algaLinks.
-                    linkToRestauranteAtivar(restauranteModel.getId() , "ativar"));
+                    linkToRestauranteAtivacao(restauranteModel.getId() , "ativar"));
         }
         if (entity.podeInativar()) {
             restauranteModel.add(algaLinks.
-                    linkToRestauranteInativar(restauranteModel.getId() , "inativar"));
+                    linkToRestauranteInativacao(restauranteModel.getId() , "inativar"));
         }
 
         restauranteModel.add(algaLinks.

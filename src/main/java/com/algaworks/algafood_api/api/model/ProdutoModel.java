@@ -18,6 +18,6 @@ public class ProdutoModel extends RepresentationModel<ProdutoModel> {
     private String nome ;
     private String descricao ;
     private BigDecimal preco ;
-    private Boolean ativo = false;
+    private Boolean ativo;
 
 }

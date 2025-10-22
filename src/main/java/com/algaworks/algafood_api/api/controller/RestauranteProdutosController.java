@@ -1,6 +1,7 @@
 package com.algaworks.algafood_api.api.controller;
 
 import com.algaworks.algafood_api.api.assembler.ProdutoAssembler;
+import com.algaworks.algafood_api.api.assembler.mapper.ProdutoMapper;
 import com.algaworks.algafood_api.api.assembler.disassambler.ProdutoDisassembler;
 import com.algaworks.algafood_api.api.model.ProdutoModel;
 import com.algaworks.algafood_api.api.model.DTO.ProdutoDTO;
@@ -26,9 +27,9 @@ public class RestauranteProdutosController {
     private ProdutoDisassembler produtoDisassembler;
 
     @GetMapping
-    public List<ProdutoModel> pegarTodosDeUmRestaurante (@PathVariable Long restauranteId , @RequestParam(required = false) boolean incluirInativos) {
+    public List<ProdutoModel> pegarTodosDeUmRestaurante (@PathVariable Long restauranteId , @RequestParam(required = false) Boolean incluirInativos) {
         List<Produto> produtos = produtoService.findAtivosByRestaurante(restauranteService.findById(restauranteId));
-        if (incluirInativos) {
+        if (incluirInativos != null && incluirInativos) {
             produtos = produtoService.findByRestaurante(restauranteService.findById(restauranteId));
         }
         return produtoAssembler.toCollection(produtos);
@@ -37,7 +38,7 @@ public class RestauranteProdutosController {
     @GetMapping("/{produtoId}")
     public ProdutoModel pegarUnico (@PathVariable Long restauranteId , @PathVariable Long produtoId) {
         Produto produto = produtoService.findById(restauranteId, produtoId);
-        return produtoAssembler.produtoToProdutoModel(produto);
+        return produtoAssembler.toModel(produto);
     }
 
     @PostMapping
@@ -45,13 +46,13 @@ public class RestauranteProdutosController {
     public ProdutoModel salvar (@PathVariable Long restauranteId , @RequestBody @Valid ProdutoDTO produtoDTO) {
         Produto produto = produtoDisassembler.produtoDTOToProduto(produtoDTO);
         produtoService.save(restauranteId , produto);
-        return produtoAssembler.produtoToProdutoModel(produto);
+        return produtoAssembler.toModel(produto);
     }
     @PutMapping("/{produtoId}")
     public ProdutoModel salvar (@PathVariable Long restauranteId , @PathVariable Long produtoId,@RequestBody @Valid ProdutoDTO produtoDTO) {
         Produto produtoAntigo = produtoService.findById(restauranteId, produtoId);
         produtoDisassembler.updateProdutoFromDto(produtoDTO , produtoAntigo);
-        return produtoAssembler.produtoToProdutoModel(produtoService.save(restauranteId , produtoAntigo));
+        return produtoAssembler.toModel(produtoService.save(restauranteId , produtoAntigo));
     }
 
     @DeleteMapping("/{produtoId}")
