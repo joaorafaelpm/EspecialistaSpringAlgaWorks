@@ -2,6 +2,7 @@ package com.algaworks.algafood_api.api.controller;
 
 
 import com.algaworks.algafood_api.api.assembler.FotoProdutoAssembler;
+import com.algaworks.algafood_api.api.assembler.mapper.FotoProdutoMapper;
 import com.algaworks.algafood_api.api.assembler.disassambler.FotoProdutoDisassembler;
 import com.algaworks.algafood_api.api.model.FotoProdutoModel;
 import com.algaworks.algafood_api.api.model.DTO.FotoProdutoDTO;
@@ -39,7 +40,7 @@ public class RestauranteProdutoFotoController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public FotoProdutoModel pegarFoto (@PathVariable Long restauranteId , @PathVariable Long produtoId) {
-        return fotoProdutoAssembler.fotoProdutoToFotoProdutoModel(
+        return fotoProdutoAssembler.toModel(
                 fotoProdutoService.findById(restauranteId , produtoId));
     }
 
@@ -87,7 +88,7 @@ public class RestauranteProdutoFotoController {
 
         FotoProduto fotoSalva = fotoProdutoService.save(fotoProduto , arquivo.getInputStream());
 
-        return fotoProdutoAssembler.fotoProdutoToFotoProdutoModel(fotoSalva);
+        return fotoProdutoAssembler.toModel(fotoSalva);
 
     }
     @DeleteMapping

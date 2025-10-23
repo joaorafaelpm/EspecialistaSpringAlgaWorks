@@ -222,6 +222,13 @@ public class AlgaLinks {
         return linkToProduto(restauranteId, produtoId, IanaLinkRelations.SELF.value());
     }
 
+    public Link linkToFotoProduto (Long restauranteId, Long produtoId , String rel) {
+        return linkTo(methodOn(RestauranteProdutoFotoController.class).pegarFoto(restauranteId, produtoId)).withRel(rel);
+    }
+    public Link linkToFotoProduto (Long restauranteId, Long produtoId) {
+        return linkToFotoProduto(restauranteId , produtoId , IanaLinkRelations.SELF.value());
+    }
+
     public Link linkToCozinha (Long cozinhaId , String rel) {
         return linkTo(methodOn(CozinhaController.class).getById(cozinhaId)).withRel(rel);
     }
@@ -232,11 +239,48 @@ public class AlgaLinks {
     public Link linkToCozinhas(String rel) {
         return linkTo(CozinhaController.class).withRel(rel);
     }
-
     public Link linkToCozinhas() {
         return linkToCozinhas(IanaLinkRelations.COLLECTION.value());
     }
+    public Link linkToGrupos(String rel) {
+        return linkTo(GrupoController.class).withRel(rel);
+    }
+    public Link linkToGrupos() {
+        return linkToGrupos(IanaLinkRelations.COLLECTION.value());
+    }
+    public Link linkToGrupo(Long grupoId,String rel) {
+        return linkTo(methodOn(GrupoController.class).findById(grupoId)).withRel(rel);
+    }
+    public Link linkToGrupo(Long grupoId) {
+        return linkToGrupo(grupoId , IanaLinkRelations.SELF.value());
+    }
 
+    public Link linkToGrupoPermissao (Long grupoId , String rel) {
+        return linkTo(methodOn(GrupoPermissaoController.class).listarPermissao(grupoId)).withRel(rel);
+    }
+
+    public Link linkToAssociacaoGrupoPermissao (Long grupoId,Long permissaoId , String rel) {
+        return linkTo(methodOn(GrupoPermissaoController.class).associarPermissao(grupoId , permissaoId)).withRel(rel);
+    }
+
+    public Link linkToDesassociacaoGrupoPermissao (Long grupoId,Long permissaoId , String rel) {
+        return linkTo(methodOn(GrupoPermissaoController.class).desassociarPermissao(grupoId , permissaoId)).withRel(rel);
+    }
+
+    public Link linkToAssociacaoGrupoUsuario (Long usuarioId , Long grupoId, String rel) {
+        return linkTo(methodOn(UsuarioGrupoController.class).associar(usuarioId , grupoId)).withRel(rel);
+    }
+
+    public Link linkToDesassociacaoGrupoUsuario (Long usuarioId , Long grupoId, String rel) {
+        return linkTo(methodOn(UsuarioGrupoController.class).desassociar(usuarioId , grupoId)).withRel(rel);
+    }
+
+    public Link linkToPermissoes (String rel) {
+        return linkTo(PermissaoController.class).withRel(rel);
+    }
+    public Link linkToPermissoes () {
+        return linkToPermissoes(IanaLinkRelations.COLLECTION.value());
+    }
 
 
 }

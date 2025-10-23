@@ -1,20 +1,60 @@
 package com.algaworks.algafood_api.api.assembler;
 
+
+import com.algaworks.algafood_api.api.AlgaLinks;
+import com.algaworks.algafood_api.api.assembler.mapper.GrupoMapper;
 import com.algaworks.algafood_api.api.model.GrupoModel;
 import com.algaworks.algafood_api.domain.model.Grupo;
-import org.mapstruct.Mapper;
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.List;
 
-@Mapper(componentModel = "spring")
-public interface GrupoAssembler {
+@Component
+public class GrupoAssembler extends RepresentationModelAssemblerSupport<Grupo , GrupoModel> {
+    @Autowired
+    private AlgaLinks algaLinks;
 
-    @Bean
-    GrupoModel grupoToGrupoModel(Grupo grupo);
+    @Autowired
+    private GrupoMapper grupoMapper;
 
-    @Bean
-    List<GrupoModel> toCollection(Collection<Grupo> listaGrupo);
+    public GrupoAssembler () {
+        super(Grupo.class , GrupoModel.class);
+    }
+
+
+    @Override
+    public GrupoModel toModel(Grupo entity) {
+        GrupoModel grupoModel = grupoMapper.toModel(entity);
+
+        grupoModel.add(algaLinks.linkToGrupos());
+        grupoModel.add(algaLinks.linkToGrupo(entity.getId()));
+        grupoModel.add(algaLinks.linkToGrupoPermissao(entity.getId() , "permissoes"));
+
+        return grupoModel;
+    }
+
+    public CollectionModel<GrupoModel> toCollection (Collection<Grupo> listaGrupo) {
+        var listaGrupoModel = listaGrupo.stream().map(this::toModel).toList();
+        CollectionModel<GrupoModel> gruposCollectionModel = CollectionModel.of(listaGrupoModel);
+        gruposCollectionModel.add(algaLinks.linkToGrupos("grupos"));
+
+        return gruposCollectionModel;
+    }
+    public CollectionModel<GrupoModel> toCollectionRefUsuario (Long usuarioId , Collection<Grupo> listaGrupo) {
+        var listaGrupoModel = listaGrupo.stream().map(this::toModel).toList();
+        CollectionModel<GrupoModel> gruposCollectionModel = CollectionModel.of(listaGrupoModel);
+
+        gruposCollectionModel.forEach(grupoModel ->
+                grupoModel.add(algaLinks.linkToDesassociacaoGrupoUsuario(usuarioId , grupoModel.getId() , "desassociar" )));
+
+        gruposCollectionModel.add(algaLinks.linkToGrupos("grupos"));
+        gruposCollectionModel.add(algaLinks.linkToDesassociacaoGrupoUsuario(usuarioId ,null , "associar" ));
+
+        return gruposCollectionModel;
+    }
 
 }
+

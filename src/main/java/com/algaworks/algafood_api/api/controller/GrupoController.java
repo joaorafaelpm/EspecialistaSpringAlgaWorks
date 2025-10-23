@@ -1,6 +1,7 @@
 package com.algaworks.algafood_api.api.controller;
 
 import com.algaworks.algafood_api.api.assembler.GrupoAssembler;
+import com.algaworks.algafood_api.api.assembler.mapper.GrupoMapper;
 import com.algaworks.algafood_api.api.assembler.disassambler.GrupoDisassembler;
 import com.algaworks.algafood_api.api.model.GrupoModel;
 import com.algaworks.algafood_api.api.model.DTO.GrupoDTO;
@@ -8,6 +9,7 @@ import com.algaworks.algafood_api.domain.model.Grupo;
 import com.algaworks.algafood_api.domain.service.CadastroGrupoService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,20 +27,20 @@ public class GrupoController {
     private GrupoDisassembler grupoDisassembler;
 
     @GetMapping
-    public List<GrupoModel> findAll () {
+    public CollectionModel<GrupoModel> findAll () {
         return grupoAssembler.toCollection(grupoService.findAll());
     }
 
     @GetMapping("/{grupoId}")
     public ResponseEntity<GrupoModel> findById (@PathVariable Long grupoId) {
-        return ResponseEntity.ok(grupoAssembler.grupoToGrupoModel(grupoService.findById(grupoId)));
+        return ResponseEntity.ok(grupoAssembler.toModel(grupoService.findById(grupoId)));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public GrupoModel save (@RequestBody @Valid GrupoDTO grupoDTO) {
         Grupo grupo = grupoDisassembler.grupoDTOToGrupo(grupoDTO);
-        return grupoAssembler.grupoToGrupoModel(grupoService.save(grupo));
+        return grupoAssembler.toModel(grupoService.save(grupo));
     }
 
     @PutMapping("/{id}")
@@ -46,7 +48,7 @@ public class GrupoController {
         Grupo grupoAntigo = grupoService.findById(id);
         grupoDisassembler.updateGrupoFromDto(grupoDTO , grupoAntigo);
 
-        return ResponseEntity.ok(grupoAssembler.grupoToGrupoModel(grupoService.save(grupoAntigo)));
+        return ResponseEntity.ok(grupoAssembler.toModel(grupoService.save(grupoAntigo)));
         }
 
     @DeleteMapping("/{id}")

@@ -9,7 +9,7 @@ import org.springframework.hateoas.server.core.Relation;
 import java.math.BigDecimal;
 
 
-@Relation(collectionRelation = "itens-pedido")
+@Relation(collectionRelation = "itensPedido")
 @Getter
 @Setter
 @AllArgsConstructor
