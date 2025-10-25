@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.*;
 class CadastroCozinhaIT {
 
 	private static final Long COZINHA_ID_INEXISTENTE = 10000L ;
+	private static final String PATH_PADRAO_REQUISICAO ="/cozinhas";
 	private int numeroCozinhas ;
 //	@Autowired
 //	private Flyway flyway ;
@@ -47,7 +48,7 @@ class CadastroCozinhaIT {
 		enableLoggingOfRequestAndResponseIfValidationFails();
 //		Definindo a porta e o caminho padrão dos testes
 		RestAssured.port = port;
-		RestAssured.basePath = "/cozinhas" ;
+		RestAssured.basePath = PATH_PADRAO_REQUISICAO ;
 
 //		Isso reseta o banco para um estado conhecido por nós (afterMigrate). Pense comigo, os testes integrados são executados fora de sequência, então se eu primeiro gerar uma nova cozinha e depois procurar somente 4 cozinhas vai gerar uma incongruência e dar erro no teste de 4 cozinhas. Por isso damos um callback no flyway antes de cada etapa
 //		flyway.migrate() ;

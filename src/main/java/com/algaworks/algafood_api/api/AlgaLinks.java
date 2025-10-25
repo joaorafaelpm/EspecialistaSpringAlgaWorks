@@ -1,6 +1,7 @@
 package com.algaworks.algafood_api.api;
 
 import com.algaworks.algafood_api.api.controller.*;
+import com.ctc.wstx.shaded.msv_core.util.Uri;
 import org.springframework.hateoas.*;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,7 @@ public class AlgaLinks {
     public static final TemplateVariables PROJECAO_VARIABLES = new TemplateVariables(
             new TemplateVariable("projecao", TemplateVariable.VariableType.REQUEST_PARAM)
     );
+
 
     public Link linkToPedidos (String rel) {
         TemplateVariables filtroVariables = new TemplateVariables(
@@ -282,6 +284,20 @@ public class AlgaLinks {
         return linkToPermissoes(IanaLinkRelations.COLLECTION.value());
     }
 
+    public Link linkToEstatisticas (String rel) {
+        return linkTo(EstatisticasController.class).withRel(rel);
+    }
+    public Link linkToEstatisticasVendasDiarias (String rel) {
+        TemplateVariables filtro = new TemplateVariables(
+                new TemplateVariable("restauranteId", TemplateVariable.VariableType.REQUEST_PARAM),
+                new TemplateVariable("dataCriacaoInicio", TemplateVariable.VariableType.REQUEST_PARAM),
+                new TemplateVariable("dataCriacaoFim", TemplateVariable.VariableType.REQUEST_PARAM),
+                new TemplateVariable("timeOffSet", TemplateVariable.VariableType.REQUEST_PARAM)
+        );
+        String link = linkTo(methodOn(EstatisticasController.class).consultarVendasJson(null, null)).toUri().toString();
+
+        return Link.of(UriTemplate.of(link , filtro) , rel);
+    }
 
 }
 
