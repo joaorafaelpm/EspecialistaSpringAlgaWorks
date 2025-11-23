@@ -14,7 +14,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/restaurantes/{restauranteId}/usuarios")
+@RequestMapping("/v1/restaurantes/{restauranteId}/usuarios")
 public class RestauranteUsuarioController {
 
     private CadastroRestauranteService restauranteService;

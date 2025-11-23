@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/v1" , produces = MediaType.APPLICATION_JSON_VALUE)
 public class RootEntryPointController {
 
     @Autowired
@@ -27,6 +27,7 @@ public class RootEntryPointController {
         rootEntryPointModel.add(algaLinks.linkToPermissoes("permissoes"));
         rootEntryPointModel.add(algaLinks.linkToFormasPagamento("formasPagamento"));
         rootEntryPointModel.add(algaLinks.linkToEstados("estados"));
+        rootEntryPointModel.add(algaLinks.linkToCidades("cidades"));
         rootEntryPointModel.add(algaLinks.linkToEstatisticas("estatisticas"));
 
         return rootEntryPointModel;

@@ -20,7 +20,7 @@ import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping("/formas-pagamento")
+@RequestMapping("/v1/formas-pagamento")
 @AllArgsConstructor
 public class FormaPagamentoController {
 

@@ -8,7 +8,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/permissoes")
+@RequestMapping("/v1/permissoes")
 @AllArgsConstructor
 public class PermissaoController {
 

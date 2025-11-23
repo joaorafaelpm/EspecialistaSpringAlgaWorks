@@ -26,7 +26,7 @@ import java.io.InputStream;
 import java.util.List;
 
 @RestController
-@RequestMapping("/restaurantes/{restauranteId}/produtos/{produtoId}/foto")
+@RequestMapping("/v1/restaurantes/{restauranteId}/produtos/{produtoId}/foto")
 @AllArgsConstructor
 public class RestauranteProdutoFotoController {
 

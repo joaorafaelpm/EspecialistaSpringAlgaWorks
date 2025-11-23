@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/pedidos/{pedidoId}")
+@RequestMapping("/v1/pedidos/{pedidoId}")
 @AllArgsConstructor
 public class FluxoPedidoController {
 

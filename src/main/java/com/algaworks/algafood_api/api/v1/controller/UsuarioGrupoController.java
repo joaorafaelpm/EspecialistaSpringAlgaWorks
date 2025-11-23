@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/usuarios/{usuarioId}/grupos")
+@RequestMapping("/v1/usuarios/{usuarioId}/grupos")
 @AllArgsConstructor
 public class UsuarioGrupoController {
 

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @ResponseBody
 @AllArgsConstructor
-@RequestMapping("/estados")
+@RequestMapping("/v1/estados")
 public class EstadoController {
 
     private EstadoRepository estadoRepository ;

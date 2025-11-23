@@ -28,7 +28,7 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping("/pedidos")
+@RequestMapping("/v1/pedidos")
 @AllArgsConstructor
 public class PedidoController {
 

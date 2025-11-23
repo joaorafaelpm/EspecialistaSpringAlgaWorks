@@ -5,7 +5,6 @@ import com.algaworks.algafood_api.api.v1.assembler.CidadeModelAssembler;
 import com.algaworks.algafood_api.api.v1.assembler.disassambler.CidadeDisassembler;
 import com.algaworks.algafood_api.api.v1.model.CidadeModel;
 import com.algaworks.algafood_api.api.v1.model.DTO.CidadeDTO;
-import com.algaworks.algafood_api.core.web.AlgaMediaTypes;
 import com.algaworks.algafood_api.domain.exception.EstadoNaoEncontradoException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.algaworks.algafood_api.domain.model.Cidade;
@@ -15,13 +14,14 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(value = "/cidades" , produces = AlgaMediaTypes.V1_APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/v1/cidades" , produces = MediaType.APPLICATION_JSON_VALUE)
 public class CidadeController {
 
     private CidadeRepository cidadeRepository;
@@ -31,18 +31,18 @@ public class CidadeController {
     private CidadeModelAssembler cidadeAssembler;
     private CidadeDisassembler cidadeDisassembler;
 
-    @GetMapping(produces = AlgaMediaTypes.V1_APPLICATION_JSON_VALUE)
+    @GetMapping
     public CollectionModel<CidadeModel> all () {
         return cidadeAssembler.toCollection(cidadeRepository.findAll());
     }
 
-    @GetMapping(value = "/{id}" , produces = AlgaMediaTypes.V1_APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}")
     public CidadeModel getById (@PathVariable Long id) {
         return cidadeAssembler.toModel(cidadeService.findById(id));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(produces = AlgaMediaTypes.V1_APPLICATION_JSON_VALUE)
+    @PostMapping
     public CidadeModel add (@RequestBody @Valid CidadeDTO cidadeDTO) {
         try {
             Cidade cidade = cidadeDisassembler.cidadeDTOToCidade(cidadeDTO);
@@ -57,7 +57,7 @@ public class CidadeController {
         }
     }
 
-    @PutMapping(value = "/{id}" , produces = AlgaMediaTypes.V1_APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}")
     public CidadeModel save (@PathVariable Long id , @RequestBody @Valid CidadeDTO cidadeDTO) {
         Cidade cidadeAntiga = cidadeService.findById(id);
         Cidade cidadeAtualizada = cidadeDisassembler.cidadeDTOToCidade(cidadeDTO);
