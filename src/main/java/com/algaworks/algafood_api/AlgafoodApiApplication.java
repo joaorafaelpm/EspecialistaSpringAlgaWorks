@@ -16,6 +16,7 @@ public class AlgafoodApiApplication {
 		Dotenv dotenv = Dotenv.configure()
 				.load();
 		System.setProperty("API_EMAIL_KEY", dotenv.get("API_EMAIL_KEY"));
+		System.setProperty("LOGGLY_TOKEN", dotenv.get("LOGGLY_TOKEN"));
 
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 

@@ -12,6 +12,7 @@ import com.algaworks.algafood_api.domain.repository.CidadeRepository;
 import com.algaworks.algafood_api.domain.service.CadastroCidadeService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,6 +23,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/v1/cidades" , produces = MediaType.APPLICATION_JSON_VALUE)
+@Slf4j
 public class CidadeController {
 
     private CidadeRepository cidadeRepository;
@@ -33,6 +35,10 @@ public class CidadeController {
 
     @GetMapping
     public CollectionModel<CidadeModel> all () {
+        log.info("Buscando lista de cidades");
+        if (true) {
+            throw new RuntimeException("Erro esperado");
+        }
         return cidadeAssembler.toCollection(cidadeRepository.findAll());
     }
 

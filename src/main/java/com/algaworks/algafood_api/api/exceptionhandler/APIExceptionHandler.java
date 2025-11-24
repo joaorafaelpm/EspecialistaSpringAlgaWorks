@@ -8,6 +8,7 @@ import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.PropertyBindingException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +33,10 @@ import java.util.stream.Collectors;
 
 /**
  * Classe responsável por capturar e tratar exceções de forma centralizada.
- * <p>
- * A anotação @RestControllerAdvice indica ao Spring que esta classe será
- * aplicada globalmente a todos os controladores REST da aplicação.
- * <p>
- * Isso garante respostas consistentes para erros e evita duplicação
- * de código de tratamento em cada controlador.
- * <p>
- * O uso do ProblemDetail segue a especificação RFC 7807,
- * que define um formato padronizado para representar erros HTTP.
+ * O objeto de erro segue a especificação RFC 7807.
  */
 @ControllerAdvice
+@Slf4j
 public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 
     public static final String SYSTEM_ERROR_MESSAGE = String.format("Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde ou contate o administrador do sistema.");
@@ -251,8 +245,11 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
             Exception ex , WebRequest request) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR ;
 
-        // Usando a StackTrace visivel durante o tempo de desenvolvimento para verificarmos as exceções e podemos trata-las mais facilmente
-        ex.printStackTrace();
+
+    // Imprimimos o stack trace usando o log desta vez...
+//        ex.printStackTrace();
+
+        log.error(ex.getMessage() , ex);
 
         APIError apiError = createAPIErrorBuilder(
                 status ,ProblemType.ERRO_DE_SISTEMA , SYSTEM_ERROR_MESSAGE , SYSTEM_ERROR_MESSAGE
