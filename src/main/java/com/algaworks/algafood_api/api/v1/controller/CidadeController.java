@@ -36,9 +36,6 @@ public class CidadeController {
     @GetMapping
     public CollectionModel<CidadeModel> all () {
         log.info("Buscando lista de cidades");
-        if (true) {
-            throw new RuntimeException("Erro esperado");
-        }
         return cidadeAssembler.toCollection(cidadeRepository.findAll());
     }
 
