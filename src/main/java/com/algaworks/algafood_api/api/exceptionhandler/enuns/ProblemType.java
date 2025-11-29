@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum ProblemType {
 
-    MENSSAGEM_INCOMPREESSIVEL("/menssagem-incompreenssivel" , "Menssagem Incompreenssível."),
+    MENSAGEM_INCOMPREESSIVEL("/mensagem-incompreenssivel" , "Mensagem Incompreenssível."),
     DADOS_INVALIDOS("/dados-invalidos" , "Algum dado foi inserido de forma incorreta."),
     RECURSO_NAO_ENCONTRADO("/recurso-nao-encontrado" , "Recurso não encontrado."),
     ERRO_DE_SISTEMA("/erro-inesperado" , "Erro inesperado."),
@@ -14,11 +14,11 @@ public enum ProblemType {
     NEGOCIO_EXCEPTION("/erro-de-negocio" , "Houve uma violação da regra de negócio.") ;
 
     private String path;
-    private String tittle;
+    private String title;
 
-    ProblemType (String path , String tittle) {
+    ProblemType (String path , String title) {
         this.path = "https://algafood.com.br" + path ;
-        this.tittle = tittle;
+        this.title = title;
     }
 
 

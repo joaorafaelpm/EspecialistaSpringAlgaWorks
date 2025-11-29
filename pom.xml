@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.0</version>
+		<version>3.3.0</version>
 		<relativePath/>
 	</parent>
 	<groupId>com.algaworks</groupId>
@@ -37,7 +37,8 @@
 		<jasperreports.version>6.21.3</jasperreports.version>
 		<hateoas.version>2.6.4</hateoas.version>
 		<loggly.version>0.1.5</loggly.version>
-		<spring-security.version>6.0.0</spring-security.version>
+		<spring-security.version>6.3.0</spring-security.version>
+		<oauth2-oidc-sdk.version>11.30.1</oauth2-oidc-sdk.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -137,9 +138,8 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
 		</dependency>
 
 	</dependencies>

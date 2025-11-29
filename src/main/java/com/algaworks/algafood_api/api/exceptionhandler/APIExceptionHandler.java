@@ -16,11 +16,12 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -71,10 +72,6 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         return handleMultipleErrorsValidation(ex, ex.getBindingResult() , headers ,HttpStatus.BAD_REQUEST, request);
     }
 
-    @ExceptionHandler(BindException.class)
-    protected ResponseEntity<Object> handleBindException (BindException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        return handleMultipleErrorsValidation(ex, ex.getBindingResult() , headers ,HttpStatus.BAD_REQUEST, request);
-    }
 
     //    Este erro é o mesmo erro acima, porém, neste caso, essas violações se dizem respeito à minhas próprias validações do BeanValidation, nesse caso, o PositivoOuZero
     @ExceptionHandler(ValidacaoException.class)
@@ -83,11 +80,13 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         return handleMultipleErrorsValidation(ex , ex.getBindingResult() , new HttpHeaders(),HttpStatus.BAD_REQUEST , request );
     }
 
+
+
     //    Definindo um padrão de respostas para o tratamento de erro, seguindo o padrão do ResponseEntityExceptionHandler
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
 //        Se não tiver nenhum corpo de resposta disponível, a gente padroniza um.
-        if (body == null) {
+         if (body == null) {
             body = APIError.builder()
                     .timestamp(OffsetDateTime.now())
                     .title(ex.getLocalizedMessage())
@@ -103,9 +102,37 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
                     .status(statusCode.value())
                     .build();
         }
+
         return super.handleExceptionInternal(ex, body, headers, statusCode, request);
     }
 
+    //    Erro sobre quando algum parâmetro da url é obrigatório e não está presente!
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(
+            MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+
+        String detail = String.format(
+                "O parâmetro obrigatório '%s' não foi informado.",
+                ex.getParameterName()
+        );
+
+        APIError apiError = createAPIErrorBuilder(
+                status,
+                ProblemType.PARAMETRO_INVALIDO,
+                detail
+        ).build();
+
+        return handleExceptionInternal(ex, apiError, headers, status, request);
+    }
+
+
+    @Override
+    protected ResponseEntity<Object> handleServletRequestBindingException(ServletRequestBindingException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        String detail = "Falha na ligação de parâmetros de requisição";
+
+        APIError apiError = createAPIErrorBuilder(status , ProblemType.PARAMETRO_INVALIDO , detail).build();
+        return handleExceptionInternal(ex , apiError , headers, status , request);
+    }
 
     @ExceptionHandler(EntidadeNaoEncontradaException.class)
     public ResponseEntity<?> handlEntidadeNaoEncontrado(
@@ -146,7 +173,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
                 .timestamp(OffsetDateTime.now())
                 .status(status.value())
                 .type(problemType.getPath())
-                .title(problemType.getTittle())
+                .title(problemType.getTitle())
                 .detail(detail)
                 .userMessage(userMessage);
     }
@@ -157,9 +184,9 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
                 .timestamp(OffsetDateTime.now())
                 .status(status.value())
                 .type(problemType.getPath())
-                .title(problemType.getTittle())
+                .title(problemType.getTitle())
                 .detail(detail)
-                .userMessage(APIExceptionHandler.SYSTEM_ERROR_MESSAGE);
+                .userMessage(SYSTEM_ERROR_MESSAGE);
     }
 
 //    Nós sobrescrevemos essa exception para não lançar nenhum json de volta ao consumidor, fazemos isso por que se o corpo da menssagem não for aceito (se a Media Type for diferente da passada) ele não deve receber nada no body de qualquer forma, e é um erro se nós passarmos algo no body, por isso tratamos para passar só os status
@@ -186,6 +213,10 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, apiError , headers, status, request);
     }
 
+
+
+
+
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -200,9 +231,8 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 
         String detail = "O corpo da requisição é inválido. Tente verificar a sintaxe do texto digitado.";
 
-
         APIError apiError = createAPIErrorBuilder(
-                status ,ProblemType.MENSSAGEM_INCOMPREESSIVEL , detail
+                status ,ProblemType.MENSAGEM_INCOMPREESSIVEL, detail
         )
         .build();
 
@@ -215,7 +245,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     private ResponseEntity<Object> handlePropertyBindingExceptions(PropertyBindingException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         String path = joinPath(ex.getPath());
 
-        ProblemType problemType = ProblemType.MENSSAGEM_INCOMPREESSIVEL;
+        ProblemType problemType = ProblemType.MENSAGEM_INCOMPREESSIVEL;
         String detail = String.format("A propriedade '%s' não consta na entidade original do tipo '%s' . Corrija ou remova e informe um valor compatível com " +
                 "a entidade original." , path , ex.getReferringClass().getSimpleName()) ;
 
@@ -229,7 +259,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 //        Pegamos os elementos que causaram o problema e caso seja um elemento pai, uso o "." para separar
         String path = joinPath(ex.getPath());
 
-        ProblemType problemType = ProblemType.MENSSAGEM_INCOMPREESSIVEL;
+        ProblemType problemType = ProblemType.MENSAGEM_INCOMPREESSIVEL;
         String detail = String.format("A propriedade '%s' recebeu o valor " +
                 "'%s' que é um tipo inválido. Corrija e informe um valor compatível com " +
                 "o tipo '%s'" , path , ex.getValue() , ex.getTargetType().getSimpleName()) ;
@@ -244,10 +274,6 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> handleDefaultException(
             Exception ex , WebRequest request) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR ;
-
-
-    // Imprimimos o stack trace usando o log desta vez...
-//        ex.printStackTrace();
 
         log.error(ex.getMessage() , ex);
 

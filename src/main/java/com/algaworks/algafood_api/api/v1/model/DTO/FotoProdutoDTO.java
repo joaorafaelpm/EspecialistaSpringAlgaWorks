@@ -4,13 +4,18 @@ import com.algaworks.algafood_api.core.validation.fotoProduto.FileSize;
 import com.algaworks.algafood_api.core.validation.fotoProduto.FileType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+
 public class FotoProdutoDTO {
 
     @NotNull
