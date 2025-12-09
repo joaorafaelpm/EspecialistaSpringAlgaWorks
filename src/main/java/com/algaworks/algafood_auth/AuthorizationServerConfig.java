@@ -1,5 +1,6 @@
 package com.algaworks.algafood_auth;
 
+import jdk.jfr.Registered;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -39,14 +40,12 @@ public class AuthorizationServerConfig {
                 .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
                 .with(authorizationServerConfigurer, (authorizationServer) ->
                         authorizationServer
-                                .oidc(Customizer.withDefaults())	// Enable OpenID Connect 1.0
+                                .oidc(Customizer.withDefaults())
                 )
                 .authorizeHttpRequests((authorize) ->
                         authorize
                                 .anyRequest().authenticated()
                 )
-                // Redirect to the login page when not authenticated from the
-                // authorization endpoint
                 .exceptionHandling((exceptions) -> exceptions
                         .defaultAuthenticationEntryPointFor(
                                 new LoginUrlAuthenticationEntryPoint("/login"),
@@ -73,13 +72,11 @@ public class AuthorizationServerConfig {
 
     @Bean
     public RegisteredClientRepository registeredClientRepository(PasswordEncoder passwordEncoder) {
-        RegisteredClient algafoodweb = RegisteredClient
+        RegisteredClient algafoodend = RegisteredClient
                 .withId("1")
-                .clientId("algafood-web")
-                .clientSecret(passwordEncoder.encode("web123"))
+                .clientId("algafood-end")
+                .clientSecret(passwordEncoder.encode("backend123"))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-//                Eu estou abertamente pulando o módulo onde o tutor implementa o fluxo PASSWORD, por que a implementação dele seria feito a parte e não faz sentido dedicar meu tempo a entender o código por tras disso antes de aprender a base do Spring Authentication Server por completo
-//                O último commit feito nesse repositório eu implementei o Password flux 100% feito por IA, porém como eu não consegui extrair nada, decidi seguir por um caminho onde eu possa de fato aprender
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .scope("WRITE")
                 .scope("READ")
@@ -89,8 +86,25 @@ public class AuthorizationServerConfig {
                         .build())
                 .build();
 
-        return new InMemoryRegisteredClientRepository(Arrays.asList(algafoodweb));
+//        localhost:8081/oauth2/authorize?response_type=code&client_id=algafood-analytics&state=abc&redirect_uri=http://client-application
+        RegisteredClient algafoodanalytics = RegisteredClient
+                .withId("2")
+                .clientId("algafood-analytics")
+                .clientSecret(passwordEncoder.encode("analytics123"))
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .redirectUri("http://client-application")
+                .scope("WRITE")
+                .scope("READ")
+                .tokenSettings(TokenSettings.builder()
+                        .accessTokenFormat(OAuth2TokenFormat.REFERENCE)
+                        .accessTokenTimeToLive(Duration.ofMinutes(30))
+                        .build())
+                .build();
+
+        return new InMemoryRegisteredClientRepository(Arrays.asList(algafoodend , algafoodanalytics));
     }
+
 
     @Bean
     public AuthorizationServerSettings authorizationServerSettings(AlgaFoodSecurityProperties properties) {
