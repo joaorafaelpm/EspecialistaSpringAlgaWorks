@@ -2,7 +2,7 @@ package com.algaworks.algafood_api.core.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer; // IMPORTANTE: Importar o Customizer
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -23,8 +23,12 @@ public class ResourceServerConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .opaqueToken(Customizer.withDefaults())
+                        .opaqueToken(opaque -> opaque
+                                .introspectionUri("http://localhost:8081/oauth2/introspect")
+                                .introspectionClientCredentials("algafood-end", "backend123")
+                        )
                 )
+
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

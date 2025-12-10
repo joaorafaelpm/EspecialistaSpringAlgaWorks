@@ -11,7 +11,6 @@ import org.springframework.validation.annotation.Validated;
 @Getter
 @Setter
 @Component
-//To transformando uma especificação própria do application.properties em uma classe para generalizar o remetente do email e o estado da implementação (por padrão é MOCK/testes)
 @ConfigurationProperties("algafood.email")
 public class EmailProperties {
 

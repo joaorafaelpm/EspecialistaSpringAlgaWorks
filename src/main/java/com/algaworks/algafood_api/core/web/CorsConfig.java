@@ -9,16 +9,20 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
     @Autowired
     private ApiDeprecationHandler apiDeprecationHandler;
 
+
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // Mapeia todas as rotas da sua aplicação
-                .allowedOrigins("http://127.0.0.1:5500"); // Permite requisições da origem "http://127.0.0.1:5500"
+                .allowedOrigins("http://localhost:8082");
+        // Permite requisições da origem "http://127.0.0.1:5500"
     }
 
     @Override

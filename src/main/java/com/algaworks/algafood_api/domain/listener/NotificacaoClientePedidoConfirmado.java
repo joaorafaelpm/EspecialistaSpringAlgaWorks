@@ -5,7 +5,6 @@ import com.algaworks.algafood_api.domain.event.PedidoConfirmadoEvent;
 import com.algaworks.algafood_api.domain.model.Pedido;
 import com.algaworks.algafood_api.domain.service.EnvioEmailService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 

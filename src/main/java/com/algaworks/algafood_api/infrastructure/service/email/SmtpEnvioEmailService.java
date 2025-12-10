@@ -4,7 +4,6 @@ import com.algaworks.algafood_api.core.email.EmailProperties;
 import com.algaworks.algafood_api.domain.service.EnvioEmailService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
