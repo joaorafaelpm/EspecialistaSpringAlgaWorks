@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<style>
+    .row {
+      margin-bottom: 10px;
+      margin-top: 10px;
+    }
+</style>
+<script src="//code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script>
+const config = {
+  clientId: "algafood-analytics",
+  authorizeUrl: "http://localhost:8081/oauth2/authorize",
+  tokenUrl: "http://localhost:8081/oauth2/token",
+  callbackUrl: "http://localhost:8082/callback",
+  cozinhasUrl: "http://localhost:8080/v1/cozinhas",
+  verifier:"ronaldo123",
+  challenge:"EaH_sQjXjgIjW_Qt5MYlN3YlvdI78HmOFTs4RwkD5Ig",
+};
+
+
+async function login() {
+  const state = btoa(Math.random());
+  localStorage.setItem("clientState", state);
+
+  localStorage.setItem("pkce_verifier", config.verifier);
+
+  const url =
+    `${config.authorizeUrl}` +
+    `?response_type=code` +
+    `&client_id=${encodeURIComponent(config.clientId)}` +
+    `&redirect_uri=${encodeURIComponent(config.callbackUrl)}` +
+    `&scope=${encodeURIComponent('WRITE READ')}` +
+    `&state=${encodeURIComponent(state)}` +
+    `&code_challenge=${config.challenge}` +
+    `&code_challenge_method=S256`;
+
+  window.location.href = url;
+}
+
+async function gerarAccessToken(code) {
+  const verifier = localStorage.getItem("pkce_verifier");
+  if (!verifier) { alert("Code verifier não encontrado."); return; }
+
+  const params = new URLSearchParams();
+  params.append("grant_type", "authorization_code");
+  params.append("code", code);
+  params.append("redirect_uri", config.callbackUrl);
+  params.append("client_id", config.clientId);       // necessário para client público
+  params.append("code_verifier", config.verifier);          // **ESSENCIAL**
+
+  const resp = await fetch(config.tokenUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: params.toString()
+  });
+
+  if (!resp.ok) {
+    const body = await resp.text();
+    console.error("Erro token:", resp.status, body);
+    alert("Erro ao gerar access token (veja console).");
+    return;
+  }
+
+  const json = await resp.json();
+  window.accessToken = json.access_token;
+  alert("Access token obtido: " + json.access_token);
+}
+
+window.addEventListener('load', async () => {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  const state = params.get("state");
+  const stored = localStorage.getItem("clientState");
+  if (code) {
+    if (state !== stored) { alert("State inválido"); return; }
+    await gerarAccessToken(code);
+    // opcional: limpa URL
+    history.replaceState(null, "", "/");
+  }
+});
+
+
+function consultar() {
+  alert("Consultando recurso com access token " + accessToken);
+
+  $.ajax({
+    url: config.cozinhasUrl,
+    type: "get",
+
+    beforeSend: function(request) {
+      request.setRequestHeader("Authorization", "Bearer " + accessToken);
+    },
+
+    success: function(response) {
+      var json = JSON.stringify(response);
+      $("#resultado").text(json);
+    },
+
+    error: function(error) {
+      alert("Erro ao consultar recurso");
+    }
+  });
+}
+</script>
+
+
+<button onclick="login()">Login (PKCE)</button>
+<button onclick="consultar()">Consultar cozinhas</button>
+
+<div class="row">
+    <div id="resultado">
+</div>
+</div>
+
+</body>
+</html>

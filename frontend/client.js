@@ -3,10 +3,9 @@
 
 const config = {
   clientId: "algafood-analytics",
-  clientSecret: "analytics123",
   authorizeUrl: "http://localhost:8081/oauth2/authorize",
   tokenUrl: "http://localhost:8081/oauth2/token",
-  callbackUrl: "http://localhost:8082",
+  callbackUrl: "http://localhost:8082/callback",
   cozinhasUrl: "http://localhost:8080/v1/cozinhas",
 };
 
@@ -50,10 +49,6 @@ function gerarAccessToken(code) {
     data: params.toString(),
     contentType: "application/x-www-form-urlencoded",
 
-    beforeSend: function(request) {
-      request.setRequestHeader("Authorization", "Basic " + clientAuth);
-    },
-
     success: function(response) {
       accessToken = response.access_token;
 
@@ -71,7 +66,7 @@ function login() {
   let state = btoa(Math.random());
   localStorage.setItem("clientState", state);
 
-  window.location.href = `${config.authorizeUrl}?response_type=code&client_id=${config.clientId}&state=${state}&redirect_uri=${config.callbackUrl}`;
+  window.location.href = `${config.authorizeUrl}?response_type=code&client_id=${config.clientId}&grant_type=authorization_code&scope=WRITE READ&state=abc&redirect_uri=${config.callbackUrl}&code_challenge=EaH_sQjXjgIjW_Qt5MYlN3YlvdI78HmOFTs4RwkD5Ig&code_challenge_method=S256`;
 }
 
 $(document).ready(function() {
