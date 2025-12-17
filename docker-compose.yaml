@@ -1,15 +1,19 @@
 services:
-  banco:
+  mysql-database:
     image: mysql:8.3.0
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: algafood
     ports:
       - 3307:3306
-  banco-test:
+
+  mysql-test-database:
     image: mysql:8.3.0
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: algafood_test
     ports:
       - 3308:3306
+
+volumes:
+  redis-data:
