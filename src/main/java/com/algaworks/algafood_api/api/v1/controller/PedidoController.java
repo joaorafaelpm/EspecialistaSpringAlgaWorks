@@ -8,10 +8,12 @@ import com.algaworks.algafood_api.api.v1.model.PedidoResumoModel;
 import com.algaworks.algafood_api.api.v1.model.DTO.PedidoDTO;
 import com.algaworks.algafood_api.core.data.PageWrapper;
 import com.algaworks.algafood_api.core.data.PageableTranslator;
+import com.algaworks.algafood_api.core.security.AlgaSecurity;
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.algaworks.algafood_api.domain.model.Pedido;
 import com.algaworks.algafood_api.domain.filter.PedidoFilter;
+import com.algaworks.algafood_api.domain.model.Usuario;
 import com.algaworks.algafood_api.domain.service.CadastroPedidoService;
 import com.algaworks.algafood_api.domain.service.EmissaoPedidoService;
 import com.algaworks.algafood_api.infrastructure.repository.spec.PedidoSpecs;
@@ -39,6 +41,7 @@ public class PedidoController {
     private PedidoResumoModelAssembler pedidoResumoModelAssembler;
     private PedidoDisassembler pedidoDisassembler;
     private PagedResourcesAssembler<Pedido> pagedResourcesAssembler;
+
 
 
     @GetMapping

@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 public interface PedidoDisassembler {
 
     @Mapping(source = "restauranteId", target = "restaurante")
-    @Mapping(source = "clienteId", target = "cliente")
     @Mapping(source = "formaPagamentoId", target = "formaPagamento")
     @Mapping(source = "itens", target = "itens", qualifiedByName = "mapItens")
     Pedido pedidoDTOToPedido(PedidoDTO pedidoDTO);

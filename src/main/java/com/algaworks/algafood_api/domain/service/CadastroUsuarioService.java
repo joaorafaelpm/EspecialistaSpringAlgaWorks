@@ -3,12 +3,12 @@ package com.algaworks.algafood_api.domain.service;
 import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
-import com.algaworks.algafood_api.domain.exception.UsuarioNaoEncontradoException;
 import com.algaworks.algafood_api.domain.model.Usuario;
 import com.algaworks.algafood_api.domain.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,7 +18,9 @@ import java.util.Optional;
 @AllArgsConstructor
 public class CadastroUsuarioService  {
 
-    private final UsuarioRepository usuarioRepository ;
+    private UsuarioRepository usuarioRepository ;
+    private PasswordEncoder passwordEncoder ;
+
 
     public List<Usuario> findAll () {
         return usuarioRepository.findAll();
@@ -42,6 +44,10 @@ public class CadastroUsuarioService  {
             ));
         }
 
+        if (usuario.isNovo()) {
+            usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+        }
+
         return usuarioRepository.save(usuario) ;
     }
 
@@ -58,14 +64,13 @@ public class CadastroUsuarioService  {
     }
 
     @Transactional
-    public void savePassword (Usuario usuario , String senhaAntiga , String senhaNova) {
-        if (usuario.senhaNaoCoincideCom(senhaAntiga)) {
+    public void changePassword(Long id , String senhaAntiga , String senhaNova) {
+        Usuario usuario = findById(id);
+
+        if (!passwordEncoder.matches(senhaAntiga, usuario.getSenha())) {
             throw new NegocioException("Senhas não coincidem, por favor verifique de novo e tente novamente.");
         }
-        if (usuario.senhaCoincideCom(senhaAntiga)) {
-            usuario.setSenha(senhaNova);
-        }
-        usuarioRepository.save(usuario);
+        usuario.setSenha(passwordEncoder.encode(senhaNova));
     }
 
 

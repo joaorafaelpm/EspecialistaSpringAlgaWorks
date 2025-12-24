@@ -23,10 +23,6 @@ public class PedidoDTO {
 
     @Valid
     @NotNull
-    private UsuarioIdDTO clienteId ;
-
-    @Valid
-    @NotNull
     private FormaPagamentoIdDTO formaPagamentoId ;
 
     @Valid

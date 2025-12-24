@@ -55,7 +55,6 @@ public class UsuarioController {
     @PutMapping("/{id}/senha")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void savePassword (@PathVariable Long id , @RequestBody @Valid SenhaDTO senhaDTO) {
-        Usuario usuarioSenhaAntiga = usuarioService.findById(id);
-        usuarioService.savePassword(usuarioSenhaAntiga , senhaDTO.getSenhaAtual() , senhaDTO.getNovaSenha());
+        usuarioService.changePassword(id , senhaDTO.getSenhaAtual() , senhaDTO.getNovaSenha());
     }
 }

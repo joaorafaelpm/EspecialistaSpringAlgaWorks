@@ -1,5 +1,6 @@
 package com.algaworks.algafood_api.domain.service;
 
+import com.algaworks.algafood_api.core.security.AlgaSecurity;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
 import com.algaworks.algafood_api.domain.model.*;
 import jakarta.transaction.Transactional;
@@ -12,10 +13,11 @@ public class EmissaoPedidoService {
 
     private  final CadastroPedidoService pedidoService;
     private  final CadastroRestauranteService restauranteService;
-    private  final CadastroUsuarioService usuarioService;
     private  final CadastroFormaPagamentoService formaPagamentoService;
     private  final CadastroProdutoService produtoService;
     private  final CadastroCidadeService cidadeService;
+    private  final CadastroUsuarioService usuarioService;
+    private  final AlgaSecurity algaSecurity;
 
     @Transactional
     public Pedido emitirPedido(Pedido pedido) {
@@ -37,15 +39,12 @@ public class EmissaoPedidoService {
         Long restauranteId = pedido.getRestaurante().getId();
         Long formaPagamentoId = pedido.getFormaPagamento().getId();
         Long cidadeId = pedido.getEnderecoEntrega().getCidade().getId();
+        Long clienteId = algaSecurity.getUsuarioId();
 
         Cidade cidade = cidadeService.findById(cidadeId);
         Restaurante restaurante = restauranteService.findById(restauranteId);
         FormaPagamento formaPagamento = formaPagamentoService.findById(formaPagamentoId);
-
-//        O Professor pediu para usar um cliente fixo de Id 1, como a implementação de um clienteId é extremamente simples, eu fiz, mas a princípio nós vamos validar se o usuário é autenticado ou não.]
-//        Isso é uma má prática, o código não deveria receber qualquer cliente, só estou fazendo isso pela práticidade mais a frente
-        Long usuarioId = pedido.getCliente().getId();
-        Usuario usuario = usuarioService.findById(usuarioId);
+        Usuario usuario = usuarioService.findById(clienteId);
 
         pedido.getEnderecoEntrega().setCidade(cidade);
         pedido.setRestaurante(restaurante);
