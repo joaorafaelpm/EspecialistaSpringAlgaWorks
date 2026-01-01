@@ -7,12 +7,14 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.hibernate.sql.exec.spi.JdbcOperation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -24,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
@@ -88,7 +91,7 @@ public class AuthorizationServerConfig {
     }
 
     @Bean
-    public RegisteredClientRepository registeredClientRepository(PasswordEncoder passwordEncoder) {
+    public RegisteredClientRepository registeredClientRepository(PasswordEncoder passwordEncoder , JdbcOperations jdbcOperation) {
         RegisteredClient algafoodend = RegisteredClient
                 .withId("1")
                 .clientId("algafood-end")
@@ -155,7 +158,12 @@ public class AuthorizationServerConfig {
 //        Esse método é muito menos seguro, não atoa foi depreciado, então é por isso que eu escolho não seguir com ele, mas a teoria é basicamente a mesma. E assim como a teoria é a mesma, a url é exatamente igual, a única diferença é no tipo de retorno, que passa de "code" para "token"
 //        localhost:8081/oauth2/authorize?response_type=token&client_id=algafood-web&state=abc&redirect_uri=http://client-application
 
-        return new InMemoryRegisteredClientRepository(Arrays.asList(algafoodend , algafoodanalytics, algafoodWeb));
+        JdbcRegisteredClientRepository jdbcRegisteredClientRepository = new JdbcRegisteredClientRepository(jdbcOperation);
+
+        jdbcRegisteredClientRepository.save(algafoodend);
+        jdbcRegisteredClientRepository.save(algafoodWeb);
+        jdbcRegisteredClientRepository.save(algafoodanalytics);
+        return jdbcRegisteredClientRepository;
     }
 
     @Bean
@@ -178,9 +186,6 @@ public class AuthorizationServerConfig {
     public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer (UsuarioRepository usuarioRepository) {
         return context -> {
             Authentication authentication = context.getPrincipal();
-            System.out.println("==========================================================");
-            System.out.println(authentication.getPrincipal().getClass());
-            System.out.println("==========================================================");
 
             if (authentication.getPrincipal() instanceof User) {
                 User user = (User) authentication.getPrincipal();
