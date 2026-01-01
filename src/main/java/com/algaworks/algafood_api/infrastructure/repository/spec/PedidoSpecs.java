@@ -23,7 +23,7 @@ public class PedidoSpecs {
             }
 
             if(filter.getRestauranteId() != null) {
-                predicates.add(builder.equal(root.get("restaurante").get("id") , filter.getClienteId()));
+                predicates.add(builder.equal(root.get("restaurante").get("id") , filter.getRestauranteId()));
             }
 
             if (filter.getDataCriacaoInicio() != null) {

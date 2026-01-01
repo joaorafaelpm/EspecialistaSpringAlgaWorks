@@ -4,6 +4,7 @@ import com.algaworks.algafood_api.api.v1.assembler.ProdutoAssembler;
 import com.algaworks.algafood_api.api.v1.assembler.disassambler.ProdutoDisassembler;
 import com.algaworks.algafood_api.api.v1.model.ProdutoModel;
 import com.algaworks.algafood_api.api.v1.model.DTO.ProdutoDTO;
+import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.model.Produto;
 import com.algaworks.algafood_api.domain.service.CadastroProdutoService;
 import com.algaworks.algafood_api.domain.service.CadastroRestauranteService;
@@ -25,6 +26,7 @@ public class RestauranteProdutosController {
     private ProdutoAssembler produtoAssembler;
     private ProdutoDisassembler produtoDisassembler;
 
+    @CheckSecurity.Restaurantes.PodeConsultar
     @GetMapping
     public List<ProdutoModel> pegarTodosDeUmRestaurante (@PathVariable Long restauranteId , @RequestParam(required = false) Boolean incluirInativos) {
         List<Produto> produtos = produtoService.findAtivosByRestaurante(restauranteService.findById(restauranteId));
@@ -33,13 +35,14 @@ public class RestauranteProdutosController {
         }
         return produtoAssembler.toCollection(produtos);
     }
-
+    @CheckSecurity.Restaurantes.PodeConsultar
     @GetMapping("/{produtoId}")
     public ProdutoModel pegarUnico (@PathVariable Long restauranteId , @PathVariable Long produtoId) {
         Produto produto = produtoService.findById(restauranteId, produtoId);
         return produtoAssembler.toModel(produto);
     }
 
+    @CheckSecurity.Restaurantes.PodeGerenciarFuncionamento
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProdutoModel salvar (@PathVariable Long restauranteId , @RequestBody @Valid ProdutoDTO produtoDTO) {
@@ -47,6 +50,8 @@ public class RestauranteProdutosController {
         produtoService.save(restauranteId , produto);
         return produtoAssembler.toModel(produto);
     }
+
+    @CheckSecurity.Restaurantes.PodeGerenciarFuncionamento
     @PutMapping("/{produtoId}")
     public ProdutoModel salvar (@PathVariable Long restauranteId , @PathVariable Long produtoId,@RequestBody @Valid ProdutoDTO produtoDTO) {
         Produto produtoAntigo = produtoService.findById(restauranteId, produtoId);
@@ -54,6 +59,7 @@ public class RestauranteProdutosController {
         return produtoAssembler.toModel(produtoService.save(restauranteId , produtoAntigo));
     }
 
+    @CheckSecurity.Restaurantes.PodeGerenciarFuncionamento
     @DeleteMapping("/{produtoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar (@PathVariable Long restauranteId , @PathVariable Long produtoId) {

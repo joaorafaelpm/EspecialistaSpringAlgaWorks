@@ -16,6 +16,7 @@ delete from restaurante_usuario_responsavel;
 delete from pedido;
 delete from item_pedido;
 delete from foto_produto;
+delete from oauth2_registered_client;
 
 set foreign_key_checks = 1;
 
@@ -78,23 +79,16 @@ insert into produto (nome, descricao, preco, ativo, restaurante_id) values ('Esp
 
 insert into grupo (nome) values ('Gerente'), ('Vendedor'), ('Secretária'), ('Cadastrador');
 
-insert into permissao (id, nome, descricao) values (1, 'CONSULTAR_COZINHAS', 'Permite consultar cozinhas');
-insert into permissao (id, nome, descricao) values (2, 'EDITAR_COZINHAS', 'Permite editar cozinhas');
-insert into permissao (id, nome, descricao) values (3, 'CONSULTAR_FORMAS_PAGAMENTO', 'Permite consultar formas de pagamento');
-insert into permissao (id, nome, descricao) values (4, 'EDITAR_FORMAS_PAGAMENTO', 'Permite criar ou editar formas de pagamento');
-insert into permissao (id, nome, descricao) values (5, 'CONSULTAR_CIDADES', 'Permite consultar cidades');
-insert into permissao (id, nome, descricao) values (6, 'EDITAR_CIDADES', 'Permite criar ou editar cidades');
-insert into permissao (id, nome, descricao) values (7, 'CONSULTAR_ESTADOS', 'Permite consultar estados');
-insert into permissao (id, nome, descricao) values (8, 'EDITAR_ESTADOS', 'Permite criar ou editar estados');
-insert into permissao (id, nome, descricao) values (9, 'CONSULTAR_USUARIOS', 'Permite consultar usuários');
-insert into permissao (id, nome, descricao) values (10, 'EDITAR_USUARIOS', 'Permite criar ou editar usuários');
-insert into permissao (id, nome, descricao) values (11, 'CONSULTAR_RESTAURANTES', 'Permite consultar restaurantes');
-insert into permissao (id, nome, descricao) values (12, 'EDITAR_RESTAURANTES', 'Permite criar, editar ou gerenciar restaurantes');
-insert into permissao (id, nome, descricao) values (13, 'CONSULTAR_PRODUTOS', 'Permite consultar produtos');
-insert into permissao (id, nome, descricao) values (14, 'EDITAR_PRODUTOS', 'Permite criar ou editar produtos');
-insert into permissao (id, nome, descricao) values (15, 'CONSULTAR_PEDIDOS', 'Permite consultar pedidos');
-insert into permissao (id, nome, descricao) values (16, 'GERENCIAR_PEDIDOS', 'Permite gerenciar pedidos');
-insert into permissao (id, nome, descricao) values (17, 'GERAR_RELATORIOS', 'Permite gerar relatórios');
+insert into permissao (id, nome, descricao) values (1, 'EDITAR_COZINHAS', 'Permite editar cozinhas');
+insert into permissao (id, nome, descricao) values (2, 'EDITAR_FORMAS_PAGAMENTO', 'Permite criar ou editar formas de pagamento');
+insert into permissao (id, nome, descricao) values (3, 'EDITAR_CIDADES', 'Permite criar ou editar cidades');
+insert into permissao (id, nome, descricao) values (4, 'EDITAR_ESTADOS', 'Permite criar ou editar estados');
+insert into permissao (id, nome, descricao) values (5, 'CONSULTAR_USUARIOS_GRUPOS_PERMISSOES', 'Permite consultar usuários');
+insert into permissao (id, nome, descricao) values (6, 'EDITAR_USUARIOS_GRUPOS_PERMISSOES', 'Permite criar ou editar usuários');
+insert into permissao (id, nome, descricao) values (7, 'EDITAR_RESTAURANTES', 'Permite criar, editar ou gerenciar restaurantes');
+insert into permissao (id, nome, descricao) values (8, 'CONSULTAR_PEDIDOS', 'Permite consultar pedidos');
+insert into permissao (id, nome, descricao) values (9, 'GERENCIAR_PEDIDOS', 'Permite gerenciar pedidos');
+insert into permissao (id, nome, descricao) values (10, 'GERAR_RELATORIOS', 'Permite gerar relatórios');
 
 
 -- Adiciona todas as permissoes no grupo do gerente
@@ -107,17 +101,17 @@ insert into grupo_permissao (grupo_id, permissao_id)
 #Vendedor só tem acesso às consultas da API
 select 2, id from permissao where nome like 'CONSULTAR_%';
 
-insert into grupo_permissao (grupo_id, permissao_id) values (2, 14);
+insert into grupo_permissao (grupo_id, permissao_id) values (2, 9);
 
 -- Adiciona permissoes no grupo do auxiliar
 insert into grupo_permissao (grupo_id, permissao_id)
-#Auxiliar só tem acesso às consultas da API
+-- Auxiliar só tem acesso às consultas da API
 select 3, id from permissao where nome like 'CONSULTAR_%';
 
 -- Adiciona permissoes no grupo cadastrador
 insert into grupo_permissao (grupo_id, permissao_id)
 -- Cadastrador faz o que quiser com as tabelas de restaurantes e produtos
-select 4, id from permissao where nome like '%_RESTAURANTES' or nome like '%_PRODUTOS';
+select 4, id from permissao where nome like '%_RESTAURANTES';
 
 insert into usuario (id, nome, email, senha, data_cadastro) values
 (1, 'João da Silva', 'joao.ger@algafood.com', '$2a$12$xM3T9jhJ/qTbQ8yKkFyapOJeD.xzlaOB.CIgaKUBBsSfxw2dAbzM6', utc_timestamp),
@@ -125,11 +119,12 @@ insert into usuario (id, nome, email, senha, data_cadastro) values
 (3, 'Roberto fazbear', 'guinas.sec@algafood.com', '$2a$12$xM3T9jhJ/qTbQ8yKkFyapOJeD.xzlaOB.CIgaKUBBsSfxw2dAbzM6', utc_timestamp),
 (4, 'La ele da silva', 'alele.cad@algafood.com', '$2a$12$xM3T9jhJ/qTbQ8yKkFyapOJeD.xzlaOB.CIgaKUBBsSfxw2dAbzM6', utc_timestamp),
 (5, 'José Souza', 'email.teste.pendezzapizza.tcc+hubert@gmail.com', '$2a$12$xM3T9jhJ/qTbQ8yKkFyapOJeD.xzlaOB.CIgaKUBBsSfxw2dAbzM6', utc_timestamp),
-(6, 'Sebastião Martins', 'email.teste.pendezzapizza.tcc+sebastiao@gmail.com', '$2a$12$xM3T9jhJ/qTbQ8yKkFyapOJeD.xzlaOB.CIgaKUBBsSfxw2dAbzM6', utc_timestamp);
+(6, 'Sebastião Martins', 'email.teste.pendezzapizza.tcc+sebastiao@gmail.com', '$2a$12$xM3T9jhJ/qTbQ8yKkFyapOJeD.xzlaOB.CIgaKUBBsSfxw2dAbzM6', utc_timestamp),
+(7, 'Ronaldo Pinto', 'cocoxixicocopinto@gmail.com', '$2a$12$xM3T9jhJ/qTbQ8yKkFyapOJeD.xzlaOB.CIgaKUBBsSfxw2dAbzM6', utc_timestamp);
 
 insert into usuario_grupo (usuario_id, grupo_id) values (1, 1), (2, 2), (3, 3) , (4,4);
 
-insert into restaurante_usuario_responsavel (usuario_id , restaurante_id) values (1 , 1) , (2 , 2) , (3 , 4) , (4 , 3);
+insert into restaurante_usuario_responsavel (usuario_id , restaurante_id) values (5 , 1) , (5 , 3) , (6 , 2) , (6 , 4);
 
 insert into pedido (id,codigo, restaurante_id, cliente_usuario_id, forma_pagamento_id, endereco_cidade_id, endereco_cep,
     endereco_logradouro, endereco_numero, endereco_complemento, endereco_bairro,
@@ -192,3 +187,12 @@ values (7, 6, 2, 1, 110, 110, null);
 
 insert into item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, preco_total, observacao)
 values (6, 5, 3, 1, 87.2, 87.2, null);
+
+
+-- Como a tabela mudou da última stack do spring security até agora , eu estou usando o que o spring inseriu na minha tabela e simplesmente copiei e passei para cá, se necessário alteração, ou um modo de configuração mais simplificado, basta adicionar pelo código no AuthorizationServerConfig e depois salvar com a classe de jdbc, que ele vai criar a row automaticamente no banco de dados e basta copia-la e fazer um insert no afterMingrate com aqueles dados
+-- Neste commit eu vou deixar o código disponível para documentar no caso de eu necessitar isto no futuro e para isso vou salvar o commit como "insert auth client doc"
+insert into oauth2_registered_client
+    (id, client_id, client_id_issued_at, client_secret, client_secret_expires_at, client_name, client_authentication_methods, authorization_grant_types, redirect_uris, scopes, client_settings, token_settings, post_logout_redirect_uris)
+values ('1', 'algafood-end', '2026-01-01 18:40:31', '$2a$10$jDmmfbXgnLCCK4xHFMzlXu2zOEI9GQkvIy7YUuRqpPUrKoQjHptfO', NULL, '1', 'client_secret_basic', 'client_credentials', '', 'READ,WRITE', '{\"@class\":\"java.util.Collections$UnmodifiableMap\",\"settings.client.require-proof-key\":false,\"settings.client.require-authorization-consent\":true}', '{\"@class\":\"java.util.Collections$UnmodifiableMap\",\"settings.token.reuse-refresh-tokens\":true,\"settings.token.x509-certificate-bound-access-tokens\":false,\"settings.token.id-token-signature-algorithm\":[\"org.springframework.security.oauth2.jose.jws.SignatureAlgorithm\",\"RS256\"],\"settings.token.access-token-time-to-live\":[\"java.time.Duration\",1800.000000000],\"settings.token.access-token-format\":{\"@class\":\"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat\",\"value\":\"self-contained\"},\"settings.token.refresh-token-time-to-live\":[\"java.time.Duration\",3600.000000000],\"settings.token.authorization-code-time-to-live\":[\"java.time.Duration\",300.000000000],\"settings.token.device-code-time-to-live\":[\"java.time.Duration\",300.000000000]}', '') ,
+('2', 'algafood-analytics', '2026-01-01 18:40:31', '$2a$10$QO4pJcV.10HyMWRs0M0cV.B0FIQYxy4ueHXPWPHKnw5Xo8m55y8M2', NULL, '2', 'none', 'authorization_code', 'http://localhost:8082/callback', 'READ,WRITE', '{\"@class\":\"java.util.Collections$UnmodifiableMap\",\"settings.client.require-proof-key\":true,\"settings.client.require-authorization-consent\":true}', '{\"@class\":\"java.util.Collections$UnmodifiableMap\",\"settings.token.reuse-refresh-tokens\":true,\"settings.token.x509-certificate-bound-access-tokens\":false,\"settings.token.id-token-signature-algorithm\":[\"org.springframework.security.oauth2.jose.jws.SignatureAlgorithm\",\"RS256\"],\"settings.token.access-token-time-to-live\":[\"java.time.Duration\",1800.000000000],\"settings.token.access-token-format\":{\"@class\":\"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat\",\"value\":\"self-contained\"},\"settings.token.refresh-token-time-to-live\":[\"java.time.Duration\",3600.000000000],\"settings.token.authorization-code-time-to-live\":[\"java.time.Duration\",300.000000000],\"settings.token.device-code-time-to-live\":[\"java.time.Duration\",300.000000000]}', ''),
+('3', 'algafood-web', '2026-01-01 18:40:31', '$2a$10$utkQ6W9.Pd0/1aSMkieno.jadbC1Hwq8ajcxWNVI2NO20jKx2.sA6', NULL, '3', 'client_secret_basic', 'refresh_token,authorization_code', 'http://localhost:8081/laele', 'READ,WRITE', '{\"@class\":\"java.util.Collections$UnmodifiableMap\",\"settings.client.require-proof-key\":true,\"settings.client.require-authorization-consent\":true}', '{\"@class\":\"java.util.Collections$UnmodifiableMap\",\"settings.token.reuse-refresh-tokens\":false,\"settings.token.x509-certificate-bound-access-tokens\":false,\"settings.token.id-token-signature-algorithm\":[\"org.springframework.security.oauth2.jose.jws.SignatureAlgorithm\",\"RS256\"],\"settings.token.access-token-time-to-live\":[\"java.time.Duration\",1800.000000000],\"settings.token.access-token-format\":{\"@class\":\"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat\",\"value\":\"self-contained\"},\"settings.token.refresh-token-time-to-live\":[\"java.time.Duration\",86400.000000000],\"settings.token.authorization-code-time-to-live\":[\"java.time.Duration\",300.000000000],\"settings.token.device-code-time-to-live\":[\"java.time.Duration\",300.000000000]}', '');

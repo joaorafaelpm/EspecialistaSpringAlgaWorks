@@ -5,6 +5,7 @@ import com.algaworks.algafood_api.api.v1.assembler.FotoProdutoAssembler;
 import com.algaworks.algafood_api.api.v1.assembler.disassambler.FotoProdutoDisassembler;
 import com.algaworks.algafood_api.api.v1.model.FotoProdutoModel;
 import com.algaworks.algafood_api.api.v1.model.DTO.FotoProdutoDTO;
+import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.model.FotoProduto;
 import com.algaworks.algafood_api.domain.model.Produto;
@@ -37,12 +38,14 @@ public class RestauranteProdutoFotoController {
     private FotoProdutoAssembler fotoProdutoAssembler;
     private FotoProdutoDisassembler fotoProdutoDisassembler;
 
+    @CheckSecurity.Restaurantes.PodeConsultar
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public FotoProdutoModel pegarFoto (@PathVariable Long restauranteId , @PathVariable Long produtoId) {
         return fotoProdutoAssembler.toModel(
                 fotoProdutoService.findById(restauranteId , produtoId));
     }
 
+//    Não vou anotar com algum escopo por que o usuário final não tem acesso à esse endpoint
     @GetMapping
     public ResponseEntity<InputStreamResource> servirFoto (@PathVariable Long restauranteId , @PathVariable Long produtoId ,
                     @RequestHeader(name="accept") String acceptHeaders) throws HttpMediaTypeNotAcceptableException {
@@ -75,6 +78,7 @@ public class RestauranteProdutoFotoController {
         }
     }
 
+    @CheckSecurity.Restaurantes.PodeGerenciarFuncionamento
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public FotoProdutoModel adicionarFoto (@PathVariable Long restauranteId , @PathVariable Long produtoId ,
                                            @Valid FotoProdutoDTO fotoProdutoDTO) throws IOException {
@@ -90,6 +94,7 @@ public class RestauranteProdutoFotoController {
         return fotoProdutoAssembler.toModel(fotoSalva);
 
     }
+    @CheckSecurity.Restaurantes.PodeGerenciarFuncionamento
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removerFoto (@PathVariable Long restauranteId , @PathVariable Long produtoId){

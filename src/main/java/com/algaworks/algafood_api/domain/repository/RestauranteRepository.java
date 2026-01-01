@@ -41,4 +41,6 @@ public interface RestauranteRepository
     List<Restaurante> find (String nome , BigDecimal taxaInicial , BigDecimal taxaFinal) ;
 
     int countByCozinhaId (Long cozinhaId);
+
+    boolean existsResponsavel(Long restauranteId , Long usuarioId);
 }

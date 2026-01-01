@@ -29,4 +29,5 @@ public interface PedidoRepository extends CustomJPARepository<Pedido , Long> ,
 
     Optional<Pedido> findByCodigo (String codigo);
 
+    boolean isPedidoGerenciadoPor (String codigoPedido , Long usuarioId);
 }

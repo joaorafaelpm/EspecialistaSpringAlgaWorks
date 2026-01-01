@@ -4,6 +4,7 @@ import com.algaworks.algafood_api.api.v1.assembler.GrupoAssembler;
 import com.algaworks.algafood_api.api.v1.assembler.disassambler.GrupoDisassembler;
 import com.algaworks.algafood_api.api.v1.model.GrupoModel;
 import com.algaworks.algafood_api.api.v1.model.DTO.GrupoDTO;
+import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.model.Grupo;
 import com.algaworks.algafood_api.domain.service.CadastroGrupoService;
 import jakarta.validation.Valid;
@@ -23,16 +24,19 @@ public class GrupoController {
     private GrupoAssembler grupoAssembler;
     private GrupoDisassembler grupoDisassembler;
 
+    @CheckSecurity.UsuariosGruposPermissoes.PodeConsultar
     @GetMapping
     public CollectionModel<GrupoModel> findAll () {
         return grupoAssembler.toCollection(grupoService.findAll());
     }
 
+    @CheckSecurity.UsuariosGruposPermissoes.PodeConsultar
     @GetMapping("/{grupoId}")
     public ResponseEntity<GrupoModel> findById (@PathVariable Long grupoId) {
         return ResponseEntity.ok(grupoAssembler.toModel(grupoService.findById(grupoId)));
     }
 
+    @CheckSecurity.UsuariosGruposPermissoes.PodeEditar
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public GrupoModel save (@RequestBody @Valid GrupoDTO grupoDTO) {
@@ -40,6 +44,7 @@ public class GrupoController {
         return grupoAssembler.toModel(grupoService.save(grupo));
     }
 
+    @CheckSecurity.UsuariosGruposPermissoes.PodeEditar
     @PutMapping("/{id}")
     public ResponseEntity<GrupoModel> save (@PathVariable Long id , @RequestBody @Valid GrupoDTO grupoDTO) {
         Grupo grupoAntigo = grupoService.findById(id);
@@ -48,6 +53,7 @@ public class GrupoController {
         return ResponseEntity.ok(grupoAssembler.toModel(grupoService.save(grupoAntigo)));
         }
 
+    @CheckSecurity.UsuariosGruposPermissoes.PodeEditar
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void remover (@PathVariable Long id) {

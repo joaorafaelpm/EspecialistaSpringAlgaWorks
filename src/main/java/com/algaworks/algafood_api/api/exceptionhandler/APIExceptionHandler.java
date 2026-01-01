@@ -16,6 +16,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
@@ -28,6 +29,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.nio.file.AccessDeniedException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -133,6 +135,20 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         APIError apiError = createAPIErrorBuilder(status , ProblemType.PARAMETRO_INVALIDO , detail).build();
         return handleExceptionInternal(ex , apiError , headers, status , request);
     }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<?> handleAuthorizationDeniedException (AuthorizationDeniedException ex , WebRequest request) {
+        String detail = ex.getMessage();
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        APIError apiError = createAPIErrorBuilder(
+                status , ProblemType.AUTHORITY_EXCEPTION , detail
+        )
+            .userMessage("Você não tem permissão necessária para executar a ação.")
+            .build();
+
+        return handleExceptionInternal(ex , apiError , new HttpHeaders() , status , request);
+    }
+
 
     @ExceptionHandler(EntidadeNaoEncontradaException.class)
     public ResponseEntity<?> handlEntidadeNaoEncontrado(

@@ -2,6 +2,7 @@ package com.algaworks.algafood_api.api.v1.controller;
 
 import com.algaworks.algafood_api.api.v1.assembler.PermissaoAssembler;
 import com.algaworks.algafood_api.api.v1.model.PermissaoModel;
+import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.service.CadastroGrupoService;
 import lombok.AllArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
@@ -17,16 +18,19 @@ public class GrupoPermissaoController {
 
     private PermissaoAssembler permissaoAssembler ;
 
+    @CheckSecurity.UsuariosGruposPermissoes.PodeConsultar
     @GetMapping
     public CollectionModel<PermissaoModel> listarPermissao (@PathVariable Long grupoId) {
         return permissaoAssembler.toCollectionRefGrupo(grupoId , grupoService.findById(grupoId).getPermissoes());
     }
 
+    @CheckSecurity.UsuariosGruposPermissoes.PodeEditar
     @PutMapping("/{permissaoId}")
     public ResponseEntity<Void> associarPermissao (@PathVariable Long grupoId , @PathVariable Long permissaoId) {
         grupoService.associar(grupoId , permissaoId);
         return ResponseEntity.noContent().build();
     }
+    @CheckSecurity.UsuariosGruposPermissoes.PodeEditar
     @DeleteMapping("/{permissaoId}")
     public ResponseEntity<Void> desassociarPermissao (@PathVariable Long grupoId , @PathVariable Long permissaoId) {
         grupoService.desassociar(grupoId , permissaoId);

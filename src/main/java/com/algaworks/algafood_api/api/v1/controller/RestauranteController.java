@@ -8,6 +8,7 @@ import com.algaworks.algafood_api.api.v1.model.RestauranteApenasNomeModel;
 import com.algaworks.algafood_api.api.v1.model.RestauranteModel;
 import com.algaworks.algafood_api.api.v1.model.DTO.RestauranteDTO;
 import com.algaworks.algafood_api.api.v1.model.RestauranteResumoModel;
+import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.exception.CidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.CozinhaNaoEncontradaException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
@@ -36,16 +37,19 @@ public class RestauranteController {
 
     private RestauranteDisassembler restauranteDisessambler;
 
+    @CheckSecurity.Restaurantes.PodeConsultar
     @GetMapping
     public CollectionModel<RestauranteResumoModel> listar() {
         return restauranteResumoAssembler.toCollection(restauranteService.findAll());
     }
 
+    @CheckSecurity.Restaurantes.PodeConsultar
     @GetMapping(params = "projecao=apenas-nome")
     public CollectionModel<RestauranteApenasNomeModel> listarApenasNomes() {
         return restauranteApenasNomeAssembler.toCollection(restauranteService.findAll());
     }
 
+    @CheckSecurity.Restaurantes.PodeConsultar
     @GetMapping("/{id}")
     public RestauranteModel getById (@PathVariable Long id) {
         Restaurante restaurante = restauranteService.findById(id);
@@ -53,7 +57,7 @@ public class RestauranteController {
                 .toModel(restaurante);
     }
 
-
+    @CheckSecurity.Restaurantes.PodeGerenciarCadastro
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public RestauranteModel add (@RequestBody @Valid RestauranteDTO restauranteDTO) {
@@ -68,7 +72,7 @@ public class RestauranteController {
             throw new NegocioException(e.getMessage()) ;
         }
     }
-
+    @CheckSecurity.Restaurantes.PodeGerenciarCadastro
     @PutMapping("/{id}")
     public ResponseEntity<?> save (@PathVariable Long id , @RequestBody @Valid RestauranteDTO restauranteDTO) {
         try {
@@ -87,13 +91,14 @@ public class RestauranteController {
             throw new NegocioException(e.getMessage()) ;
         }
     }
-
+    @CheckSecurity.Restaurantes.PodeGerenciarCadastro
     @PutMapping("/{id}/ativo")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> ativar (@PathVariable Long id) {
         restauranteService.ativar(id);
         return ResponseEntity.noContent().build();
     }
+    @CheckSecurity.Restaurantes.PodeGerenciarCadastro
     @DeleteMapping("/{id}/ativo")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> inativar (@PathVariable Long id) {
@@ -101,6 +106,7 @@ public class RestauranteController {
         return ResponseEntity.noContent().build();
     }
 
+    @CheckSecurity.Restaurantes.PodeGerenciarCadastro
 //    Recebemos uma lista para ativar vários restaurantes de uma vez
     @PutMapping("/ativacoes")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -113,6 +119,7 @@ public class RestauranteController {
             throw new NegocioException(e.getMessage() , e);
         }
     }
+    @CheckSecurity.Restaurantes.PodeGerenciarCadastro
     @DeleteMapping("/ativacoes")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> inativarMultiplos (@RequestBody List<Long> restauranteIds) {
@@ -125,17 +132,19 @@ public class RestauranteController {
         }
     }
 
-    @PutMapping("/{id}/abertura")
+    @CheckSecurity.Restaurantes.PodeGerenciarFuncionamento
+    @PutMapping("/{restauranteId}/abertura")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> abrir (@PathVariable Long id) {
-        restauranteService.abrir(id);
+    public ResponseEntity<Void> abrir (@PathVariable Long restauranteId) {
+        restauranteService.abrir(restauranteId);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}/fechamento")
+    @CheckSecurity.Restaurantes.PodeGerenciarFuncionamento
+    @PutMapping("/{restauranteId}/fechamento")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> fechar (@PathVariable Long id) {
-        restauranteService.fechar(id);
+    public ResponseEntity<Void> fechar (@PathVariable Long restauranteId) {
+        restauranteService.fechar(restauranteId);
         return ResponseEntity.noContent().build();
     }
 

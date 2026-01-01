@@ -2,6 +2,7 @@ package com.algaworks.algafood_api.api.v1.controller;
 
 import com.algaworks.algafood_api.api.v1.AlgaLinks;
 import com.algaworks.algafood_api.api.v1.model.EstatisticasModel;
+import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.filter.VendaDiariaFilter;
 import com.algaworks.algafood_api.domain.model.dto.VendaDiaria;
 import com.algaworks.algafood_api.domain.service.VendaQueryService;
@@ -22,10 +23,11 @@ import java.util.List;
 @AllArgsConstructor
 public class EstatisticasController {
 
-    private AlgaLinks algaLinks;
+    private AlgaLinks algaLinks;    
     private VendaQueryService vendaQueryService;
     private VendaReportService vendaReportService;
 
+    @CheckSecurity.Estatisticas.PodeConsultar
     @GetMapping
     public EstatisticasModel exporLinks () {
         EstatisticasModel estatisticasModel = new EstatisticasModel();
@@ -39,11 +41,13 @@ public class EstatisticasController {
 
 
 
+    @CheckSecurity.Estatisticas.PodeConsultar
     @GetMapping(path = "/vendas-diarias", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<VendaDiaria> consultarVendasJson (VendaDiariaFilter filter ,
                           @RequestParam(required = false , defaultValue = "+00:00") String timeOffSet) {
         return vendaQueryService.consultarVendasDiarias(filter , timeOffSet);
     }
+    @CheckSecurity.Estatisticas.PodeConsultar
     @GetMapping(path = "/vendas-diarias", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> consultarVendas (VendaDiariaFilter filter ,
                                            @RequestParam(required = false , defaultValue = "+00:00") String timeOffSet) {

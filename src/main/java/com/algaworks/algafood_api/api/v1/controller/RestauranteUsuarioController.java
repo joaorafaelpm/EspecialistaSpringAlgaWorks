@@ -2,6 +2,7 @@ package com.algaworks.algafood_api.api.v1.controller;
 
 import com.algaworks.algafood_api.api.v1.assembler.UsuarioModelAssembler;
 import com.algaworks.algafood_api.api.v1.model.UsuarioModel;
+import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.model.Restaurante;
 import com.algaworks.algafood_api.domain.service.CadastroRestauranteService;
 import lombok.AllArgsConstructor;
@@ -21,18 +22,21 @@ public class RestauranteUsuarioController {
 
     private UsuarioModelAssembler usuarioModelAssembler;
 
+    @CheckSecurity.Restaurantes.PodeGerenciarCadastro
     @GetMapping
     public CollectionModel<UsuarioModel> listar (@PathVariable Long restauranteId) {
         Restaurante restaurante = restauranteService.findById(restauranteId);
         return usuarioModelAssembler.toCollectionRefRestaurante(restauranteId , restaurante.getUsuarios());
     }
 
+    @CheckSecurity.Restaurantes.PodeGerenciarCadastro
     @PutMapping("/{usuarioId}")
     public ResponseEntity<Void> associar (@PathVariable Long restauranteId , @PathVariable Long usuarioId) {
         restauranteService.associarUsuarioResponsavel(restauranteId , usuarioId) ;
         return ResponseEntity.noContent().build();
     }
 
+    @CheckSecurity.Restaurantes.PodeGerenciarCadastro
     @DeleteMapping("/{usuarioId}")
     public ResponseEntity<Void> desassociar (@PathVariable Long restauranteId , @PathVariable Long usuarioId) {
         restauranteService.desassociarUsuarioResponsavel(restauranteId , usuarioId);

@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -17,10 +19,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class ResourceServerConfig {
 
     @Bean
@@ -29,12 +31,8 @@ public class ResourceServerConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST , "/v1/cozinhas/**").hasAuthority("EDITAR_COZINHAS")
-                        .requestMatchers(HttpMethod.PUT , "/v1/cozinhas/**").hasAuthority("EDITAR_COZINHAS")
-                        .requestMatchers(HttpMethod.GET , "/v1/cozinhas/**").authenticated()
-//                        .requestMatchers("/oauth2/**").authenticated()
-
-                        .anyRequest().denyAll()
+                        .requestMatchers("/oauth2/**").authenticated()
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwtConfigurer -> {
@@ -63,7 +61,7 @@ public class ResourceServerConfig {
                 return Collections.emptyList();
             }
 
-            JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
+            var authoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
 //            Converto isso para permissões reconhecidas pelo sistema
             Collection<GrantedAuthority> grantedAuthorities = authoritiesConverter.convert(jwt);
