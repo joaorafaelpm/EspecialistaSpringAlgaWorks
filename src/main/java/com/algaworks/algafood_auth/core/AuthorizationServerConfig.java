@@ -92,78 +92,7 @@ public class AuthorizationServerConfig {
 
     @Bean
     public RegisteredClientRepository registeredClientRepository(PasswordEncoder passwordEncoder , JdbcOperations jdbcOperation) {
-        RegisteredClient algafoodend = RegisteredClient
-                .withId("1")
-                .clientId("algafood-end")
-                .clientSecret(passwordEncoder.encode("backend123"))
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .scope("WRITE")
-                .scope("READ")
-                .clientSettings(ClientSettings.builder()
-                        .requireAuthorizationConsent(true)
-                        .build())
-                .tokenSettings(TokenSettings.builder()
-                        .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
-                        .accessTokenTimeToLive(Duration.ofMinutes(30))
-                        .build())
-                .build();
-
-//        Authorization_Code grant_type + PKCE
-//        localhost:8081/oauth2/authorize?response_type=code&client_id=algafood-analytics&state=abc&redirect_uri=http://client-application
-        RegisteredClient algafoodanalytics = RegisteredClient
-                .withId("2")
-                .clientId("algafood-analytics")
-                .clientSecret(passwordEncoder.encode("analytics123"))
-                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUri("http://localhost:8082/callback")
-                .scope("WRITE")
-                .scope("READ")
-                .clientSettings(ClientSettings.builder()
-//                        Isso torna o PKCE obrigatório
-                        .requireProofKey(true)
-                        .requireAuthorizationConsent(true)
-                        .build())
-                .tokenSettings(TokenSettings.builder()
-                        .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
-                        .accessTokenTimeToLive(Duration.ofMinutes(30))
-
-                        .build())
-                .build();
-        RegisteredClient algafoodWeb = RegisteredClient
-                .withId("3")
-                .clientId("algafood-web")
-                .clientSecret(passwordEncoder.encode("web123"))
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://localhost:8081/laele")
-                .scope("WRITE")
-                .scope("READ")
-                .clientSettings(ClientSettings.builder()
-//                        Isso torna o PKCE obrigatório
-                        .requireProofKey(true)
-                        .requireAuthorizationConsent(true)
-                        .build())
-                .tokenSettings(TokenSettings.builder()
-                        .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
-                        .accessTokenTimeToLive(Duration.ofMinutes(30))
-                        .refreshTokenTimeToLive(Duration.ofDays(1))
-                        .reuseRefreshTokens(false)
-                        .build())
-                .build();
-
-//        Implicit grant_type, está depreciado, por isso eu não vou replicar, até para não perder tanto tempo como no password, mas esse estilo de autenticação segue o mesmo padrão do authorization_code, a diferença é que ele não retorna um código na url que nós usamos para acessar o token, ele retorna o token diretamente
-//        Esse método é muito menos seguro, não atoa foi depreciado, então é por isso que eu escolho não seguir com ele, mas a teoria é basicamente a mesma. E assim como a teoria é a mesma, a url é exatamente igual, a única diferença é no tipo de retorno, que passa de "code" para "token"
-//        localhost:8081/oauth2/authorize?response_type=token&client_id=algafood-web&state=abc&redirect_uri=http://client-application
-
-        JdbcRegisteredClientRepository jdbcRegisteredClientRepository = new JdbcRegisteredClientRepository(jdbcOperation);
-
-        jdbcRegisteredClientRepository.save(algafoodend);
-        jdbcRegisteredClientRepository.save(algafoodWeb);
-        jdbcRegisteredClientRepository.save(algafoodanalytics);
-        return jdbcRegisteredClientRepository;
+        return new JdbcRegisteredClientRepository(jdbcOperation);
     }
 
     @Bean
