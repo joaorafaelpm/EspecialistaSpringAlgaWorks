@@ -4,6 +4,7 @@ import com.algaworks.algafood_api.api.v1.AlgaLinks;
 import com.algaworks.algafood_api.api.v1.assembler.mapper.UsuarioMapper;
 import com.algaworks.algafood_api.api.v1.model.UsuarioModel;
 import com.algaworks.algafood_api.api.v1.controller.UsuarioController;
+import com.algaworks.algafood_api.core.security.AlgaSecurity;
 import com.algaworks.algafood_api.domain.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
@@ -22,6 +23,9 @@ public class UsuarioModelAssembler extends RepresentationModelAssemblerSupport<U
     @Autowired
     private AlgaLinks algaLinks;
 
+    @Autowired
+    private AlgaSecurity algaSecurity;
+
     public UsuarioModelAssembler () {
         super(UsuarioController.class, UsuarioModel.class);
     }
@@ -30,9 +34,11 @@ public class UsuarioModelAssembler extends RepresentationModelAssemblerSupport<U
     public UsuarioModel toModel(Usuario entity) {
         UsuarioModel usuarioModel = usuarioMapper.toModel(entity);
 
-        usuarioModel.add(algaLinks.linkToUsuario(usuarioModel.getId()));
-        usuarioModel.add(algaLinks.linkToUsuarios());
-        usuarioModel.add(algaLinks.linkToGruposUsuario(usuarioModel.getId() ,"gruposUsuario" ));
+        if (algaSecurity.podeConsultarUsuariosGruposPermissoes()) {
+            usuarioModel.add(algaLinks.linkToUsuario(usuarioModel.getId()));
+            usuarioModel.add(algaLinks.linkToUsuarios());
+            usuarioModel.add(algaLinks.linkToGruposUsuario(usuarioModel.getId() ,"gruposUsuario" ));
+        }
 
         return usuarioModel;
     }
@@ -41,7 +47,9 @@ public class UsuarioModelAssembler extends RepresentationModelAssemblerSupport<U
         List<UsuarioModel> listaUsuarioModel = listaUsuario.stream().map(this::toModel).toList();
         CollectionModel<UsuarioModel> usuarioModels = CollectionModel.of(listaUsuarioModel);
 
-        usuarioModels.add(algaLinks.linkToUsuarios("usuarios"));
+        if (algaSecurity.podeConsultarUsuariosGruposPermissoes()) {
+            usuarioModels.add(algaLinks.linkToUsuarios("usuarios"));
+        }
 
         return usuarioModels;
     }
@@ -49,12 +57,16 @@ public class UsuarioModelAssembler extends RepresentationModelAssemblerSupport<U
     public CollectionModel<UsuarioModel> toCollectionRefRestaurante (Long restauranteId , Collection<Usuario> listaUsuario) {
         CollectionModel<UsuarioModel> listaUsuarioModel = toCollection(listaUsuario);
 
-        listaUsuarioModel.forEach(usuarioModel ->
-                usuarioModel.add(algaLinks.linkToResponsaveisRestauranteDesassociacao(restauranteId, usuarioModel.getId() , "desassociar")));
-        return listaUsuarioModel
-                .removeLinks()
+        if (algaSecurity.podeGerenciarCadastrosRestaurantes()) {
+            listaUsuarioModel.forEach(usuarioModel ->
+                usuarioModel.add(algaLinks.
+                        linkToResponsaveisRestauranteDesassociacao(restauranteId, usuarioModel.getId() , "desassociar")));
+
+            listaUsuarioModel.removeLinks()
                 .add(algaLinks.linkToResponsaveisRestaurante(restauranteId))
                 .add(algaLinks.linkToResponsaveisRestauranteAssociacao(restauranteId , "associar"));
+        }
+        return listaUsuarioModel ;
     }
 
 }

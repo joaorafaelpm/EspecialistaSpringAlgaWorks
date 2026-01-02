@@ -3,6 +3,7 @@ package com.algaworks.algafood_api.api.v1.assembler;
 import com.algaworks.algafood_api.api.v1.AlgaLinks;
 import com.algaworks.algafood_api.api.v1.assembler.mapper.RestauranteResumoMapper;
 import com.algaworks.algafood_api.api.v1.model.RestauranteApenasNomeModel;
+import com.algaworks.algafood_api.core.security.AlgaSecurity;
 import com.algaworks.algafood_api.domain.model.Restaurante;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
@@ -21,6 +22,9 @@ public class RestauranteApenasNomeModelAssembler extends RepresentationModelAsse
     @Autowired
     private AlgaLinks algaLinks;
 
+    @Autowired
+    private AlgaSecurity algaSecurity;
+
     public RestauranteApenasNomeModelAssembler() {
         super(Restaurante.class, RestauranteApenasNomeModel.class);
     }
@@ -29,10 +33,13 @@ public class RestauranteApenasNomeModelAssembler extends RepresentationModelAsse
     public RestauranteApenasNomeModel toModel(Restaurante entity) {
         RestauranteApenasNomeModel restauranteModel = restauranteMapper.toModelResumido(entity);
 
-        restauranteModel.add(algaLinks.
-                linkToRestaurante(restauranteModel.getId()));
-        restauranteModel.add(algaLinks.
-                linkToRestaurantes("restaurantes"));
+        if (algaSecurity.podeConsultarRestaurantes() ) {
+            restauranteModel.add(algaLinks.
+                    linkToRestaurante(restauranteModel.getId()));
+            restauranteModel.add(algaLinks.
+                    linkToRestaurantes("restaurantes"));
+        }
+
 
         return restauranteModel;
     }
@@ -41,7 +48,9 @@ public class RestauranteApenasNomeModelAssembler extends RepresentationModelAsse
         List<RestauranteApenasNomeModel> listaUsuariosModel = listaUsuarios.stream().map(this::toModel).toList();
         CollectionModel<RestauranteApenasNomeModel> restauranteModels = CollectionModel.of(listaUsuariosModel);
 
-        restauranteModels.add(algaLinks.linkToRestaurantes("restaurantes"));
+        if (algaSecurity.podeConsultarRestaurantes() ) {
+            restauranteModels.add(algaLinks.linkToRestaurantes("restaurantes"));
+        }
 
         return restauranteModels;
 

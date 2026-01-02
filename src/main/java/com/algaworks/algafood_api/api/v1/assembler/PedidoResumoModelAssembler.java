@@ -4,6 +4,7 @@ import com.algaworks.algafood_api.api.v1.AlgaLinks;
 import com.algaworks.algafood_api.api.v1.assembler.mapper.PedidoResumoMapper;
 import com.algaworks.algafood_api.api.v1.model.PedidoResumoModel;
 import com.algaworks.algafood_api.api.v1.controller.PedidoController;
+import com.algaworks.algafood_api.core.security.AlgaSecurity;
 import com.algaworks.algafood_api.domain.model.Pedido;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.*;
@@ -21,6 +22,9 @@ public class PedidoResumoModelAssembler extends RepresentationModelAssemblerSupp
     @Autowired
     private AlgaLinks algaLinks;
 
+    @Autowired
+    private AlgaSecurity algaSecurity;
+
     public PedidoResumoModelAssembler() {
         super(PedidoController.class, PedidoResumoModel.class);
     }
@@ -29,12 +33,18 @@ public class PedidoResumoModelAssembler extends RepresentationModelAssemblerSupp
     public PedidoResumoModel toModel(Pedido pedido) {
         PedidoResumoModel pedidoModel = pedidoResumoMapper.toModel(pedido);
 
-        pedidoModel.add(algaLinks.linkToPedidos(IanaLinkRelations.COLLECTION.value()));
-
-        pedidoModel.getRestaurante().add(algaLinks.linkToRestaurante(pedidoModel.getRestaurante().getId()));
-        pedidoModel.getCliente().add(algaLinks.linkToUsuario(pedidoModel.getCliente().getId()));
-
-        pedidoModel.add(algaLinks.linkToPedido(pedidoModel.getCodigo()));
+        Long restauranteId = pedidoModel.getRestaurante().getId();
+        Long clienteId = pedido.getCliente().getId();
+        if (algaSecurity.podeBuscarPedidos()) {
+            pedidoModel.add(algaLinks.linkToPedidos(IanaLinkRelations.COLLECTION.value()));
+            pedidoModel.add(algaLinks.linkToPedido(pedidoModel.getCodigo()));
+        }
+        if (algaSecurity.podeConsultarRestaurantes()) {
+            pedidoModel.getRestaurante().add(algaLinks.linkToRestaurante(restauranteId));
+        }
+        if (algaSecurity.podeConsultarUsuariosGruposPermissoes()) {
+            pedidoModel.getCliente().add(algaLinks.linkToUsuario(clienteId));
+        }
 
         return pedidoModel;
     }
@@ -42,7 +52,9 @@ public class PedidoResumoModelAssembler extends RepresentationModelAssemblerSupp
     public CollectionModel<PedidoResumoModel> toCollection (Collection<Pedido> listaPedido) {
         var listaPedidoModel = listaPedido.stream().map(this::toModel).toList();
         CollectionModel<PedidoResumoModel> pedidosCollectionModel = CollectionModel.of(listaPedidoModel);
-        pedidosCollectionModel.add(algaLinks.linkToPedidos("pedidos"));
+        if (algaSecurity.podeBuscarPedidos()) {
+            pedidosCollectionModel.add(algaLinks.linkToPedidos("pedidos"));
+        }
 
         return pedidosCollectionModel;
     }

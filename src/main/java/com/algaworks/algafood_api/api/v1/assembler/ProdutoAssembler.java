@@ -3,6 +3,7 @@ package com.algaworks.algafood_api.api.v1.assembler;
 import com.algaworks.algafood_api.api.v1.AlgaLinks;
 import com.algaworks.algafood_api.api.v1.assembler.mapper.ProdutoMapper;
 import com.algaworks.algafood_api.api.v1.model.ProdutoModel;
+import com.algaworks.algafood_api.core.security.AlgaSecurity;
 import com.algaworks.algafood_api.domain.model.Produto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
@@ -19,6 +20,9 @@ public class ProdutoAssembler extends RepresentationModelAssemblerSupport<Produt
     @Autowired
     private ProdutoMapper produtoMapper;
 
+    @Autowired
+    private AlgaSecurity algaSecurity;
+
     public ProdutoAssembler () {
         super(Produto.class , ProdutoModel.class);
     }
@@ -29,9 +33,13 @@ public class ProdutoAssembler extends RepresentationModelAssemblerSupport<Produt
         ProdutoModel produtoModel = produtoMapper.toModel(entity);
 
         Long restauranteId = entity.getRestaurante().getId();
-        produtoModel.add(algaLinks.linkToProdutosRestaurante(restauranteId, "produtos"));
-        produtoModel.add(algaLinks.linkToProduto(restauranteId, entity.getId()));
-        produtoModel.add(algaLinks.linkToFotoProduto(restauranteId, entity.getId() , "fotoProduto"));
+
+        if (algaSecurity.podeConsultarRestaurantes()) {
+            produtoModel.add(algaLinks.linkToProdutosRestaurante(restauranteId, "produtos"));
+            produtoModel.add(algaLinks.linkToProduto(restauranteId, entity.getId()));
+            produtoModel.add(algaLinks.linkToFotoProduto(restauranteId, entity.getId() , "fotoProduto"));
+        }
+
 
         return produtoModel;
     }

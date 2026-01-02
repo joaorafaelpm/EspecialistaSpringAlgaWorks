@@ -1,6 +1,7 @@
 package com.algaworks.algafood_api.domain.service;
 
 import com.algaworks.algafood_api.domain.exception.CidadeNaoEncontradaException;
+import com.algaworks.algafood_api.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.model.Cidade;
 import com.algaworks.algafood_api.domain.model.Estado;
@@ -8,6 +9,7 @@ import com.algaworks.algafood_api.domain.repository.CidadeRepository;
 import com.algaworks.algafood_api.domain.repository.EstadoRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -41,8 +43,14 @@ public class CadastroCidadeService {
 
     @Transactional
     public void remove (Long id) {
-        cidadeRepository.deleteById(id);
-        cidadeRepository.flush();
+        try {
+            cidadeRepository.deleteById(id);
+            cidadeRepository.flush();
+        }
+        catch (DataIntegrityViolationException e) {
+            throw new EntidadeEmUsoException(id) ;
+        }
+
     }
 
 }

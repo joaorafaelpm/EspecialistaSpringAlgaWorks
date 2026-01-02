@@ -4,6 +4,7 @@ import com.algaworks.algafood_api.api.v1.AlgaLinks;
 import com.algaworks.algafood_api.api.v1.assembler.mapper.CozinhaMapper;
 import com.algaworks.algafood_api.api.v1.controller.CozinhaController;
 import com.algaworks.algafood_api.api.v1.model.CozinhaModel;
+import com.algaworks.algafood_api.core.security.AlgaSecurity;
 import com.algaworks.algafood_api.domain.model.Cozinha;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
@@ -21,6 +22,9 @@ public class CozinhaModelAssembler extends RepresentationModelAssemblerSupport<C
     @Autowired
     private AlgaLinks algaLinks ;
 
+    @Autowired
+    private AlgaSecurity algaSecurity;
+
     public CozinhaModelAssembler() {
         super(CozinhaController.class, CozinhaModel.class);
     }
@@ -28,10 +32,12 @@ public class CozinhaModelAssembler extends RepresentationModelAssemblerSupport<C
     @Override
     public CozinhaModel toModel(Cozinha cozinha) {
         CozinhaModel cozinhaModel = cozinhaMapper.toModel(cozinha);
+        if (algaSecurity.podeConsultarCozinhas()) {
+            cozinhaModel.add(algaLinks.linkToCozinha(cozinhaModel.getId()));
 
-        cozinhaModel.add(algaLinks.linkToCozinha(cozinhaModel.getId()));
+            cozinhaModel.add(algaLinks.linkToCozinhas());
+        }
 
-        cozinhaModel.add(algaLinks.linkToCozinhas());
 
         return cozinhaModel;
     }
@@ -40,7 +46,9 @@ public class CozinhaModelAssembler extends RepresentationModelAssemblerSupport<C
         var listaCozinhaModel = listaCozinha.stream().map(this::toModel).toList();
         CollectionModel<CozinhaModel> cozinhasCollectionModel = CollectionModel.of(listaCozinhaModel);
 
-        cozinhasCollectionModel.add(algaLinks.linkToCozinhas());
+        if (algaSecurity.podeConsultarCozinhas()) {
+            cozinhasCollectionModel.add(algaLinks.linkToCozinhas());
+        }
 
         return cozinhasCollectionModel;
     }

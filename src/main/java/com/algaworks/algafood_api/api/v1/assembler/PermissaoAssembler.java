@@ -3,6 +3,7 @@ package com.algaworks.algafood_api.api.v1.assembler;
 import com.algaworks.algafood_api.api.v1.AlgaLinks;
 import com.algaworks.algafood_api.api.v1.assembler.mapper.PermissaoMapper;
 import com.algaworks.algafood_api.api.v1.model.PermissaoModel;
+import com.algaworks.algafood_api.core.security.AlgaSecurity;
 import com.algaworks.algafood_api.domain.model.Permissao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
@@ -19,6 +20,9 @@ public class PermissaoAssembler extends RepresentationModelAssemblerSupport<Perm
     @Autowired
     private PermissaoMapper permissaoMapper;
 
+    @Autowired
+    private AlgaSecurity algaSecurity;
+
     public PermissaoAssembler () {
         super(Permissao.class , PermissaoModel.class);
     }
@@ -27,15 +31,19 @@ public class PermissaoAssembler extends RepresentationModelAssemblerSupport<Perm
     @Override
     public PermissaoModel toModel(Permissao entity) {
         PermissaoModel permissaoModel = permissaoMapper.toModel(entity);
-        permissaoModel.add(algaLinks.linkToPermissoes());
-
+        if(algaSecurity.podeConsultarUsuariosGruposPermissoes()) {
+            permissaoModel.add(algaLinks.linkToPermissoes());
+        }
         return permissaoModel;
     }
 
     public CollectionModel<PermissaoModel> toCollection (Collection<Permissao> listaPermissao) {
         var listaPermissaoModel = listaPermissao.stream().map(this::toModel).toList();
         CollectionModel<PermissaoModel> permissoesCollectionModel = CollectionModel.of(listaPermissaoModel);
-        permissoesCollectionModel.add(algaLinks.linkToPermissoes("permissoes"));
+
+        if(algaSecurity.podeConsultarUsuariosGruposPermissoes()) {
+            permissoesCollectionModel.add(algaLinks.linkToPermissoes("permissoes"));
+        }
 
         return permissoesCollectionModel;
     }
@@ -43,11 +51,16 @@ public class PermissaoAssembler extends RepresentationModelAssemblerSupport<Perm
         var listaPermissaoModel = listaPermissao.stream().map(this::toModel).toList();
         CollectionModel<PermissaoModel> permissoesCollectionModel = CollectionModel.of(listaPermissaoModel);
 
-        permissoesCollectionModel.forEach(permissaoModel ->
-                permissaoModel.add(algaLinks.
-                        linkToDesassociacaoGrupoPermissao(grupoId ,permissaoModel.getId(), "desassociar")));
-        permissoesCollectionModel.add(algaLinks.linkToPermissoes("permissoes"));
-        permissoesCollectionModel.add(algaLinks.linkToAssociacaoGrupoPermissao(grupoId , null , "associar"));
+        if(algaSecurity.podeConsultarUsuariosGruposPermissoes()) {
+            permissoesCollectionModel.add(algaLinks.linkToPermissoes("permissoes"));
+        }
+
+        if (algaSecurity.podeEditarUsuariosGruposPermissoes()) {
+            permissoesCollectionModel.forEach(permissaoModel ->
+                    permissaoModel.add(algaLinks.
+                            linkToDesassociacaoGrupoPermissao(grupoId ,permissaoModel.getId(), "desassociar")));
+            permissoesCollectionModel.add(algaLinks.linkToAssociacaoGrupoPermissao(grupoId , null , "associar"));
+        }
 
         return permissoesCollectionModel;
     }

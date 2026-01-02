@@ -4,6 +4,7 @@ package com.algaworks.algafood_api.api.v1.assembler;
 import com.algaworks.algafood_api.api.v1.AlgaLinks;
 import com.algaworks.algafood_api.api.v1.assembler.mapper.GrupoMapper;
 import com.algaworks.algafood_api.api.v1.model.GrupoModel;
+import com.algaworks.algafood_api.core.security.AlgaSecurity;
 import com.algaworks.algafood_api.domain.model.Grupo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
@@ -20,6 +21,9 @@ public class GrupoAssembler extends RepresentationModelAssemblerSupport<Grupo , 
     @Autowired
     private GrupoMapper grupoMapper;
 
+    @Autowired
+    private AlgaSecurity algaSecurity;
+
     public GrupoAssembler () {
         super(Grupo.class , GrupoModel.class);
     }
@@ -29,9 +33,12 @@ public class GrupoAssembler extends RepresentationModelAssemblerSupport<Grupo , 
     public GrupoModel toModel(Grupo entity) {
         GrupoModel grupoModel = grupoMapper.toModel(entity);
 
-        grupoModel.add(algaLinks.linkToGrupos());
-        grupoModel.add(algaLinks.linkToGrupo(entity.getId()));
-        grupoModel.add(algaLinks.linkToGrupoPermissao(entity.getId() , "permissoes"));
+        if (algaSecurity.podeConsultarUsuariosGruposPermissoes()) {
+            grupoModel.add(algaLinks.linkToGrupos());
+            grupoModel.add(algaLinks.linkToGrupo(entity.getId()));
+            grupoModel.add(algaLinks.linkToGrupoPermissao(entity.getId() , "permissoes"));
+        }
+
 
         return grupoModel;
     }
@@ -39,19 +46,27 @@ public class GrupoAssembler extends RepresentationModelAssemblerSupport<Grupo , 
     public CollectionModel<GrupoModel> toCollection (Collection<Grupo> listaGrupo) {
         var listaGrupoModel = listaGrupo.stream().map(this::toModel).toList();
         CollectionModel<GrupoModel> gruposCollectionModel = CollectionModel.of(listaGrupoModel);
-        gruposCollectionModel.add(algaLinks.linkToGrupos("grupos"));
+        if (algaSecurity.podeConsultarUsuariosGruposPermissoes()) {
+            gruposCollectionModel.add(algaLinks.linkToGrupos("grupos"));
+        }
 
         return gruposCollectionModel;
     }
+
+
+
     public CollectionModel<GrupoModel> toCollectionRefUsuario (Long usuarioId , Collection<Grupo> listaGrupo) {
         var listaGrupoModel = listaGrupo.stream().map(this::toModel).toList();
         CollectionModel<GrupoModel> gruposCollectionModel = CollectionModel.of(listaGrupoModel);
 
-        gruposCollectionModel.forEach(grupoModel ->
-                grupoModel.add(algaLinks.linkToDesassociacaoGrupoUsuario(usuarioId , grupoModel.getId() , "desassociar" )));
-
-        gruposCollectionModel.add(algaLinks.linkToGrupos("grupos"));
-        gruposCollectionModel.add(algaLinks.linkToDesassociacaoGrupoUsuario(usuarioId ,null , "associar" ));
+        if (algaSecurity.podeEditarUsuariosGruposPermissoes()) {
+            gruposCollectionModel.forEach(grupoModel ->
+                    grupoModel.add(algaLinks.linkToDesassociacaoGrupoUsuario(usuarioId , grupoModel.getId() , "desassociar" )));
+            gruposCollectionModel.add(algaLinks.linkToDesassociacaoGrupoUsuario(usuarioId ,null , "associar" ));
+        }
+        if (algaSecurity.podeConsultarUsuariosGruposPermissoes()) {
+            gruposCollectionModel.add(algaLinks.linkToGrupos("grupos"));
+        }
 
         return gruposCollectionModel;
     }
