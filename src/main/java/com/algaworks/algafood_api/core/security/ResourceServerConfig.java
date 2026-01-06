@@ -2,14 +2,11 @@ package com.algaworks.algafood_api.core.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -27,34 +24,32 @@ public class ResourceServerConfig {
 
     @Bean
     public SecurityFilterChain resourceServerFilterChain(HttpSecurity http) throws Exception {
-
-        http.csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
+        http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/oauth2/**").authenticated()
+                        // Adicione liberações públicas se necessário, ex: /public/**, /v3/api-docs
                         .anyRequest().authenticated()
                 )
+                .csrf(AbstractHttpConfigurer::disable)
+                // Habilita o login via formulário para o usuário se autenticar no Authorization Server
+                .formLogin(loginFormConfigurer ->
+                        loginFormConfigurer.loginPage("/login").permitAll())
+                // Habilita a validação de tokens JWT para requisições de API
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwtConfigurer -> {
-//                            Adicionando uri para verificação dos tokens
-                            jwtConfigurer.jwkSetUri("http://localhost:8081/oauth2/jwks");
-//                            Adicionando leitura de permissões
+                            // CUIDADO: Usar localhost aqui força a aplicação a chamar a si mesma via rede.
+                            // Em produção, certifique-se que a aplicação consegue se enxergar externamente.
+                            jwtConfigurer.jwkSetUri("http://localhost:8080/oauth2/jwks");
                             jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter());
                         })
-
-                )
-                .formLogin(Customizer.withDefaults())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                );
 
         return http.build();
     }
 
-    private JwtAuthenticationConverter jwtAuthenticationConverter () {
+    private JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
 
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
-//            Pego a minha lista de permissões
             List<String> authorities = jwt.getClaimAsStringList("authorities");
 
             if (authorities == null) {
@@ -62,11 +57,8 @@ public class ResourceServerConfig {
             }
 
             var authoritiesConverter = new JwtGrantedAuthoritiesConverter();
-
-//            Converto isso para permissões reconhecidas pelo sistema
             Collection<GrantedAuthority> grantedAuthorities = authoritiesConverter.convert(jwt);
 
-//            Eu adiciono todas as permissões para essa lista de permissões reconhecidas
             grantedAuthorities.addAll(authorities
                     .stream()
                     .map(SimpleGrantedAuthority::new)
@@ -77,6 +69,4 @@ public class ResourceServerConfig {
 
         return converter;
     }
-
-
 }

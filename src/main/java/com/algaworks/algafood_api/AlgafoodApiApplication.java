@@ -13,10 +13,7 @@ import java.util.TimeZone;
 public class AlgafoodApiApplication {
 
 	public static void main(String[] args) {
-		Dotenv dotenv = Dotenv.configure().directory("./algafood-api")
-				.load();
-		System.setProperty("API_EMAIL_KEY", dotenv.get("API_EMAIL_KEY"));
-		System.setProperty("LOGGLY_TOKEN", dotenv.get("LOGGLY_TOKEN"));
+
 
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
