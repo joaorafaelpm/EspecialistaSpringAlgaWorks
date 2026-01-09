@@ -11,7 +11,7 @@
 	<groupId>com.algaworks</groupId>
 	<artifactId>algafood-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-    <name>algafood-api</name>
+	<name>algafood-api</name>
 	<description>Projeto de restaurante com a Alga Works</description>
 	<url/>
 	<licenses>
@@ -20,7 +20,7 @@
 	<developers>
 		<developer/>
 	</developers>
-    <scm>
+	<scm>
 		<connection/>
 		<developerConnection/>
 		<tag/>
@@ -40,6 +40,7 @@
 		<hateoas.version>2.6.4</hateoas.version>
 		<loggly.version>0.1.5</loggly.version>
 		<spring-security.version>6.5.0</spring-security.version>
+		<jib-maven-plugin.version>3.4.1</jib-maven-plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -156,10 +157,15 @@
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.session</groupId>
+			<artifactId>spring-session-data-redis</artifactId>
+		</dependency>
 	</dependencies>
-
-
 	<build>
 		<plugins>
 			<plugin>
@@ -201,7 +207,33 @@
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>3.5.3</version>
 			</plugin>
+
+
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>docker</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.google.cloud.tools</groupId>
+						<artifactId>jib-maven-plugin</artifactId>
+						<version>${jib-maven-plugin.version}</version>
+						<configuration>
+							<from>
+								<image>eclipse-temurin:21-jre</image>
+							</from>
+							<to>
+								<image>algafood-api</image>
+							</to>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 
 </project>

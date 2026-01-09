@@ -1,22 +1,54 @@
+networks:
+  algafood-network:
+    driver: bridge
+
 services:
-  mysql-database:
+  algafood-mysql:
     image: mysql:8.3.0
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: algafood
     ports:
-      - 3307:3306
+      - "3307:3306"
+    networks:
+      - algafood-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  mysql-test-database:
+  algafood-mysql-tests:
     image: mysql:8.3.0
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: algafood_test
     ports:
-      - 3308:3306
+      - "3308:3306"
 
-  backend :
-    image:
+  algafood-redis:
+    image: redis:8.4.0-alpine
+    networks:
+      - algafood-network
 
-volumes:
-  redis-data:
+  algafood-api:
+    image: algafood-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://algafood-mysql/algafood?createDatabaseIfNotExists=true&serverTimeZone=UTC
+      SPRING_SESSION_STORE_TYPE: redis
+      SPRING_DATA_REDIS_HOST: algafood-redis
+    networks:
+      - algafood-network
+    depends_on:
+      algafood-mysql:
+        condition: service_healthy
+
+  algafood-proxy:
+    build: ./nginx
+    image: algafood-proxy
+    ports:
+      - "80:80"
+    networks:
+      - algafood-network
+    depends_on:
+      - algafood-api
