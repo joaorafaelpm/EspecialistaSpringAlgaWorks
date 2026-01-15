@@ -27,9 +27,15 @@ public class ResourceServerConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         // Adicione liberações públicas se necessário, ex: /public/**, /v3/api-docs
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 // Habilita o login via formulário para o usuário se autenticar no Authorization Server
                 .formLogin(loginFormConfigurer ->
                         loginFormConfigurer.loginPage("/login").permitAll())
@@ -38,7 +44,7 @@ public class ResourceServerConfig {
                         .jwt(jwtConfigurer -> {
                             // CUIDADO: Usar localhost aqui força a aplicação a chamar a si mesma via rede.
                             // Em produção, certifique-se que a aplicação consegue se enxergar externamente.
-                            jwtConfigurer.jwkSetUri("http://localhost:8080/oauth2/jwks");
+                            jwtConfigurer.jwkSetUri("http://algafood-api:8080/oauth2/jwks");
                             jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter());
                         })
                 );

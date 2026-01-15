@@ -6,6 +6,7 @@ import com.algaworks.algafood_api.api.v1.assembler.disassambler.PedidoDisassembl
 import com.algaworks.algafood_api.api.v1.model.PedidoModel;
 import com.algaworks.algafood_api.api.v1.model.PedidoResumoModel;
 import com.algaworks.algafood_api.api.v1.model.DTO.PedidoDTO;
+import com.algaworks.algafood_api.api.v1.openapi.controller.PedidoControllerOpenApi;
 import com.algaworks.algafood_api.core.data.PageWrapper;
 import com.algaworks.algafood_api.core.data.PageableTranslator;
 import com.algaworks.algafood_api.core.security.AlgaSecurity;
@@ -33,7 +34,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/v1/pedidos")
 @AllArgsConstructor
-public class PedidoController {
+public class PedidoController implements PedidoControllerOpenApi {
 
     private CadastroPedidoService pedidoService;
     private EmissaoPedidoService emitirPedidoService;

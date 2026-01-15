@@ -4,12 +4,14 @@ import com.algaworks.algafood_api.api.v1.assembler.ProdutoAssembler;
 import com.algaworks.algafood_api.api.v1.assembler.disassambler.ProdutoDisassembler;
 import com.algaworks.algafood_api.api.v1.model.ProdutoModel;
 import com.algaworks.algafood_api.api.v1.model.DTO.ProdutoDTO;
+import com.algaworks.algafood_api.api.v1.openapi.controller.RestauranteProdutoControllerOpenApi;
 import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.model.Produto;
 import com.algaworks.algafood_api.domain.service.CadastroProdutoService;
 import com.algaworks.algafood_api.domain.service.CadastroRestauranteService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/restaurantes/{restauranteId}/produtos")
 @AllArgsConstructor
-public class RestauranteProdutosController {
+public class RestauranteProdutoController implements RestauranteProdutoControllerOpenApi {
 
     private CadastroProdutoService produtoService;
     private CadastroRestauranteService restauranteService;
@@ -28,7 +30,7 @@ public class RestauranteProdutosController {
 
     @CheckSecurity.Restaurantes.PodeConsultar
     @GetMapping
-    public List<ProdutoModel> pegarTodosDeUmRestaurante (@PathVariable Long restauranteId , @RequestParam(required = false) Boolean incluirInativos) {
+    public CollectionModel<ProdutoModel> pegarTodosDeUmRestaurante (@PathVariable Long restauranteId , @RequestParam(required = false) Boolean incluirInativos) {
         List<Produto> produtos = produtoService.findAtivosByRestaurante(restauranteService.findById(restauranteId));
         if (incluirInativos != null && incluirInativos) {
             produtos = produtoService.findByRestaurante(restauranteService.findById(restauranteId));
@@ -45,7 +47,7 @@ public class RestauranteProdutosController {
     @CheckSecurity.Restaurantes.PodeGerenciarFuncionamento
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ProdutoModel salvar (@PathVariable Long restauranteId , @RequestBody @Valid ProdutoDTO produtoDTO) {
+    public ProdutoModel adicionar (@PathVariable Long restauranteId , @RequestBody @Valid ProdutoDTO produtoDTO) {
         Produto produto = produtoDisassembler.produtoDTOToProduto(produtoDTO);
         produtoService.save(restauranteId , produto);
         return produtoAssembler.toModel(produto);
@@ -58,13 +60,5 @@ public class RestauranteProdutosController {
         produtoDisassembler.updateProdutoFromDto(produtoDTO , produtoAntigo);
         return produtoAssembler.toModel(produtoService.save(restauranteId , produtoAntigo));
     }
-
-    @CheckSecurity.Restaurantes.PodeGerenciarFuncionamento
-    @DeleteMapping("/{produtoId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletar (@PathVariable Long restauranteId , @PathVariable Long produtoId) {
-        produtoService.remove(restauranteId , produtoId);
-    }
-
 
 }

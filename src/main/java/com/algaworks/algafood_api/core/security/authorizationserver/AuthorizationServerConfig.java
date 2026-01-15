@@ -54,10 +54,12 @@ public class AuthorizationServerConfig {
                 .with(authorizationServerConfigurer, (authorizationServer) ->
                         authorizationServer.oidc(Customizer.withDefaults())
                 )
+                .cors(Customizer.withDefaults())
                 .formLogin(loginFormConfigurer ->
                         loginFormConfigurer.loginPage("/login").permitAll())
                 .authorizeHttpRequests((authorize) ->
-                        authorize.anyRequest().authenticated()
+                        authorize
+                       .anyRequest().authenticated()
                 );
         return http.build();
     }
@@ -70,19 +72,6 @@ public class AuthorizationServerConfig {
 //        Aqui a gente pega a nossa classe do par de chaves do servidor de autenticação e monta o nosso jwt com base nisso, a classe e sua respectiva configuração é feita a partir do application.properties, onde todo o arquivo da chave está na codificação em base64 então o arquivo é o mesmo toda vez que nós reiniciamos o servidor, para facilitar no desenvolvimento, vou alterar para gerar uma chave nova a cada vez que o servidor reiniciar, para assim não manter o login quando eu reiniciar a aplicação
     @Bean
     public JWKSource<SecurityContext> jwkSource(JwtKeyStoreProperties properties) throws Exception {
-        if ("dev".equals(properties.getPassword())) {
-            KeyPair keyPair = generateRsaKey();
-
-            RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-            RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-
-            RSAKey rsaKey = new RSAKey.Builder(publicKey)
-                    .privateKey(privateKey)
-                    .keyID(UUID.randomUUID().toString()) // ID único para esta sessão do servidor
-                    .build();
-
-            return new ImmutableJWKSet<>(new JWKSet(rsaKey));
-        }
         char[] keyStorePass = properties.getPassword().toCharArray();
         String keypairAlias = properties.getKeypairAlias();
 
@@ -179,7 +168,7 @@ public class AuthorizationServerConfig {
     @Bean
     public AuthorizationServerSettings authorizationServerSettings(AlgaFoodSecurityProperties properties) {
         return AuthorizationServerSettings.builder()
-                .issuer("http://localhost:8080")
+                .issuer("http://localhost")
                 .build();
     }
 }

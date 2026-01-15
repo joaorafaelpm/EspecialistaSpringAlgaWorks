@@ -2,6 +2,7 @@ package com.algaworks.algafood_api.api.v1.controller;
 
 import com.algaworks.algafood_api.api.v1.assembler.UsuarioModelAssembler;
 import com.algaworks.algafood_api.api.v1.model.UsuarioModel;
+import com.algaworks.algafood_api.api.v1.openapi.controller.RestauranteUsuarioResponsavelControllerOpenApi;
 import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.model.Restaurante;
 import com.algaworks.algafood_api.domain.service.CadastroRestauranteService;
@@ -16,7 +17,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/v1/restaurantes/{restauranteId}/usuarios")
-public class RestauranteUsuarioController {
+public class RestauranteUsuarioResponsavelController implements RestauranteUsuarioResponsavelControllerOpenApi {
 
     private CadastroRestauranteService restauranteService;
 

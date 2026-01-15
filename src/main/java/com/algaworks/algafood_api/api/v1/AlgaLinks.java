@@ -103,7 +103,7 @@ public class AlgaLinks {
     }
 
     public Link linkToResponsaveisRestaurante(Long restauranteId, String rel) {
-        return linkTo(methodOn(RestauranteUsuarioController.class)
+        return linkTo(methodOn(RestauranteUsuarioResponsavelController.class)
                 .listar(restauranteId)).withRel(rel);
     }
 
@@ -112,16 +112,16 @@ public class AlgaLinks {
     }
 
     public Link linkToResponsaveisRestauranteAssociacao(Long restauranteId , String rel) {
-        return linkTo(methodOn(RestauranteUsuarioController.class)
+        return linkTo(methodOn(RestauranteUsuarioResponsavelController.class)
                 .associar(restauranteId , null)).withRel(rel);
     }
     public Link linkToResponsaveisRestauranteDesassociacao(Long restauranteId ,Long usuarioId, String rel) {
-        return linkTo(methodOn(RestauranteUsuarioController.class)
+        return linkTo(methodOn(RestauranteUsuarioResponsavelController.class)
                 .desassociar(restauranteId , usuarioId)).withRel(rel);
     }
 
     public Link linkToProdutosRestaurante(Long restauranteId , String rel) {
-        return linkTo(methodOn(RestauranteProdutosController.class).pegarTodosDeUmRestaurante(restauranteId , null)).withRel(rel);
+        return linkTo(methodOn(RestauranteProdutoController.class).pegarTodosDeUmRestaurante(restauranteId , null)).withRel(rel);
     }
     public Link linkToProdutosRestaurante(Long restauranteId) {
         return linkToProdutosRestaurante(restauranteId , IanaLinkRelations.SELF.value());
@@ -215,7 +215,7 @@ public class AlgaLinks {
     }
 
     public Link linkToProduto(Long restauranteId, Long produtoId, String rel) {
-        return linkTo(methodOn(RestauranteProdutosController.class)
+        return linkTo(methodOn(RestauranteProdutoController.class)
                 .pegarUnico(restauranteId, produtoId)).withRel(rel);
     }
 
@@ -250,7 +250,7 @@ public class AlgaLinks {
         return linkToGrupos(IanaLinkRelations.COLLECTION.value());
     }
     public Link linkToGrupo(Long grupoId,String rel) {
-        return linkTo(methodOn(GrupoController.class).findById(grupoId)).withRel(rel);
+        return linkTo(methodOn(GrupoController.class).getById(grupoId)).withRel(rel);
     }
     public Link linkToGrupo(Long grupoId) {
         return linkToGrupo(grupoId , IanaLinkRelations.SELF.value());
@@ -293,7 +293,7 @@ public class AlgaLinks {
                 new TemplateVariable("dataCriacaoFim", TemplateVariable.VariableType.REQUEST_PARAM),
                 new TemplateVariable("timeOffSet", TemplateVariable.VariableType.REQUEST_PARAM)
         );
-        String link = linkTo(methodOn(EstatisticasController.class).consultarVendasJson(null, null)).toUri().toString();
+        String link = linkTo(methodOn(EstatisticasController.class).consultarVendasDiarias(null, null)).toUri().toString();
 
         return Link.of(UriTemplate.of(link , filtro) , rel);
     }

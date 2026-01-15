@@ -5,6 +5,7 @@ import com.algaworks.algafood_api.api.v1.assembler.CozinhaModelAssembler;
 import com.algaworks.algafood_api.api.v1.assembler.disassambler.CozinhaDisassembler;
 import com.algaworks.algafood_api.api.v1.model.CozinhaModel;
 import com.algaworks.algafood_api.api.v1.model.DTO.CozinhaDTO;
+import com.algaworks.algafood_api.api.v1.openapi.controller.CozinhaControllerOpenApi;
 import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.model.Cozinha;
 import com.algaworks.algafood_api.domain.service.CadastroCozinhaService;
@@ -16,13 +17,12 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/v1/cozinhas")
-public class CozinhaController {
+public class CozinhaController implements CozinhaControllerOpenApi {
 
 
     private CadastroCozinhaService cozinhaService ;
@@ -35,19 +35,16 @@ public class CozinhaController {
     @CheckSecurity.Cozinhas.PodeConsultar
     @GetMapping
     public PagedModel<CozinhaModel> all (Pageable pageable) {
-//        System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
-
         Page<Cozinha> findAll = cozinhaService.findAll(pageable);
-        PagedModel<CozinhaModel> cozinhaPagedModel = pagedResourcesAssembler
+        return pagedResourcesAssembler
                 .toModel(findAll , cozinhaModelAssembler);
-        return cozinhaPagedModel ;
 
     }
 
     @CheckSecurity.Cozinhas.PodeConsultar
-    @GetMapping("/{id}")
-    public CozinhaModel getById (@PathVariable Long id) {
-        return cozinhaModelAssembler.toModel(cozinhaService.findById(id));
+    @GetMapping("/{cozinhaId}")
+    public CozinhaModel getById (@PathVariable Long cozinhaId) {
+        return cozinhaModelAssembler.toModel(cozinhaService.findById(cozinhaId));
     }
 
     @CheckSecurity.Cozinhas.PodeEditar
@@ -58,19 +55,18 @@ public class CozinhaController {
         return cozinhaModelAssembler.toModel(cozinhaService.save(cozinha)) ;
     }
     @CheckSecurity.Cozinhas.PodeEditar
-    @PutMapping("/{id}")
-    public  ResponseEntity<CozinhaModel> save (@PathVariable Long id , @RequestBody @Valid CozinhaDTO cozinhaDTO) {
-        Cozinha cozinhaAntigo = cozinhaService.findById(id);
+    @PutMapping("/{cozinhaId}")
+    public CozinhaModel save (@PathVariable Long cozinhaId , @RequestBody @Valid CozinhaDTO cozinhaDTO) {
+        Cozinha cozinhaAntigo = cozinhaService.findById(cozinhaId);
         cozinhaDisassembler.updateCozinhaFromDto(cozinhaDTO , cozinhaAntigo);
-        return ResponseEntity.ok(cozinhaModelAssembler
-                .toModel(cozinhaService
-                        .save(id , cozinhaAntigo)));
+        return cozinhaModelAssembler.toModel(cozinhaService
+                        .save(cozinhaId , cozinhaAntigo));
     }
     @CheckSecurity.Cozinhas.PodeEditar
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}")
-    public void remove (@PathVariable Long id) {
-        cozinhaService.remove(id);
+    @DeleteMapping("/{cozinhaId}")
+    public ResponseEntity<Void> remove (@PathVariable Long cozinhaId) {
+        cozinhaService.remove(cozinhaId);
+        return ResponseEntity.noContent().build();
     }
 
 

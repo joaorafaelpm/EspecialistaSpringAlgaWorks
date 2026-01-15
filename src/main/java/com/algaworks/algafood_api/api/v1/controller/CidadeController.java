@@ -5,6 +5,7 @@ import com.algaworks.algafood_api.api.v1.assembler.CidadeModelAssembler;
 import com.algaworks.algafood_api.api.v1.assembler.disassambler.CidadeDisassembler;
 import com.algaworks.algafood_api.api.v1.model.CidadeModel;
 import com.algaworks.algafood_api.api.v1.model.DTO.CidadeDTO;
+import com.algaworks.algafood_api.api.v1.openapi.controller.CidadeControllerOpenApi;
 import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.exception.EstadoNaoEncontradoException;
 import com.algaworks.algafood_api.domain.exception.NegocioException;
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -25,7 +27,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @AllArgsConstructor
 @RequestMapping(path = "/v1/cidades" , produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
-public class CidadeController {
+public class CidadeController implements CidadeControllerOpenApi {
 
     private CidadeRepository cidadeRepository;
 
@@ -42,9 +44,9 @@ public class CidadeController {
     }
 
     @CheckSecurity.Cozinhas.PodeConsultar
-    @GetMapping(value = "/{id}")
-    public CidadeModel getById (@PathVariable Long id) {
-        return cidadeAssembler.toModel(cidadeService.findById(id));
+    @GetMapping(value = "/{cidadeId}")
+    public CidadeModel getById (@PathVariable Long cidadeId) {
+        return cidadeAssembler.toModel(cidadeService.findById(cidadeId));
     }
 
     @CheckSecurity.Cozinhas.PodeEditar
@@ -65,23 +67,23 @@ public class CidadeController {
     }
 
     @CheckSecurity.Cozinhas.PodeEditar
-    @PutMapping(value = "/{id}")
-    public CidadeModel save (@PathVariable Long id , @RequestBody @Valid CidadeDTO cidadeDTO) {
-        Cidade cidadeAntiga = cidadeService.findById(id);
+    @PutMapping(value = "/{cidadeId}")
+    public CidadeModel save (@PathVariable Long cidadeId , @RequestBody @Valid CidadeDTO cidadeDTO) {
+        Cidade cidadeAntiga = cidadeService.findById(cidadeId);
         Cidade cidadeAtualizada = cidadeDisassembler.cidadeDTOToCidade(cidadeDTO);
 
         cidadeDisassembler.updateCidadeFromDto(cidadeDTO , cidadeAntiga);
         cidadeAntiga.setEstado(cidadeAtualizada.getEstado());
         return cidadeAssembler
                 .toModel(cidadeService
-                        .save(id , cidadeAntiga));
+                        .save(cidadeId , cidadeAntiga));
     }
 
     @CheckSecurity.Cozinhas.PodeEditar
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}")
-    public void remove (@PathVariable Long id) {
-        cidadeService.remove(id);
+    @DeleteMapping("/{cidadeId}")
+    public ResponseEntity<Void> remove (@PathVariable Long cidadeId) {
+        cidadeService.remove(cidadeId);
+        return ResponseEntity.noContent().build();
     }
 
 

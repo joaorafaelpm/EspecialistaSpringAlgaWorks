@@ -2,6 +2,7 @@ package com.algaworks.algafood_api.api.v1.controller;
 
 import com.algaworks.algafood_api.api.v1.assembler.FormaPagamentoAssembler;
 import com.algaworks.algafood_api.api.v1.model.FormaPagamentoModel;
+import com.algaworks.algafood_api.api.v1.openapi.controller.RestauranteFormaPagamentoControllerOpenApi;
 import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.model.Restaurante;
 import com.algaworks.algafood_api.domain.service.CadastroRestauranteService;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/v1/restaurantes/{restauranteId}/formas-pagamento")
-public class RestauranteFormaPagamentoController {
+public class RestauranteFormaPagamentoController implements RestauranteFormaPagamentoControllerOpenApi {
 
     private CadastroRestauranteService restauranteService;
     private FormaPagamentoAssembler formaPagamentoAssembler ;

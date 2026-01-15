@@ -2,6 +2,7 @@ package com.algaworks.algafood_api.api.v1.controller;
 
 import com.algaworks.algafood_api.api.v1.assembler.GrupoAssembler;
 import com.algaworks.algafood_api.api.v1.model.GrupoModel;
+import com.algaworks.algafood_api.api.v1.openapi.controller.UsuarioGrupoControllerOpenApi;
 import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.service.CadastroGrupoService;
 import com.algaworks.algafood_api.domain.service.CadastroUsuarioService;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/usuarios/{usuarioId}/grupos")
 @AllArgsConstructor
-public class UsuarioGrupoController {
+public class UsuarioGrupoController implements UsuarioGrupoControllerOpenApi {
 
     private CadastroGrupoService grupoService;
     private CadastroUsuarioService usuarioService;

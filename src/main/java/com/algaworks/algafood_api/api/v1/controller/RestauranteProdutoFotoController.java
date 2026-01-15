@@ -5,6 +5,7 @@ import com.algaworks.algafood_api.api.v1.assembler.FotoProdutoAssembler;
 import com.algaworks.algafood_api.api.v1.assembler.disassambler.FotoProdutoDisassembler;
 import com.algaworks.algafood_api.api.v1.model.FotoProdutoModel;
 import com.algaworks.algafood_api.api.v1.model.DTO.FotoProdutoDTO;
+import com.algaworks.algafood_api.api.v1.openapi.controller.RestauranteProdutoFotoControllerOpenApi;
 import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood_api.domain.model.FotoProduto;
@@ -29,7 +30,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/restaurantes/{restauranteId}/produtos/{produtoId}/foto")
 @AllArgsConstructor
-public class RestauranteProdutoFotoController {
+public class RestauranteProdutoFotoController implements RestauranteProdutoFotoControllerOpenApi {
 
     private CatalogoFotoProdutoService fotoProdutoService ;
     private CadastroProdutoService produtoService ;
@@ -81,15 +82,19 @@ public class RestauranteProdutoFotoController {
     @CheckSecurity.Restaurantes.PodeGerenciarFuncionamento
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public FotoProdutoModel adicionarFoto (@PathVariable Long restauranteId , @PathVariable Long produtoId ,
-                                           @Valid FotoProdutoDTO fotoProdutoDTO) throws IOException {
+                                           @Valid FotoProdutoDTO fotoProdutoDTO ,
+                                           @RequestPart(required = true) MultipartFile arquivo) throws IOException {
 
         Produto produto = produtoService.findById(restauranteId, produtoId);
-        MultipartFile arquivo = fotoProdutoDTO.getArquivo();
 
-        FotoProduto fotoProduto = fotoProdutoDisassembler.fotoProdutoDTOToFotoProduto(fotoProdutoDTO);
-        fotoProduto.setProduto(produto);
+        FotoProduto foto = new FotoProduto();
+        foto.setProduto(produto);
+        foto.setDescricao(fotoProdutoDTO.getDescricao());
+        foto.setContentType(arquivo.getContentType());
+        foto.setTamanho(arquivo.getSize());
+        foto.setNomeArquivo(arquivo.getOriginalFilename());
 
-        FotoProduto fotoSalva = fotoProdutoService.save(fotoProduto , arquivo.getInputStream());
+        FotoProduto fotoSalva = fotoProdutoService.save(foto , arquivo.getInputStream());
 
         return fotoProdutoAssembler.toModel(fotoSalva);
 
@@ -97,8 +102,9 @@ public class RestauranteProdutoFotoController {
     @CheckSecurity.Restaurantes.PodeGerenciarFuncionamento
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removerFoto (@PathVariable Long restauranteId , @PathVariable Long produtoId){
+    public ResponseEntity<Void> removerFoto (@PathVariable Long restauranteId , @PathVariable Long produtoId){
         fotoProdutoService.delete(restauranteId , produtoId);
+        return ResponseEntity.noContent().build();
     }
 
 }

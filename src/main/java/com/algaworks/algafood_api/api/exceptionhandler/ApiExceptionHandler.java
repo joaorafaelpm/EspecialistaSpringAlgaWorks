@@ -29,7 +29,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.nio.file.AccessDeniedException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,7 +39,7 @@ import java.util.stream.Collectors;
  */
 @ControllerAdvice
 @Slf4j
-public class APIExceptionHandler extends ResponseEntityExceptionHandler {
+public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     public static final String SYSTEM_ERROR_MESSAGE = String.format("Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde ou contate o administrador do sistema.");
 
@@ -50,19 +49,19 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     private ResponseEntity<Object> handleMultipleErrorsValidation(Exception ex ,BindingResult bindingResult , HttpHeaders headers,HttpStatus status , WebRequest request) {
         String detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente.";
 //        A gente faz um mapeamento simples para pegar cada campo e passar para a nossa classe
-        List<APIError.Object> problemObjects = bindingResult.getAllErrors()
+        List<ApiError.Object> problemObjects = bindingResult.getAllErrors()
                 .stream().map(objectError -> {
                     String message = messageSource.getMessage(objectError , LocaleContextHolder.getLocale());
                     String name = objectError.getObjectName() ;
                     if (objectError instanceof FieldError) {
                         name = ((FieldError) objectError).getField() ;
                     }
-                    return APIError.Object.builder()
+                    return ApiError.Object.builder()
                             .name(name)
                             .userMessage(message)
                             .build() ;
                 }).collect(Collectors.toList());
-        APIError apiError = createAPIErrorBuilder(status, ProblemType.DADOS_INVALIDOS, detail, detail)
+        ApiError apiError = createAPIErrorBuilder(status, ProblemType.DADOS_INVALIDOS, detail, detail)
                 .objects(problemObjects)
                 .build();
         return handleExceptionInternal(ex , apiError , headers ,status , request);
@@ -89,7 +88,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
 //        Se não tiver nenhum corpo de resposta disponível, a gente padroniza um.
          if (body == null) {
-            body = APIError.builder()
+            body = ApiError.builder()
                     .timestamp(OffsetDateTime.now())
                     .title(ex.getLocalizedMessage())
                     .status(statusCode.value())
@@ -97,7 +96,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         }
 //        Se existir um corpo e for um texto vindo diretamente da exceção, a gente passa ele como corpo.
         else if (body instanceof String) {
-            body = APIError.builder()
+            body = ApiError.builder()
                     .timestamp(OffsetDateTime.now())
                     .userMessage(SYSTEM_ERROR_MESSAGE)
                     .title((String) body)
@@ -118,7 +117,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
                 ex.getParameterName()
         );
 
-        APIError apiError = createAPIErrorBuilder(
+        ApiError apiError = createAPIErrorBuilder(
                 status,
                 ProblemType.PARAMETRO_INVALIDO,
                 detail
@@ -132,7 +131,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleServletRequestBindingException(ServletRequestBindingException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         String detail = "Falha na ligação de parâmetros de requisição";
 
-        APIError apiError = createAPIErrorBuilder(status , ProblemType.PARAMETRO_INVALIDO , detail).build();
+        ApiError apiError = createAPIErrorBuilder(status , ProblemType.PARAMETRO_INVALIDO , detail).build();
         return handleExceptionInternal(ex , apiError , headers, status , request);
     }
 
@@ -140,7 +139,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> handleAuthorizationDeniedException (AuthorizationDeniedException ex , WebRequest request) {
         String detail = ex.getMessage();
         HttpStatus status = HttpStatus.FORBIDDEN;
-        APIError apiError = createAPIErrorBuilder(
+        ApiError apiError = createAPIErrorBuilder(
                 status , ProblemType.AUTHORITY_EXCEPTION , detail
         )
             .userMessage("Você não tem permissão necessária para executar a ação.")
@@ -154,7 +153,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> handlEntidadeNaoEncontrado(
             EntidadeNaoEncontradaException ex , WebRequest request) {
         HttpStatus status = HttpStatus.NOT_FOUND ;
-        APIError apiError = createAPIErrorBuilder(
+        ApiError apiError = createAPIErrorBuilder(
                 status ,ProblemType.RECURSO_NAO_ENCONTRADO , ex.getMessage() , ex.getMessage()
         ).build();
         return handleExceptionInternal(ex , apiError , new HttpHeaders(), status , request );
@@ -164,7 +163,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
             NegocioException ex , WebRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST ;
 
-        APIError apiError = createAPIErrorBuilder(
+        ApiError apiError = createAPIErrorBuilder(
                 status ,ProblemType.NEGOCIO_EXCEPTION , ex.getMessage() , SYSTEM_ERROR_MESSAGE
         ).build();
 
@@ -175,7 +174,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
             EntidadeEmUsoException ex , WebRequest request) {
         HttpStatus status = HttpStatus.CONFLICT ;
         String detail = ex.getMessage() ;
-        APIError apiError = createAPIErrorBuilder(
+        ApiError apiError = createAPIErrorBuilder(
                 status ,ProblemType.ENTIDADE_EM_USO , detail , detail
         )
                 .build();
@@ -183,9 +182,9 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
 //    Criando um builder padrão para a classe de Erro para sofistificar o código
-    private APIError.APIErrorBuilder createAPIErrorBuilder (
+    private ApiError.ApiErrorBuilder createAPIErrorBuilder (
             HttpStatus status , ProblemType problemType , String detail , String userMessage) {
-        return APIError.builder()
+        return ApiError.builder()
                 .timestamp(OffsetDateTime.now())
                 .status(status.value())
                 .type(problemType.getPath())
@@ -194,9 +193,9 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
                 .userMessage(userMessage);
     }
 //    Fazendo uma reescrita de função por que as classes de HttpStatus são diferentes (a do ResponseEntityExceptionHandler -> usa HttpStatusCode enquanto o padrão da aplicação é HttpStatus)
-    private APIError.APIErrorBuilder createAPIErrorBuilder (
+    private ApiError.ApiErrorBuilder createAPIErrorBuilder (
             HttpStatusCode status , ProblemType problemType , String detail) {
-        return APIError.builder()
+        return ApiError.builder()
                 .timestamp(OffsetDateTime.now())
                 .status(status.value())
                 .type(problemType.getPath())
@@ -217,7 +216,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 
         String detail = String.format("O parâmetro da URL '%s' recebeu o valor de '%s', que é um tipo inválido. Corrija e informe um valor compatível ao tipo '%s'." , ex.getPropertyName() , ex.getValue() , ex.getRequiredType().getSimpleName());
 
-        APIError apiError = createAPIErrorBuilder(status, ProblemType.PARAMETRO_INVALIDO , detail).build();
+        ApiError apiError = createAPIErrorBuilder(status, ProblemType.PARAMETRO_INVALIDO , detail).build();
         return handleExceptionInternal(ex,apiError , headers, status, request);
     }
 
@@ -225,7 +224,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         String detail = String.format("O recurso '%s' que você tentou acessar, é inexistente." , ex.getResourcePath());
 
-        APIError apiError = createAPIErrorBuilder(status, ProblemType.RECURSO_NAO_ENCONTRADO , detail).build();
+        ApiError apiError = createAPIErrorBuilder(status, ProblemType.RECURSO_NAO_ENCONTRADO , detail).build();
         return handleExceptionInternal(ex, apiError , headers, status, request);
     }
 
@@ -247,7 +246,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 
         String detail = "O corpo da requisição é inválido. Tente verificar a sintaxe do texto digitado.";
 
-        APIError apiError = createAPIErrorBuilder(
+        ApiError apiError = createAPIErrorBuilder(
                 status ,ProblemType.MENSAGEM_INCOMPREESSIVEL, detail
         )
         .build();
@@ -265,7 +264,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         String detail = String.format("A propriedade '%s' não consta na entidade original do tipo '%s' . Corrija ou remova e informe um valor compatível com " +
                 "a entidade original." , path , ex.getReferringClass().getSimpleName()) ;
 
-        APIError apiError = createAPIErrorBuilder(status, problemType, detail)
+        ApiError apiError = createAPIErrorBuilder(status, problemType, detail)
                 .build();
 
         return handleExceptionInternal(ex ,apiError , headers, status, request);
@@ -279,7 +278,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         String detail = String.format("A propriedade '%s' recebeu o valor " +
                 "'%s' que é um tipo inválido. Corrija e informe um valor compatível com " +
                 "o tipo '%s'" , path , ex.getValue() , ex.getTargetType().getSimpleName()) ;
-        APIError apiError = createAPIErrorBuilder(status, problemType, detail)
+        ApiError apiError = createAPIErrorBuilder(status, problemType, detail)
                 .build();
 
         return handleExceptionInternal(ex ,apiError , headers, status, request);
@@ -293,7 +292,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 
         log.error(ex.getMessage() , ex);
 
-        APIError apiError = createAPIErrorBuilder(
+        ApiError apiError = createAPIErrorBuilder(
                 status ,ProblemType.ERRO_DE_SISTEMA , SYSTEM_ERROR_MESSAGE , SYSTEM_ERROR_MESSAGE
         ).build();
         return handleExceptionInternal(ex , apiError , new HttpHeaders(), status , request );

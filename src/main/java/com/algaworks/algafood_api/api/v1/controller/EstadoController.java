@@ -5,6 +5,7 @@ import com.algaworks.algafood_api.api.v1.assembler.EstadoModelAssembler;
 import com.algaworks.algafood_api.api.v1.assembler.disassambler.EstadoDisassembler;
 import com.algaworks.algafood_api.api.v1.model.EstadoModel;
 import com.algaworks.algafood_api.api.v1.model.DTO.EstadoDTO;
+import com.algaworks.algafood_api.api.v1.openapi.controller.EstadoControllerOpenApi;
 import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.model.Estado;
 import com.algaworks.algafood_api.domain.repository.EstadoRepository;
@@ -13,13 +14,14 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @ResponseBody
 @AllArgsConstructor
 @RequestMapping("/v1/estados")
-public class EstadoController {
+public class EstadoController implements EstadoControllerOpenApi {
 
     private EstadoRepository estadoRepository ;
 
@@ -35,9 +37,9 @@ public class EstadoController {
     }
 
     @CheckSecurity.Estados.PodeConsultar
-    @GetMapping("/{id}")
-    public EstadoModel getById (@PathVariable Long id) {
-        return estadoModelAssembler.toModel(estadoService.findById(id));
+    @GetMapping("/{estadoId}")
+    public EstadoModel getById (@PathVariable Long estadoId) {
+        return estadoModelAssembler.toModel(estadoService.findById(estadoId));
     }
 
     @CheckSecurity.Estados.PodeEditar
@@ -48,19 +50,20 @@ public class EstadoController {
     }
 
     @CheckSecurity.Estados.PodeEditar
-    @PutMapping("/{id}")
-    public  EstadoModel save (@PathVariable Long id , @RequestBody @Valid EstadoDTO estadoDTO) {
-        Estado estadoAntigo = estadoService.findById(id);
+    @PutMapping("/{estadoId}")
+    public  EstadoModel save (@PathVariable Long estadoId , @RequestBody @Valid EstadoDTO estadoDTO) {
+        Estado estadoAntigo = estadoService.findById(estadoId);
         estadoDisassembler.updateEstadoFromDto(estadoDTO , estadoAntigo);
-        Estado estadoSalvo = estadoService.save(id, estadoAntigo);
+        Estado estadoSalvo = estadoService.save(estadoId, estadoAntigo);
         return estadoModelAssembler
                 .toModel(estadoSalvo);
     }
 
     @CheckSecurity.Estados.PodeEditar
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{estadoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void remove (@PathVariable Long id) {
-        estadoService.remove(id);
+    public ResponseEntity<Void> remove (@PathVariable Long estadoId) {
+        estadoService.remove(estadoId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -4,6 +4,7 @@ import com.algaworks.algafood_api.api.v1.assembler.GrupoAssembler;
 import com.algaworks.algafood_api.api.v1.assembler.disassambler.GrupoDisassembler;
 import com.algaworks.algafood_api.api.v1.model.GrupoModel;
 import com.algaworks.algafood_api.api.v1.model.DTO.GrupoDTO;
+import com.algaworks.algafood_api.api.v1.openapi.controller.GrupoControllerOpenApi;
 import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.model.Grupo;
 import com.algaworks.algafood_api.domain.service.CadastroGrupoService;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/grupos")
 @AllArgsConstructor
-public class GrupoController {
+public class GrupoController implements GrupoControllerOpenApi {
 
     private CadastroGrupoService grupoService;
 
@@ -26,38 +27,39 @@ public class GrupoController {
 
     @CheckSecurity.UsuariosGruposPermissoes.PodeConsultar
     @GetMapping
-    public CollectionModel<GrupoModel> findAll () {
+    public CollectionModel<GrupoModel> all () {
         return grupoAssembler.toCollection(grupoService.findAll());
     }
 
     @CheckSecurity.UsuariosGruposPermissoes.PodeConsultar
     @GetMapping("/{grupoId}")
-    public ResponseEntity<GrupoModel> findById (@PathVariable Long grupoId) {
-        return ResponseEntity.ok(grupoAssembler.toModel(grupoService.findById(grupoId)));
+    public GrupoModel getById (@PathVariable Long grupoId) {
+        return grupoAssembler.toModel(grupoService.findById(grupoId));
     }
 
     @CheckSecurity.UsuariosGruposPermissoes.PodeEditar
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public GrupoModel save (@RequestBody @Valid GrupoDTO grupoDTO) {
+    public GrupoModel add (@RequestBody @Valid GrupoDTO grupoDTO) {
         Grupo grupo = grupoDisassembler.grupoDTOToGrupo(grupoDTO);
         return grupoAssembler.toModel(grupoService.save(grupo));
     }
 
     @CheckSecurity.UsuariosGruposPermissoes.PodeEditar
-    @PutMapping("/{id}")
-    public ResponseEntity<GrupoModel> save (@PathVariable Long id , @RequestBody @Valid GrupoDTO grupoDTO) {
-        Grupo grupoAntigo = grupoService.findById(id);
+    @PutMapping("/{grupoId}")
+    public GrupoModel save (@PathVariable Long grupoId , @RequestBody @Valid GrupoDTO grupoDTO) {
+        Grupo grupoAntigo = grupoService.findById(grupoId);
         grupoDisassembler.updateGrupoFromDto(grupoDTO , grupoAntigo);
 
-        return ResponseEntity.ok(grupoAssembler.toModel(grupoService.save(grupoAntigo)));
+        return grupoAssembler.toModel(grupoService.save(grupoAntigo));
         }
 
     @CheckSecurity.UsuariosGruposPermissoes.PodeEditar
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{grupoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void remover (@PathVariable Long id) {
-        grupoService.deleteById(id);
+    public ResponseEntity<Void> remove (@PathVariable Long grupoId) {
+        grupoService.deleteById(grupoId);
+        return ResponseEntity.noContent().build();
     }
 
 }

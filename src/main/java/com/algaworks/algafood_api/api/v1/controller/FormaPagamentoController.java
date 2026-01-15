@@ -4,6 +4,7 @@ import com.algaworks.algafood_api.api.v1.assembler.FormaPagamentoAssembler;
 import com.algaworks.algafood_api.api.v1.assembler.disassambler.FormaPagamentoDisassembler;
 import com.algaworks.algafood_api.api.v1.model.FormaPagamentoModel;
 import com.algaworks.algafood_api.api.v1.model.DTO.FormaPagamentoDTO;
+import com.algaworks.algafood_api.api.v1.openapi.controller.FormaPagamentoControllerOpenApi;
 import com.algaworks.algafood_api.core.security.CheckSecurity;
 import com.algaworks.algafood_api.domain.model.FormaPagamento;
 import com.algaworks.algafood_api.domain.service.CadastroFormaPagamentoService;
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/v1/formas-pagamento")
 @AllArgsConstructor
-public class FormaPagamentoController {
+public class FormaPagamentoController implements FormaPagamentoControllerOpenApi {
 
     private CadastroFormaPagamentoService formaPagamentoService ;
 
@@ -54,11 +55,11 @@ public class FormaPagamentoController {
                 .body(formaPagamentoModels);
     }
     @CheckSecurity.FormasPagamento.PodeConsultar
-    @GetMapping("/{id}")
-    public ResponseEntity<FormaPagamentoModel> getById (@PathVariable Long id , ServletWebRequest request) {
+    @GetMapping("/{formaDePagamentoId}")
+    public ResponseEntity<FormaPagamentoModel> getById (@PathVariable Long formaDePagamentoId , ServletWebRequest request) {
         ShallowEtagHeaderFilter.disableContentCaching(request.getRequest());
         String eTag = "0";
-        OffsetDateTime dataUltimaAtualizacao = formaPagamentoService.getUltimaDataAtualizacaoById(id);
+        OffsetDateTime dataUltimaAtualizacao = formaPagamentoService.getUltimaDataAtualizacaoById(formaDePagamentoId);
 
         if (dataUltimaAtualizacao != null) {
             eTag = String.valueOf(dataUltimaAtualizacao.toEpochSecond());
@@ -68,7 +69,7 @@ public class FormaPagamentoController {
             return null;
         }
         FormaPagamentoModel formaPagamentoModels = formaPagamentoAssembler
-                .toModel(formaPagamentoService.findById(id));
+                .toModel(formaPagamentoService.findById(formaDePagamentoId));
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(10 , TimeUnit.SECONDS).cachePublic())
                 .eTag(eTag)
@@ -82,19 +83,19 @@ public class FormaPagamentoController {
         return formaPagamentoAssembler.toModel(formaPagamentoService.save(formaPagamento)) ;
     }
     @CheckSecurity.FormasPagamento.PodeEditar
-    @PutMapping("/{id}")
-    public  ResponseEntity<FormaPagamentoModel> save (@PathVariable Long id , @RequestBody @Valid FormaPagamentoDTO formaPagamentoDTO) {
-        FormaPagamento formaPagamentoAntigo = formaPagamentoService.findById(id);
+    @PutMapping("/{formaDePagamentoId}")
+    public FormaPagamentoModel save (@PathVariable Long formaDePagamentoId , @RequestBody @Valid FormaPagamentoDTO formaPagamentoDTO) {
+        FormaPagamento formaPagamentoAntigo = formaPagamentoService.findById(formaDePagamentoId);
         formaPagamentoDisassembler.updateFormaPagamentoFromDto(formaPagamentoDTO , formaPagamentoAntigo);
-        return ResponseEntity.ok(formaPagamentoAssembler
+        return formaPagamentoAssembler
                 .toModel(formaPagamentoService
-                        .save(id , formaPagamentoAntigo)));
+                        .save(formaDePagamentoId , formaPagamentoAntigo));
     }
     @CheckSecurity.FormasPagamento.PodeEditar
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}")
-    public void remove (@PathVariable Long id) {
-        formaPagamentoService.remove(id);
+    @DeleteMapping("/{formaDePagamentoId}")
+    public ResponseEntity<Void> remove (@PathVariable Long formaDePagamentoId) {
+        formaPagamentoService.remove(formaDePagamentoId);
+        return ResponseEntity.noContent().build();
     }
 
 
