@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public interface PedidoMapper {
 
     @Bean
+    @Mapping(source = "statusPedido", target = "status")
     @Mapping(source = "enderecoEntrega.cidade.estado.nome" , target = "enderecoEntrega.cidade.estado")
     @Mapping(source = "itens" , target = "itens" , qualifiedByName = "mapItens")
     PedidoModel toModel(Pedido pedido);

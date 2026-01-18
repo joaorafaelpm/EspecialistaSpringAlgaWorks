@@ -1,8 +1,8 @@
 package com.algaworks.algafood_api.core.validation;
 
 import jakarta.validation.Constraint;
-import jakarta.validation.OverridesAttribute;
 import jakarta.validation.Payload;
+import jakarta.validation.constraints.NotBlank;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

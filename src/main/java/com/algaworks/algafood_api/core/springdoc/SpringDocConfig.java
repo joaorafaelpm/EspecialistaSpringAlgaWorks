@@ -68,7 +68,16 @@ public class SpringDocConfig {
                 )
                 .tags(Arrays.asList(
 //                            Adicionando descrição sem  usar a anotação, desta forma ele reconhece a  tag pelo  nome e adiciona a descrição
-                        new Tag().name("Cidades").description("Gerencia as cidades")
+                        new Tag().name("Cidades").description("Gerencia as cidades"),
+                        new Tag().name("Grupos").description("Gerencia os grupos"),
+                        new Tag().name("Cozinhas").description("Gerencia as cozinhas"),
+                        new Tag().name("Formas De Pagamento").description("Gerencia as formas de pagamento"),
+                        new Tag().name("Restaurantes").description("Gerencia os restaurantes"),
+                        new Tag().name("Estados").description("Gerencia os estados"),
+                        new Tag().name("Produtos").description("Gerencia os produtos"),
+                        new Tag().name("Permissões").description("Gerencia os permissões"),
+                        new Tag().name("Usuários").description("Gerencia os usuários"),
+                        new Tag().name("Estatísticas").description("Estatísticas da AlgaFood")
                 ))
 //                Adicionando components,  esses components são o que  compõe  o schema basecamente, nesse caso tudo que nós  fazemos é implementar a nossa classe  de ApiError no projeto  e também generalizar as respostas dos status da aplicação
                 .components(new Components()

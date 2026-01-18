@@ -1,5 +1,6 @@
 package com.algaworks.algafood_api.api.v1.model.DTO;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,9 +14,11 @@ import lombok.Setter;
 
 public class PermissaoDTO {
 
+    @Schema(example = "EDITAR_COZINHAS")
     @NotBlank
     private String nome;
 
+    @Schema(example = "Permite editar cozinhas")
     @NotBlank
     private String descricao;
 

@@ -8,12 +8,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 
-@Tag(name =  "Cidades" , description = "Gerencia as cidades")
+@Tag(name =  "Cidades")
 public interface CidadeControllerOpenApi {
 
     @Operation(summary = "Lista de cidades")
@@ -28,11 +27,13 @@ public interface CidadeControllerOpenApi {
                     description = "Id da cidade inválido",
                     content = @Content(schema = @Schema(ref = "ApiError")))
     })
-    CidadeModel getById(@Parameter(description = "Id de uma cidade" , example = "1"  , required = true) Long cidadeId);
+    CidadeModel getById(
+            @Parameter(description = "Id de uma cidade" , example = "1"  , required = true) Long cidadeId);
 
     @Operation(summary = "Cadastra uma Cidade" ,
             description = "Cadastro de uma Cidade, necesita de um Estado e nome válido")
-    CidadeModel add(@RequestBody(description = "Representação de uma nova cidade", required = true) CidadeDTO cidadeDTO);
+    CidadeModel add(
+            @RequestBody(description = "Representação de uma nova cidade", required = true) CidadeDTO cidadeDTO);
 
     @Operation(summary = "Atualiza uma Cidade por Id", responses = {
             @ApiResponse(responseCode = "200"),

@@ -42,6 +42,8 @@ services:
     depends_on:
       algafood-mysql:
         condition: service_healthy
+    volumes:
+      - "J:/JavaSpring/algaworks-api/algafood-api/catalogo:/app/catalogo"
 
   algafood-proxy:
     build: ./nginx

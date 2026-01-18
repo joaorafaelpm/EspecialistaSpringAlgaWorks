@@ -44,8 +44,6 @@ public class PedidoController implements PedidoControllerOpenApi {
     private PedidoDisassembler pedidoDisassembler;
     private PagedResourcesAssembler<Pedido> pagedResourcesAssembler;
 
-
-
     @CheckSecurity.Pedidos.PodeListar
     @GetMapping
     public PagedModel<PedidoResumoModel> pesquisar(

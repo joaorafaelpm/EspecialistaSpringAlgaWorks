@@ -18,9 +18,6 @@ public interface PedidoDisassembler {
     @Mapping(source = "itens", target = "itens", qualifiedByName = "mapItens")
     Pedido pedidoDTOToPedido(PedidoDTO pedidoDTO);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    void updatePedidoFromDto(PedidoDTO dto, @MappingTarget Pedido entity);
 
     // Mapeia de DTO → Entidade
     @Mapping(target = "produto.id", source = "produtoId")

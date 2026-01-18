@@ -1,5 +1,6 @@
 package com.algaworks.algafood_api.domain.model.enuns;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -12,6 +13,7 @@ public enum StatusPedido {
     CANCELADO("Cancelado" , CRIADO);
 
     @Getter
+    @Schema(example = "Criado")
     private String descricao ;
     private List<StatusPedido> statusAnteriores ;
 

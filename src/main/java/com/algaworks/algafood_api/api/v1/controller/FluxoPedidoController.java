@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/v1/pedidos/{codigo}")
+@RequestMapping("/v1/pedidos/{codigoPedido}")
 @AllArgsConstructor
 public class FluxoPedidoController implements FluxoPedidoControllerOpenApi {
 

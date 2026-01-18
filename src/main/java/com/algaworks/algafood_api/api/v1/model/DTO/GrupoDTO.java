@@ -1,5 +1,6 @@
 package com.algaworks.algafood_api.api.v1.model.DTO;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import lombok.Setter;
 
 public class GrupoDTO {
 
+    @Schema(example = "Gerente")
     @NotBlank
     private String nome ;
 

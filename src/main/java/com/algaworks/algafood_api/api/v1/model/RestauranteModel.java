@@ -1,5 +1,6 @@
 package com.algaworks.algafood_api.api.v1.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,9 +15,11 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class RestauranteModel extends RepresentationModel<RestauranteModel> {
 
-//    Retirei todos os Json view por que agora vamos usar classes de representação do modelo
+    @Schema(example = "1")
     private Long id;
+    @Schema(example = "Thai Gourmet")
     private String nome;
+    @Schema(example = "10.00")
     private BigDecimal taxaFrete;
     private CozinhaModel cozinha;
 
